@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(REPLACE_WITH_YOUR_PROJECT_NAME)
+project(Dead_cells)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -28,8 +28,8 @@ set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
 list(TRANSFORM SRC_FILES PREPEND ${SRC_DIR}/)
 list(TRANSFORM INCLUDE_FILES PREPEND ${INCLUDE_DIR}/)
 
-# file(GLOB_RECURSE SRC_FILES src/*)
-# file(GLOB_RECURSE HEADER_FILES include/*)
+file(GLOB_RECURSE SRC_FILES src/*)
+file(GLOB_RECURSE HEADER_FILES include/*)
 
 add_executable(${PROJECT_NAME}
     ${SRC_DIR}/main.cpp

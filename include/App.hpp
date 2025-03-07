@@ -2,6 +2,8 @@
 #define APP_HPP
 
 #include "pch.hpp" // IWYU pragma: export
+#include "Util/Renderer.hpp"
+#include "Player.hpp"
 
 class App {
 public:
@@ -24,6 +26,8 @@ private:
 
 private:
     State m_CurrentState = State::START;
+    Util::Renderer root;
+    std::shared_ptr<Player> player;
 };
 
 #endif

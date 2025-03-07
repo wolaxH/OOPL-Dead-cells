@@ -6,6 +6,17 @@
 #include "Util/Logger.hpp"
 
 void App::Start() {
+
+    std::vector<std::string> playerImg;
+    playerImg.reserve(46);
+    for (int i = 0; i < 46; i++){
+        playerImg.push_back(RESOURCE_DIR"/Beheaded/idle/idle_" + std::to_string(i) + ".png");
+    }
+    player = std::make_shared<Player>(playerImg, 100);
+    player->SetPos({-112.5f, -140.5f});
+    player->SetZIndex(5);
+    player->SetVisible(true);
+    root.AddChild(player);
     LOG_TRACE("Start");
     m_CurrentState = State::UPDATE;
 }
@@ -13,7 +24,9 @@ void App::Start() {
 void App::Update() {
     
     //TODO: do your things here and delete this line <3
+    player->update();
     
+    root.Update();
     /*
      * Do not touch the code below as they serve the purpose for
      * closing the window.
