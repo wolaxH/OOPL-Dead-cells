@@ -27,7 +27,7 @@ public:
 
     void SetPos(glm::vec2 pos){ m_Transform.translation = pos;}
 
-    void virtual update() = 0;
+    void virtual Update(std::shared_ptr<Util::GameObject> other) = 0;
 
     void SetState(c_state State, std::vector<std::string> path = {});
 
@@ -35,7 +35,9 @@ public:
 
     bool IsContainState(c_state State){return (D_Manager.find(State) != D_Manager.end()) ? true : false;}
 
-    bool IsCollsion(std::shared_ptr<GameObject> other);
+    bool IsCollsion(std::shared_ptr<Util::GameObject> other);
+
+    virtual void FixPos(std::shared_ptr<Util::GameObject> other) = 0;
 
 private:
     std::unordered_map<c_state, std::shared_ptr<Core::Drawable>> D_Manager;  //Drawable Manager

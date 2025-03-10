@@ -4,6 +4,7 @@
 #include "pch.hpp" // IWYU pragma: export
 #include "Util/Renderer.hpp"
 #include "Player.hpp"
+#include "Ground.hpp"
 
 class App {
 public:
@@ -28,6 +29,7 @@ private:
     State m_CurrentState = State::START;
     Util::Renderer root;
     std::shared_ptr<Player> player;
+    std::shared_ptr<Ground> ground, ground2, ground3;    
 };
 
 #endif
