@@ -23,7 +23,7 @@ void Character::SetState(c_state State, std::vector<std::string> path, bool loop
     }
 }
 
-bool Character::IsCollsion(std::shared_ptr<Util::GameObject> other){
+bool Character::IsCollsion(std::shared_ptr<CollsionableObj> other){
 
     glm::vec2 Pos = m_WorldPos;
     glm::vec2 other_Pos = other->m_WorldPos;

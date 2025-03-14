@@ -5,7 +5,7 @@
 #include "Util/Keycode.hpp"
 #include "Util/Logger.hpp"
 
-std::vector<std::shared_ptr<Util::GameObject>> CollsionableObjs;
+std::vector<std::shared_ptr<CollsionableObj>> CollsionableObjs;
 
 void App::Start() {
 
@@ -24,7 +24,6 @@ void App::Start() {
     ground = std::make_shared<Ground>(RESOURCE_DIR"/bg/green.png");
     CollsionableObjs.push_back(ground);
 
-
     ground2 = std::make_shared<Ground>(RESOURCE_DIR"/bg/green.png");
     ground2->m_Transform.translation = {640.0f - camera.GetPos().x, 0.0f - camera.GetPos().y};
     ground2->m_WorldPos = ground2->m_Transform.translation;
@@ -37,7 +36,9 @@ void App::Start() {
     ground3->m_Transform.scale = {0.2f, 2.0f};
     CollsionableObjs.push_back(ground3);
 
-    root.AddChildren(CollsionableObjs);
+    std::vector<std::shared_ptr<Util::GameObject>> temps;
+    for (auto& temp : CollsionableObjs){ temps.push_back(temp);}
+    root.AddChildren(temps);
     LOG_TRACE("Start");
     m_CurrentState = State::UPDATE;
 }

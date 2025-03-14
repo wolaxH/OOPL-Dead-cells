@@ -3,7 +3,7 @@
 
 #include "Character.hpp"
 
-extern std::vector<std::shared_ptr<Util::GameObject>> CollsionableObjs;
+extern std::vector<std::shared_ptr<CollsionableObj>> CollsionableObjs;
 
 class Player : public Character{
 public:
@@ -30,6 +30,6 @@ private:
     float MaxSpeed = 15.0f;
     float Gravity = 0.8f;
     float MaxFallSpeed = 20.0f;
-    int jumpStep = 0;
+    int jumpStep = 0;   //double jump counter
 };
 #endif

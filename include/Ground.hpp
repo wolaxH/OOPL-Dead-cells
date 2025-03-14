@@ -1,11 +1,11 @@
 #ifndef GROUND_HPP
 #define GROUND_HPP
 
-#include "Util/GameObject.hpp"
+#include "CollsionableObj.hpp"
 #include "Util/Image.hpp"
 
 
-class Ground : public Util::GameObject{
+class Ground : public CollsionableObj{
 public:
     Ground(const std::string& path);
     ~Ground() =  default;

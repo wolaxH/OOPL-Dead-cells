@@ -1,8 +1,9 @@
 #ifndef CHARACTER_HPP
 #define CHARACTER_HPP
 
-#include "Util/GameObject.hpp"
 #include "Util/Animation.hpp"
+
+#include "CollsionableObj.hpp"
 
 #include <unordered_map>
 
@@ -16,7 +17,7 @@ enum class c_state{
     atk
 };
 
-class Character : public Util::GameObject{
+class Character : public CollsionableObj{
 public:    
     Character(std::vector<std::string>& path, int Hp);
     ~Character() noexcept = default;
@@ -29,7 +30,7 @@ public:
 
     c_state GetState(){ return State;}
 
-    bool IsCollsion(std::shared_ptr<Util::GameObject> other);
+    bool IsCollsion(std::shared_ptr<CollsionableObj> other);
 
 protected:
     bool IsContainState(c_state State){return (D_Manager.find(State) != D_Manager.end()) ? true : false;}

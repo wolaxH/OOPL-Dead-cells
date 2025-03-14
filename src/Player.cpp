@@ -49,14 +49,10 @@ void Player::Move(){    //WIP jump and fall
         else if (VelocityX > MaxSpeed) VelocityX = MaxSpeed;
     }
     else{   //do nothing
-        
-        // idle
-        if (InGround()){
-            //  set state
-            if (GetState() != c_state::idle) SetState(c_state::idle);
+        if (InGround()){    // idle
+            if (GetState() != c_state::idle) SetState(c_state::idle);//  set state
     
-            //slow down
-            if (VelocityX > 0){
+            if (VelocityX > 0){ //slow down
                 VelocityX -= Friction;
                 if (VelocityX < 0) VelocityX = 0;
             }
