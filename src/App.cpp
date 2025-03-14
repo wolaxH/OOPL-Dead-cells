@@ -5,8 +5,7 @@
 #include "Util/Keycode.hpp"
 #include "Util/Logger.hpp"
 
-std::vector<std::shared_ptr<Ground>> grounds;
-std::vector<std::shared_ptr<Util::GameObject>> Collsionable;
+std::vector<std::shared_ptr<Util::GameObject>> CollsionableObjs;
 
 void App::Start() {
 
@@ -17,35 +16,40 @@ void App::Start() {
     }
     player = std::make_shared<Player>(playerImg, 100);
     player->SetPos({0, 0});    
-    /*遊戲pos 設定為225px/2 = 30gamepos ; 1gamepos = 3.75px*/
     player->SetZIndex(5);
     player->SetVisible(true);
     root.AddChild(player);
+    camera.SetPos(player->m_WorldPos);
 
     ground = std::make_shared<Ground>(RESOURCE_DIR"/bg/green.png");
-    grounds.push_back(ground);
+    CollsionableObjs.push_back(ground);
+
 
     ground2 = std::make_shared<Ground>(RESOURCE_DIR"/bg/green.png");
-    ground2->m_Transform.translation = {640.0f, 0.0f};
+    ground2->m_Transform.translation = {640.0f - camera.GetPos().x, 0.0f - camera.GetPos().y};
+    ground2->m_WorldPos = ground2->m_Transform.translation;
     ground2->m_Transform.scale = {0.2f, 2.0f};
-    grounds.push_back(ground2);
+    CollsionableObjs.push_back(ground2);
 
     ground3 = std::make_shared<Ground>(RESOURCE_DIR"/bg/green.png");
-    ground3->m_Transform.translation = {-640.0f, 0.0f};
+    ground3->m_Transform.translation = {-640.0f - camera.GetPos().x, 0.0f - camera.GetPos().y};
+    ground3->m_WorldPos = ground3->m_Transform.translation;
     ground3->m_Transform.scale = {0.2f, 2.0f};
-    grounds.push_back(ground3);
+    CollsionableObjs.push_back(ground3);
 
-    root.AddChild(ground);
-    root.AddChild(ground2);
-    root.AddChild(ground3);
+    root.AddChildren(CollsionableObjs);
     LOG_TRACE("Start");
     m_CurrentState = State::UPDATE;
 }
 
 void App::Update() {
     
-    //TODO: do your things here and delete this line <3
-    player->Update(ground);
+    player->Update();
+    camera.Update(player);
+    for (auto& CollsionableObj : CollsionableObjs){
+        CollsionableObj->m_Transform.translation.x = CollsionableObj->m_WorldPos.x - camera.GetPos().x;
+        CollsionableObj->m_Transform.translation.y = CollsionableObj->m_WorldPos.y - camera.GetPos().y;
+    }
     root.Update();
     /*
      * Do not touch the code below as they serve the purpose for

@@ -5,6 +5,7 @@
 #include "Util/Renderer.hpp"
 #include "Player.hpp"
 #include "Ground.hpp"
+#include "Camera.hpp"
 
 class App {
 public:
@@ -29,7 +30,8 @@ private:
     State m_CurrentState = State::START;
     Util::Renderer root;
     std::shared_ptr<Player> player;
-    std::shared_ptr<Ground> ground, ground2, ground3;    
+    std::shared_ptr<Ground> ground, ground2, ground3;
+    Camera camera;
 };
 
 #endif

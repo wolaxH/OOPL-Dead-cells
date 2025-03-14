@@ -3,6 +3,7 @@ set(SRC_FILES
     Character.cpp
     Player.cpp
     Ground.cpp
+    Camera.cpp
 )
 
 set(INCLUDE_FILES
@@ -10,6 +11,7 @@ set(INCLUDE_FILES
     Character.hpp
     Player.hpp
     Ground.hpp    
+    Camera.hpp
 )
 
 set(TEST_FILES

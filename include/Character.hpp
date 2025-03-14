@@ -16,32 +16,31 @@ enum class c_state{
     atk
 };
 
-
 class Character : public Util::GameObject{
 public:    
     Character(std::vector<std::string>& path, int Hp);
-
     ~Character() noexcept = default;
 
-    //void setPath(const std::string& Path){path = Path;}
+    void SetPos(glm::vec2 pos){ m_WorldPos = pos;}
 
-    void SetPos(glm::vec2 pos){ m_Transform.translation = pos;}
+    void virtual Update() = 0;
 
-    void virtual Update(std::shared_ptr<Util::GameObject> other) = 0;
-
-    void SetState(c_state State, std::vector<std::string> path = {});
+    void SetState(c_state State, std::vector<std::string> path = {}, bool loop = true);
 
     c_state GetState(){ return State;}
 
-    bool IsContainState(c_state State){return (D_Manager.find(State) != D_Manager.end()) ? true : false;}
-
     bool IsCollsion(std::shared_ptr<Util::GameObject> other);
 
-    virtual void FixPos(std::shared_ptr<Util::GameObject> other) = 0;
+protected:
+    bool IsContainState(c_state State){return (D_Manager.find(State) != D_Manager.end()) ? true : false;}
+
+private:
+    virtual void FixPos() = 0;
 
 private:
     std::unordered_map<c_state, std::shared_ptr<Core::Drawable>> D_Manager;  //Drawable Manager
-    c_state State; 
+    c_state State;      //current stateq
+    glm::vec2 w_Pos;    //world position
     int Hp;
 };
 
