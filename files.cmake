@@ -3,7 +3,6 @@ set(SRC_FILES
     Character.cpp
     Player.cpp
     Ground.cpp
-    Camera.cpp
 )
 
 set(INCLUDE_FILES
@@ -12,6 +11,7 @@ set(INCLUDE_FILES
     Player.hpp
     Ground.hpp    
     Camera.hpp
+    CollsionableObj.hpp
 )
 
 set(TEST_FILES

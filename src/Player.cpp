@@ -6,31 +6,23 @@ Player::Player(std::vector<std::string>& path, int Hp) : Character(path, Hp){
     m_Transform.scale = {1.5f, 1.5f};
 }
 
-void Player::InitState(c_state state, const std::vector<std::size_t>& frames, const std::vector<std::string>& paths){
-
-    std::vector<std::string> Img;
-    std::vector<std::string> temp;
-
-    for (std::size_t i =0; i < frames.size(); i++){
-        temp.clear();
-        for (std::size_t j = 0; j < frames[i]; j++){temp.push_back(paths[i] + std::to_string(j) + ".png");}
-        Img.insert(Img.end(), temp.begin(), temp.end());
-    }
-
-    if (state == c_state::jump || state == c_state::fall) SetState(state, Img, false);
-    else SetState(state, Img);
+void Player::Attack(){
+    
 }
+
+
+/*-----------------------------------move-----------------------------------*/
 
 void Player::Move(){    //WIP jump and fall
     if (Util::Input::IsKeyPressed(Util::Keycode::LEFT)){    //press right
         
         m_Transform.scale.x = -1.5; //turn the player Img
-
+        
         if (GetState() != c_state::L_move && InGround()){   //  change the state or add a new one
             if (IsContainState(c_state::L_move)){ SetState(c_state::L_move);}
             else{ InitState(c_state::L_move, {20}, {RESOURCE_DIR"/Beheaded/runA/runA_"});}
         }
-
+        
         //  chaenge pos
         if (VelocityX > -1*MaxSpeed) VelocityX += -1*AccelerationX;
         else if (VelocityX < -1*MaxSpeed) VelocityX = -1*MaxSpeed;
@@ -51,7 +43,7 @@ void Player::Move(){    //WIP jump and fall
     else{   //do nothing
         if (InGround()){    // idle
             if (GetState() != c_state::idle) SetState(c_state::idle);//  set state
-    
+            
             if (VelocityX > 0){ //slow down
                 VelocityX -= Friction;
                 if (VelocityX < 0) VelocityX = 0;
@@ -79,10 +71,10 @@ void Player::Move(){    //WIP jump and fall
     }
 }
 
-void Player::Jump(){    //WIP add double junp anima
+void Player::Jump(){    //WIP add anima
     if (InGround()) jumpStep = 0;   
     if (jumpStep == 2) return;
-
+    
     jumpStep++;
     if (GetState() != c_state::jump){
         if (IsContainState(c_state::jump)){
@@ -95,6 +87,21 @@ void Player::Jump(){    //WIP add double junp anima
         }
     }
     VelocityY = 12.5f; 
+}
+
+void Player::InitState(c_state state, const std::vector<std::size_t>& frames, const std::vector<std::string>& paths){
+
+    std::vector<std::string> Img;
+    std::vector<std::string> temp;
+
+    for (std::size_t i =0; i < frames.size(); i++){
+        temp.clear();
+        for (std::size_t j = 0; j < frames[i]; j++){temp.push_back(paths[i] + std::to_string(j) + ".png");}
+        Img.insert(Img.end(), temp.begin(), temp.end());
+    }
+
+    if (state == c_state::jump || state == c_state::fall) SetState(state, Img, false);
+    else SetState(state, Img);
 }
 
 void Player::applyGravity(){    //WIP add fall anima and state (may in Move func)
@@ -153,6 +160,8 @@ bool Player::InGround(){
     return false;
 }
 
+
+/*-----------------------------------update-----------------------------------*/
 void Player::Update(){
     Move();
     applyGravity();

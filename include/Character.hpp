@@ -32,6 +32,8 @@ public:
 
     bool IsCollsion(std::shared_ptr<CollsionableObj> other);
 
+    void virtual Attack() = 0;
+
 protected:
     bool IsContainState(c_state State){return (D_Manager.find(State) != D_Manager.end()) ? true : false;}
 
@@ -41,7 +43,6 @@ private:
 private:
     std::unordered_map<c_state, std::shared_ptr<Core::Drawable>> D_Manager;  //Drawable Manager
     c_state State;      //current stateq
-    glm::vec2 w_Pos;    //world position
     int Hp;
 };
 

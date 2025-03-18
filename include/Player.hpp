@@ -4,11 +4,14 @@
 #include "Character.hpp"
 
 extern std::vector<std::shared_ptr<CollsionableObj>> CollsionableObjs;
+extern std::vector<std::shared_ptr<Character>> Mobs;
 
 class Player : public Character{
 public:
     Player(std::vector<std::string>& path, int Hp);
     ~Player() noexcept = default;
+
+    void Attack() override;
 
     void Update() override;
     

@@ -3,10 +3,11 @@
 
 #include "Util/GameObject.hpp"
 
-class UI : public{
+class UI : public Util::GameObject{
+public:
+
+private:
 
 };
-
-
 
 #endif

@@ -6,6 +6,7 @@
 #include "Util/Logger.hpp"
 
 std::vector<std::shared_ptr<CollsionableObj>> CollsionableObjs;
+std::vector<std::shared_ptr<Character>> Mobs;
 
 void App::Start() {
 
@@ -47,9 +48,9 @@ void App::Update() {
     
     player->Update();
     camera.Update(player);
-    for (auto& CollsionableObj : CollsionableObjs){
-        CollsionableObj->m_Transform.translation.x = CollsionableObj->m_WorldPos.x - camera.GetPos().x;
-        CollsionableObj->m_Transform.translation.y = CollsionableObj->m_WorldPos.y - camera.GetPos().y;
+    for (auto& temp : CollsionableObjs){
+        temp->m_Transform.translation.x = temp->m_WorldPos.x - camera.GetPos().x;
+        temp->m_Transform.translation.y = temp->m_WorldPos.y - camera.GetPos().y;
     }
     root.Update();
     /*
