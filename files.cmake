@@ -2,16 +2,19 @@ set(SRC_FILES
     App.cpp
     Character.cpp
     Player.cpp
-    Ground.cpp
+    SolidObj.cpp
+    Zombie.cpp
 )
 
 set(INCLUDE_FILES
     App.hpp
     Character.hpp
     Player.hpp
-    Ground.hpp    
+    SolidObj.hpp    
     Camera.hpp
-    CollsionableObj.hpp
+    MapObj.hpp
+    Zombie.hpp
+    Mob.hpp
 )
 
 set(TEST_FILES

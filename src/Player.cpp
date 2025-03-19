@@ -104,7 +104,7 @@ void Player::InitState(c_state state, const std::vector<std::size_t>& frames, co
     else SetState(state, Img);
 }
 
-void Player::applyGravity(){    //WIP add fall anima and state (may in Move func)
+void Player::applyGravity(){
     if (!InGround()){
         VelocityY -= Gravity;
         //if (VelocityY <= 0){}
@@ -118,11 +118,11 @@ void Player::applyGravity(){    //WIP add fall anima and state (may in Move func
 void Player::FixPos(){
     int breakFlag = 0;
     
-    for (auto&CollsionableObj : CollsionableObjs){
+    for (auto&Solid : SolidObjs){
         breakFlag = 0;
         
         m_WorldPos.x += VelocityX;
-        if (IsCollsion(CollsionableObj)){
+        if (IsCollsion(Solid)){
             m_WorldPos.x -= VelocityX;
             VelocityX = 0;
             breakFlag++;
@@ -130,7 +130,7 @@ void Player::FixPos(){
         m_WorldPos.x -= VelocityX;
         
         m_WorldPos.y += VelocityY;
-        if (IsCollsion(CollsionableObj)){
+        if (IsCollsion(Solid)){
             m_WorldPos.y -= VelocityY;
             VelocityY = 0;
             breakFlag++;
@@ -149,9 +149,9 @@ bool Player::InGround(){
     glm::vec2 other_distance;
     float x, y;
 
-    for (auto& CollsionableObj : CollsionableObjs){
-        other_Pos = CollsionableObj->m_WorldPos;
-        other_distance = CollsionableObj->GetScaledSize() / 2.0f;
+    for (auto& Solid : SolidObjs){
+        other_Pos = Solid->m_WorldPos;
+        other_distance = Solid->GetScaledSize() / 2.0f;
 
         x = !((Pos.x < other_Pos.x - other_distance.x - 1) || (Pos.x > other_Pos.x + other_distance.x + 1));
         y = (Pos.y > other_Pos.y - other_distance.y) && (Pos.y < other_Pos.y + other_distance.y + 2);

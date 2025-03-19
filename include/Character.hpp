@@ -3,12 +3,14 @@
 
 #include "Util/Animation.hpp"
 
-#include "CollsionableObj.hpp"
+#include "MapObj.hpp"
+#include "SolidObj.hpp"
 
 #include <unordered_map>
 
+extern std::vector<std::shared_ptr<SolidObj>> SolidObjs;
 
-enum class c_state{
+enum class c_state{ //Character state
     idle,
     L_move,
     R_move,
@@ -17,7 +19,7 @@ enum class c_state{
     atk
 };
 
-class Character : public CollsionableObj{
+class Character : public MapObj{
 public:    
     Character(std::vector<std::string>& path, int Hp);
     ~Character() noexcept = default;
@@ -30,7 +32,7 @@ public:
 
     c_state GetState(){ return State;}
 
-    bool IsCollsion(std::shared_ptr<CollsionableObj> other);
+    bool IsCollsion(std::shared_ptr<MapObj> other);
 
     void virtual Attack() = 0;
 
@@ -42,7 +44,7 @@ private:
 
 private:
     std::unordered_map<c_state, std::shared_ptr<Core::Drawable>> D_Manager;  //Drawable Manager
-    c_state State;      //current stateq
+    c_state State;      //current state
     int Hp;
 };
 

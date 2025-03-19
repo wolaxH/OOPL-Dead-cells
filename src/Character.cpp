@@ -1,6 +1,5 @@
 #include "Character.hpp"
 
-
 #include "Util/Logger.hpp"
 
 Character::Character(std::vector<std::string>& path, int Hp) : Hp(Hp){
@@ -23,7 +22,7 @@ void Character::SetState(c_state State, std::vector<std::string> path, bool loop
     }
 }
 
-bool Character::IsCollsion(std::shared_ptr<CollsionableObj> other){
+bool Character::IsCollsion(std::shared_ptr<MapObj> other){
 
     glm::vec2 Pos = m_WorldPos;
     glm::vec2 other_Pos = other->m_WorldPos;
