@@ -36,16 +36,37 @@ public:
 
     void virtual Attack() = 0;
 
+
 protected:
     bool IsContainState(c_state State){return (D_Manager.find(State) != D_Manager.end()) ? true : false;}
 
-private:
-    virtual void FixPos() = 0;
+    //player util
+    bool InGround();
+    /*
+        @param path eg:RESOURCE_DIR"Zombie/move/move_"
+    */
+    void InitState(c_state state, const std::vector<std::size_t>& frames = {}, const std::vector<std::string>& paths = {});
+    
+    //for update pos
+    void applyGravity();
+    void FixPos();
+    virtual void Move() = 0;
+
+protected:
+    float VelocityX = 0, VelocityY = 0; //speed
+    float MaxSpeed = 15.0f;
+    float AccelerationX = 2;    //加速度
+    const float Friction = 1.5f;   //摩擦力(減速速度)
+    const float Gravity = 0.8f;
+    const float MaxFallSpeed = 20.0f;
+
+
+    float AtkRange;
+    int Hp;
 
 private:
     std::unordered_map<c_state, std::shared_ptr<Core::Drawable>> D_Manager;  //Drawable Manager
     c_state State;      //current state
-    int Hp;
 };
 
 #endif

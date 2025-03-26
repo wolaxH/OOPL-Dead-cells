@@ -4,6 +4,7 @@
 
 Player::Player(std::vector<std::string>& path, int Hp) : Character(path, Hp){
     m_Transform.scale = {1.5f, 1.5f};
+    top = 60, bottom = 0, left = 10, right = 10;
 }
 
 void Player::Attack(){
@@ -73,7 +74,7 @@ void Player::Move(){    //WIP jump and fall
 
 void Player::Jump(){    //WIP add anima
     if (InGround()) jumpStep = 0;   
-    if (jumpStep == 2) return;
+    //if (jumpStep == 2) return;
     
     jumpStep++;
     if (GetState() != c_state::jump){
@@ -89,76 +90,6 @@ void Player::Jump(){    //WIP add anima
     VelocityY = 12.5f; 
 }
 
-void Player::InitState(c_state state, const std::vector<std::size_t>& frames, const std::vector<std::string>& paths){
-
-    std::vector<std::string> Img;
-    std::vector<std::string> temp;
-
-    for (std::size_t i =0; i < frames.size(); i++){
-        temp.clear();
-        for (std::size_t j = 0; j < frames[i]; j++){temp.push_back(paths[i] + std::to_string(j) + ".png");}
-        Img.insert(Img.end(), temp.begin(), temp.end());
-    }
-
-    if (state == c_state::jump || state == c_state::fall) SetState(state, Img, false);
-    else SetState(state, Img);
-}
-
-void Player::applyGravity(){
-    if (!InGround()){
-        VelocityY -= Gravity;
-        //if (VelocityY <= 0){}
-        if (VelocityY < -1*MaxFallSpeed) VelocityY = -1*MaxFallSpeed;
-    }
-    else{
-        if (VelocityY < 0) VelocityY = 0;
-    }
-}
-
-void Player::FixPos(){
-    int breakFlag = 0;
-    
-    for (auto&Solid : SolidObjs){
-        breakFlag = 0;
-        
-        m_WorldPos.x += VelocityX;
-        if (IsCollsion(Solid)){
-            m_WorldPos.x -= VelocityX;
-            VelocityX = 0;
-            breakFlag++;
-        }
-        m_WorldPos.x -= VelocityX;
-        
-        m_WorldPos.y += VelocityY;
-        if (IsCollsion(Solid)){
-            m_WorldPos.y -= VelocityY;
-            VelocityY = 0;
-            breakFlag++;
-        }
-        m_WorldPos.y -= VelocityY;
-        
-        if (breakFlag == 2) break;
-    }
-}
-
-bool Player::InGround(){
-
-    glm::vec2 Pos = m_WorldPos;
-    glm::vec2 other_Pos;
-
-    glm::vec2 other_distance;
-    float x, y;
-
-    for (auto& Solid : SolidObjs){
-        other_Pos = Solid->m_WorldPos;
-        other_distance = Solid->GetScaledSize() / 2.0f;
-
-        x = !((Pos.x < other_Pos.x - other_distance.x - 1) || (Pos.x > other_Pos.x + other_distance.x + 1));
-        y = (Pos.y > other_Pos.y - other_distance.y) && (Pos.y < other_Pos.y + other_distance.y + 2);
-        if (x && y) return true;
-    }
-    return false;
-}
 
 
 /*-----------------------------------update-----------------------------------*/

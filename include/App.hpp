@@ -8,6 +8,7 @@
 #include "SolidObj.hpp"
 #include "Camera.hpp"
 #include "MapObj.hpp"
+#include "Zombie.hpp"
 
 class App {
 public:
@@ -33,6 +34,8 @@ private:
     Util::Renderer root;
     std::shared_ptr<Player> player;
     std::shared_ptr<SolidObj> ground, ground2, ground3;
+    std::shared_ptr<Zombie> zombie;
+    std::vector<std::shared_ptr<MapObj>> MapObjs;
     Camera camera;
 };
 

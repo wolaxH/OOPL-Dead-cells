@@ -2,15 +2,33 @@
 #define MOB_HPP
 
 #include "Character.hpp"
+#include "Player.hpp"
+
+enum class mob_state{
+    trace,
+    wander
+};
 
 class Mob : public Character{
 public:
-    Mob() = default;
+    Mob(std::vector<std::string>& path, int Hp, std::shared_ptr<Player> player)
+    : Character(path, Hp), player(player){MaxSpeed = 5.0f, AccelerationX = 1.5f;}
     ~Mob() = default;
 
-    virtual void DetectPlayer() = 0;
+protected:
+    virtual bool IsPlayerNearby() = 0;
 
-private:
+    void PushPlayer(){
+        if (IsCollsion(player)){
+            player->Pushed();            
+        }    
+    }
+
+protected:
+    bool AtkFlag = false;
+    float DetectRange;
+    mob_state m_state = mob_state::wander;
+    std::shared_ptr<Player> player;
 
 };
 
