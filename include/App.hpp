@@ -3,25 +3,36 @@
 
 #include "pch.hpp" // IWYU pragma: export
 #include "Util/Renderer.hpp"
+#include "Util/Text.hpp"
+
 
 #include "Player.hpp"
 #include "SolidObj.hpp"
 #include "Camera.hpp"
 #include "MapObj.hpp"
 #include "Zombie.hpp"
+#include "Button.hpp"
+#include "Menu.hpp"
+
+#include <thread>
+#include <chrono>
 
 class App {
 public:
     enum class State {
-        START,
+        INIT_MENU,
+        MENU,
+        INIT_UPDATE,
         UPDATE,
         END,
     };
 
     State GetCurrentState() const { return m_CurrentState; }
 
-    void Start();
+    void Init_Start();
+    void Start();    
 
+    void Init_Update();   //into game
     void Update();
 
     void End(); // NOLINT(readability-convert-member-functions-to-static)
@@ -29,9 +40,20 @@ public:
 private:
     void ValidTask();
 
-private:
-    State m_CurrentState = State::START;
+private:    //App Objs
+    State m_CurrentState = State::INIT_MENU;
     Util::Renderer root;
+    std::shared_ptr<Util::GameObject> WIP;
+    bool WIPFlag = false;
+
+private:    //Menu Objs
+    std::shared_ptr<Util::GameObject> Menu_Bg;
+    std::shared_ptr<Menu> StartMenu;
+    std::shared_ptr<Button> PlayButton;
+    std::shared_ptr<Button> OptionButton;
+    std::shared_ptr<Button> ExitButton;
+
+private:    //ingame Objs
     std::shared_ptr<Player> player;
     std::shared_ptr<SolidObj> ground, ground2, ground3;
     std::shared_ptr<Zombie> zombie;

@@ -91,11 +91,65 @@ void Player::Jump(){    //WIP add anima
 }
 
 
+/*
+    Clinb:
+        setPos
+        當動畫撥放完之前不能move
+        動畫播完後c_state = idle
+*/
+
+void Player::Clinb(){
+    if (InGround()) return;
+    if (GetState() == c_state::clinb){
+        auto temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
+        if (temp->GetCurrentFrameIndex() == temp->GetFrameCount() - 1){ //結束動畫
+            SetState(c_state::idle);
+            std::shared_ptr<Util::Animation> temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
+            temp->Play();
+        }
+    }
+
+    for (auto Solid : SolidObjs){
+        if ((m_WorldPos.y + top*m_Transform.scale.y > Solid->m_WorldPos.y + Solid->top*Solid->m_Transform.scale.y &&
+            m_WorldPos.y < Solid->m_WorldPos.y + Solid->top*Solid->m_Transform.scale.y) &&
+            ((m_WorldPos.x - left*m_Transform.scale.x < Solid->m_WorldPos.x + Solid->right*Solid->m_Transform.scale.x + 3 &&
+            m_WorldPos.x > Solid->m_WorldPos.x - Solid->left*Solid->m_Transform.scale.x) ||
+            (m_WorldPos.x + right*m_Transform.scale.x > Solid->m_WorldPos.x - Solid->left*Solid->m_Transform.scale.x - 3 && 
+            m_WorldPos.x < Solid->m_WorldPos.x + Solid->right*Solid->m_Transform.scale.x))){
+            
+                if (IsContainState(c_state::clinb)){
+                    SetState(c_state::clinb);
+                    std::shared_ptr<Util::Animation> temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
+                    temp->Play();
+                }
+                else{
+                    InitState(c_state::clinb, {4}, {RESOURCE_DIR"/Beheaded/jump/jumpThrough_"});
+                }
+
+                m_WorldPos.y = Solid->m_WorldPos.y + Solid->top*Solid->m_Transform.scale.y + 1;
+                VelocityY = 0;
+                if(m_Transform.scale.x > 0){
+                    m_WorldPos.x = Solid->m_WorldPos.x - Solid->left*Solid->m_Transform.scale.x + 1;
+                    VelocityX = 0;
+                }
+                else if (m_Transform.scale.x < 0){
+                    m_WorldPos.x = Solid->m_WorldPos.x + Solid->right*Solid->m_Transform.scale.x - 1;
+                    VelocityX = 0;
+                }
+                break;
+        }
+    }
+}
+
+
 
 /*-----------------------------------update-----------------------------------*/
 void Player::Update(){
-    Move();
+    if (!(GetState() == c_state::clinb)){
+        Move();
+    }
     applyGravity();
+    Clinb();
     FixPos();
 
     m_WorldPos.x += VelocityX;

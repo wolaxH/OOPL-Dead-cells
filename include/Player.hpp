@@ -32,6 +32,7 @@ public:
     
 private:
 
+    void Clinb();   //攀爬
     void Move() override;
     void Jump();
 private:

@@ -71,7 +71,7 @@ void Character::InitState(c_state state, const std::vector<std::size_t>& frames,
         Img.insert(Img.end(), temp.begin(), temp.end());
     }
 
-    if (state == c_state::jump || state == c_state::fall || state == c_state::atk) SetState(state, Img, false);
+    if (state == c_state::jump || state == c_state::fall || state == c_state::atk || state == c_state::clinb) SetState(state, Img, false);
     else SetState(state, Img);
 }
 

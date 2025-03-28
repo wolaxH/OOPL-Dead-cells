@@ -16,7 +16,8 @@ enum class c_state{ //Character state
     R_move,
     jump,
     fall,
-    atk
+    atk,
+    clinb
 };
 
 class Character : public MapObj{

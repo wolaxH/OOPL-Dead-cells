@@ -110,7 +110,7 @@ void Zombie::Move(){
 void Zombie::Update(){
     Move();
     applyGravity();
-    /*
+    
     if ((VelocityX > 0 && player->m_WorldPos.x > m_WorldPos.x && player->m_WorldPos.x < m_WorldPos.x + right) ||
         (VelocityX < 0 && player->m_WorldPos.x < m_WorldPos.x && player->m_WorldPos.x > m_WorldPos.x - left)){
     
@@ -124,7 +124,7 @@ void Zombie::Update(){
         Attack();
     }
     else if (GetState() == c_state::atk) Attack();
-    */
+    
     PushPlayer();
     FixPos();
 
