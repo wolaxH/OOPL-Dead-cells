@@ -25,7 +25,7 @@ public:
             if (VelocityX < 5) VelocityX = 5.0f;
         }
         else if (VelocityX < 0){
-            VelocityX += 2.0f;
+            VelocityX *= 0.5f;
             if (VelocityX > -5) VelocityX = -5.0f;
         }
     }
@@ -35,6 +35,7 @@ private:
     void Clinb();   //攀爬
     void Move() override;
     void Jump();
+
 private:
     
     int jumpStep = 0;   //double jump counter

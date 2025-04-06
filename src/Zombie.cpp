@@ -7,15 +7,20 @@
 
 void Zombie::Attack(){  //player
 
-    std::shared_ptr<Util::Animation> temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
-    if (temp->GetState() != Util::Animation::State::PLAY/*temp->GetCurrentFrameIndex() == temp->GetFrameCount()-1*/){
+    //rendering 
+    auto temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
+    if (temp->GetState() != Util::Animation::State::PLAY){  // init atk behavior
         SetState(c_state::idle);
         AtkFlag = false;
         return;
     }
-    if (AtkFlag) return;
-    if (temp->GetCurrentFrameIndex() >= temp->GetFrameCount()-4 || temp->GetCurrentFrameIndex() < 17 ) return;
+    //rendering end
 
+    if (AtkFlag) return;    //already attacked
+    if (temp->GetCurrentFrameIndex() >= temp->GetFrameCount()-4 ||  //atkable frame only 18 ~ 24
+        temp->GetCurrentFrameIndex() < 17 ) return; 
+
+    //the real atk logic
     if (m_Transform.scale.x > 0){   //atk forward right
         if (player->m_WorldPos.x > m_WorldPos.x && player->m_WorldPos.x < m_WorldPos.x + AtkRange){
             player->Attacked(AtkPoint);
@@ -28,6 +33,7 @@ void Zombie::Attack(){  //player
             AtkFlag = true;
         }
     }
+    //atk logic end
 }
 
 bool Zombie::IsPlayerNearby(){
@@ -36,9 +42,10 @@ bool Zombie::IsPlayerNearby(){
 }
 
 void Zombie::Move(){
-    if (GetState() == c_state::atk) return;
+    if (GetState() == c_state::atk) return; //atk cannot move
 
-    if (IsPlayerNearby()){  //trace player
+    //trace player
+    if (IsPlayerNearby()){  
         //c_state = move
         m_state = mob_state::trace;
         if (player->m_WorldPos.x > m_WorldPos.x + 10){   
@@ -77,11 +84,12 @@ void Zombie::Move(){
                 timer.SetChangeTime(2000, 5000);
                 break;
             default:
+                nextstate = c_state::idle;
                 break;
             }
             //set state
-            if (!IsContainState(nextstate)){ InitState(nextstate, {22}, {RESOURCE_DIR"/Zombie/move/move_"});}
-            else SetState(nextstate);
+            if (IsContainState(nextstate))SetState(nextstate);
+            else InitState(nextstate, {22}, {RESOURCE_DIR"/Zombie/move/move_"});
             //turn
             if (GetState() == c_state::L_move) m_Transform.scale.x = -1;
             else if (GetState() == c_state::R_move) m_Transform.scale.x = 1;
@@ -111,6 +119,7 @@ void Zombie::Update(){
     Move();
     applyGravity();
     
+    //atk behavior
     if ((VelocityX > 0 && player->m_WorldPos.x > m_WorldPos.x && player->m_WorldPos.x < m_WorldPos.x + right) ||
         (VelocityX < 0 && player->m_WorldPos.x < m_WorldPos.x && player->m_WorldPos.x > m_WorldPos.x - left)){
     
@@ -124,6 +133,7 @@ void Zombie::Update(){
         Attack();
     }
     else if (GetState() == c_state::atk) Attack();
+    //atk end
     
     PushPlayer();
     FixPos();

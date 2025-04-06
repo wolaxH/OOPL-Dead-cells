@@ -8,13 +8,12 @@ Player::Player(std::vector<std::string>& path, int Hp) : Character(path, Hp){
 }
 
 void Player::Attack(){
-    
+    //WIP
 }
-
 
 /*-----------------------------------move-----------------------------------*/
 
-void Player::Move(){    //WIP jump and fall
+void Player::Move(){
     if (Util::Input::IsKeyPressed(Util::Keycode::LEFT)){    //press right
         
         m_Transform.scale.x = -1.5; //turn the player Img
@@ -42,18 +41,18 @@ void Player::Move(){    //WIP jump and fall
         else if (VelocityX > MaxSpeed) VelocityX = MaxSpeed;
     }
     else{   //do nothing
-        if (InGround()){    // idle
-            if (GetState() != c_state::idle) SetState(c_state::idle);//  set state
-            
-            if (VelocityX > 0){ //slow down
-                VelocityX -= Friction;
-                if (VelocityX < 0) VelocityX = 0;
-            }
-            else if(VelocityX < 0){
-                VelocityX += Friction;
-                if (VelocityX > 0) VelocityX = 0;
-            }    
+        if (!InGround()) return;
+        // idle
+        if (GetState() != c_state::idle) SetState(c_state::idle);//  set state
+        
+        if (VelocityX > 0){ //slow down
+            VelocityX -= Friction;
+            if (VelocityX < 0) VelocityX = 0;
         }
+        else if(VelocityX < 0){
+            VelocityX += Friction;
+            if (VelocityX > 0) VelocityX = 0;
+        }    
     }
     
     if (Util::Input::IsKeyDown(Util::Keycode::UP)){Jump();}
@@ -61,18 +60,19 @@ void Player::Move(){    //WIP jump and fall
         if (GetState() != c_state::fall && VelocityY <= 0){   //fall
             if(IsContainState(c_state::fall)){
                 SetState(c_state::fall);
-                std::shared_ptr<Util::Animation> temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
+                auto temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
                 temp->Play();
             }
             else{
-                std::vector<std::string> Img = {RESOURCE_DIR"/Beheaded/jump/jumpTrans_", RESOURCE_DIR"/Beheaded/jump/jumpDown_"};
+                std::vector<std::string> Img =  {RESOURCE_DIR"/Beheaded/jump/jumpTrans_",
+                                                 RESOURCE_DIR"/Beheaded/jump/jumpDown_"};
                 InitState(c_state::fall, {5, 5}, Img);
             }
         }
     }
 }
 
-void Player::Jump(){    //WIP add anima
+void Player::Jump(){
     if (InGround()) jumpStep = 0;   
     //if (jumpStep == 2) return;
     
@@ -80,7 +80,7 @@ void Player::Jump(){    //WIP add anima
     if (GetState() != c_state::jump){
         if (IsContainState(c_state::jump)){
             SetState(c_state::jump);
-            std::shared_ptr<Util::Animation> temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
+            auto temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
             temp->Play();
         }
         else{ 
@@ -90,43 +90,43 @@ void Player::Jump(){    //WIP add anima
     VelocityY = 12.5f; 
 }
 
-
 /*
     Clinb:
         setPos
         當動畫撥放完之前不能move
         動畫播完後c_state = idle
 */
-
-void Player::Clinb(){
+void Player::Clinb(){   //complete the function, but animation can be optimized
     if (InGround()) return;
     if (GetState() == c_state::clinb){
         auto temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
         if (temp->GetCurrentFrameIndex() == temp->GetFrameCount() - 1){ //結束動畫
             SetState(c_state::idle);
-            std::shared_ptr<Util::Animation> temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
-            temp->Play();
+        }
+        else{
+            //VelocityX = 0, VelocityY = 0;
         }
     }
 
     for (auto Solid : SolidObjs){
         if ((m_WorldPos.y + top*m_Transform.scale.y > Solid->m_WorldPos.y + Solid->top*Solid->m_Transform.scale.y &&
             m_WorldPos.y < Solid->m_WorldPos.y + Solid->top*Solid->m_Transform.scale.y) &&
-            ((m_WorldPos.x - left*m_Transform.scale.x < Solid->m_WorldPos.x + Solid->right*Solid->m_Transform.scale.x + 3 &&
-            m_WorldPos.x > Solid->m_WorldPos.x - Solid->left*Solid->m_Transform.scale.x) ||
+            ((m_WorldPos.x - abs(left*m_Transform.scale.x) < Solid->m_WorldPos.x + abs(Solid->right*Solid->m_Transform.scale.x) + 3 &&
+            m_WorldPos.x > Solid->m_WorldPos.x - abs(Solid->left*Solid->m_Transform.scale.x)) ||
             (m_WorldPos.x + right*m_Transform.scale.x > Solid->m_WorldPos.x - Solid->left*Solid->m_Transform.scale.x - 3 && 
             m_WorldPos.x < Solid->m_WorldPos.x + Solid->right*Solid->m_Transform.scale.x))){
             
                 if (IsContainState(c_state::clinb)){
                     SetState(c_state::clinb);
                     std::shared_ptr<Util::Animation> temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
+                    temp->SetCurrentFrame(0);
                     temp->Play();
                 }
                 else{
                     InitState(c_state::clinb, {4}, {RESOURCE_DIR"/Beheaded/jump/jumpThrough_"});
                 }
 
-                m_WorldPos.y = Solid->m_WorldPos.y + Solid->top*Solid->m_Transform.scale.y + 1;
+                m_WorldPos.y = Solid->m_WorldPos.y + Solid->top*Solid->m_Transform.scale.y + 10;
                 VelocityY = 0;
                 if(m_Transform.scale.x > 0){
                     m_WorldPos.x = Solid->m_WorldPos.x - Solid->left*Solid->m_Transform.scale.x + 1;
@@ -147,8 +147,8 @@ void Player::Clinb(){
 void Player::Update(){
     if (!(GetState() == c_state::clinb)){
         Move();
+        applyGravity();
     }
-    applyGravity();
     Clinb();
     FixPos();
 
