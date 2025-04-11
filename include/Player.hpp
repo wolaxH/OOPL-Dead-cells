@@ -9,7 +9,7 @@
 
 class Player : public Character{
 public:
-    Player(std::vector<std::string>& path, int Hp);
+    Player(std::vector<std::string>& path, int Hp, const std::vector<std::shared_ptr<SolidObj>>& SolidObjs);
     ~Player() noexcept = default;
 
     void Attack() override;
@@ -20,6 +20,8 @@ public:
 
     //for mob push
     void Pushed(){ 
+        if (GetState() == c_state::roll) return;    //翻滾狀態不回被怪物推動減少速度
+
         if (VelocityX > 0){
             VelocityX *= 0.5f;
             if (VelocityX < 5) VelocityX = 5.0f;
@@ -31,10 +33,13 @@ public:
     }
     
 private:
-
+    void roll();
     void Clinb();   //攀爬
     void Move() override;
     void Jump();
+
+    //a special function for test
+    void TestP();
 
 private:
     

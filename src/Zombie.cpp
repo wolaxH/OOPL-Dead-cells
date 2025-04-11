@@ -31,6 +31,7 @@ void Zombie::Attack(){  //player
         if (player->m_WorldPos.x < m_WorldPos.x && player->m_WorldPos.x > m_WorldPos.x - AtkRange){
             player->Attacked(AtkPoint);
             AtkFlag = true;
+            
         }
     }
     //atk logic end
@@ -124,11 +125,9 @@ void Zombie::Update(){
         (VelocityX < 0 && player->m_WorldPos.x < m_WorldPos.x && player->m_WorldPos.x > m_WorldPos.x - left)){
     
         VelocityX = 0;
-        if (IsContainState(c_state::atk)){  //set atk state
-            SetState(c_state::atk);
-            std::shared_ptr<Util::Animation> temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
-            temp->Play();
-        }
+        
+        //set atk state
+        if (IsContainState(c_state::atk)) SetState(c_state::atk, {}, false);
         else InitState(c_state::atk, {28}, {RESOURCE_DIR"/Zombie/atk/atk_"});
         Attack();
     }

@@ -4,7 +4,7 @@ set(SRC_FILES
     Player.cpp
     SolidObj.cpp
     Zombie.cpp
-    Menu.cpp
+    Menu/Menu.cpp
 )
 
 set(INCLUDE_FILES
@@ -18,6 +18,7 @@ set(INCLUDE_FILES
     Mob.hpp
     Button.hpp
     Menu.hpp
+    BackGround.hpp
 )
 
 set(TEST_FILES

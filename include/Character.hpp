@@ -7,8 +7,7 @@
 #include "SolidObj.hpp"
 
 #include <unordered_map>
-
-extern std::vector<std::shared_ptr<SolidObj>> SolidObjs;
+#include <algorithm>
 
 enum class c_state{ //Character state
     idle,
@@ -17,19 +16,20 @@ enum class c_state{ //Character state
     jump,
     fall,
     atk,
-    clinb
+    clinb,
+    roll
 };
 
 class Character : public MapObj{
 public:    
-    Character(std::vector<std::string>& path, int Hp);
+    Character(std::vector<std::string>& path, int Hp, const std::vector<std::shared_ptr<SolidObj>>& SolidObjs);
     ~Character() noexcept = default;
 
     void SetPos(glm::vec2 pos){ m_WorldPos = pos;}
 
     void virtual Update() = 0;
 
-    void SetState(c_state State, std::vector<std::string> path = {}, bool loop = true);
+    void SetState(c_state State, std::vector<std::string> path = {}, bool Isloop = true);
 
     c_state GetState(){ return State;}
 
@@ -48,9 +48,15 @@ protected:
     */
     void InitState(c_state state, const std::vector<std::size_t>& frames = {}, const std::vector<std::string>& paths = {});
     
-    //for update pos
+
+
+    /*only for set VelocityY，不修改c_state*/
     void applyGravity();
+
+    /*用來修正位置，使其不會穿牆，不修改c_state*/
     void FixPos();
+
+    //移動
     virtual void Move() = 0;
 
 protected:
@@ -64,6 +70,7 @@ protected:
 
     float AtkRange;
     int Hp;
+    const std::vector<std::shared_ptr<SolidObj>>& r_SolidObjs; //reference of SolidObjs
 
 private:
     std::unordered_map<c_state, std::shared_ptr<Core::Drawable>> D_Manager;  //Drawable Manager

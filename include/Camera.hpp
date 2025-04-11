@@ -15,7 +15,10 @@ public:
 
     glm::vec2 GetPos(){ return m_Pos;}
 
-    void Update(std::shared_ptr<Player> player){m_Pos = player->m_WorldPos;}
+    void Update(std::shared_ptr<Player> player){
+        m_Pos.x = player->m_WorldPos.x;
+        m_Pos.y = player->m_WorldPos.y + 100;
+    }
 
 private:
     glm::vec2 m_Pos;
