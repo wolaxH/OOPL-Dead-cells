@@ -9,16 +9,16 @@ int main(int, char**) {
     while (!context->GetExit()) {
         switch (app.GetCurrentState()) {
             case App::State::INIT_MENU:
-                app.Init_Start();
+                app.MainPageInit();
                 break;
             case App::State::MENU:
-                app.Start();
+                app.MainPage();
                 break;
             case App::State::INIT_UPDATE:
-                app.Init_Update();
+                app.InGameInit();
                 break;
             case App::State::UPDATE:
-                app.Update();
+                app.InGameUpdate();
                 break;
 
             case App::State::END:

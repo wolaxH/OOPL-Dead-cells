@@ -1,4 +1,4 @@
-#include "Character.hpp"
+#include "Character/Character.hpp"
 
 #include "Util/Logger.hpp"
 

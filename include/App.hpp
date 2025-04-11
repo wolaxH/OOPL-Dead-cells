@@ -4,15 +4,17 @@
 #include "pch.hpp" // IWYU pragma: export
 #include "Util/Renderer.hpp"
 #include "Util/Text.hpp"
+#include "Util/Logger.hpp"
 
 
-#include "Player.hpp"
+
+#include "Character/Player.hpp"
 #include "SolidObj.hpp"
-#include "Camera.hpp"
-#include "MapObj.hpp"
-#include "Zombie.hpp"
-#include "Button.hpp"
-#include "Menu.hpp"
+#include "MyUtil/Camera.hpp"
+//#include "Abstract/MapObj.hpp"
+#include "Character/Zombie.hpp"
+#include "Menu/Button.hpp"
+#include "Menu/Menu.hpp"
 #include "BackGround.hpp"
 
 
@@ -31,11 +33,11 @@ public:
 
     State GetCurrentState() const { return m_CurrentState; }
 
-    void Init_Start();
-    void Start();    
+    void MainPageInit();
+    void MainPage();    
 
-    void Init_Update();   //into game
-    void Update();
+    void InGameInit();   //into game
+    void InGameUpdate();
 
     void End(); // NOLINT(readability-convert-member-functions-to-static)
 

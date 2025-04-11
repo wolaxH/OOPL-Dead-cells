@@ -1,7 +1,7 @@
 #ifndef PLAYER_HPP
 #define PLAYER_HPP
 
-#include "Character.hpp"
+#include "Character/Character.hpp"
 //#include "Mob.hpp"
 
 //extern std::vector<std::shared_ptr<Mob>> Mobs;

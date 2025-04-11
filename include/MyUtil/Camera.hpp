@@ -2,7 +2,7 @@
 #define CAMERA_HPP
 
 #include "pch.hpp"
-#include "Player.hpp"
+#include "Character/Player.hpp"
 
 class Camera {
 public:    

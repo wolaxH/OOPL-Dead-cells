@@ -1,4 +1,4 @@
-#include "Menu.hpp"
+#include "Menu/Menu.hpp"
 
 Menu::Menu(const std::vector<std::shared_ptr<Button>>& buttons) : Buttons(buttons) {
     m_selectlight = std::make_unique<Util::GameObject>(std::make_shared<Util::Image>(RESOURCE_DIR"/menu/selectbar.png"), 2.0f);

@@ -1,8 +1,8 @@
 #ifndef ZOMBIE_HPP
 #define ZOMBIE_HPP
 
-#include "Mob.hpp"
-#include "Timer.hpp"
+#include "Character/Mob.hpp"
+#include "MyUtil/Timer.hpp"
 
 #include <ctime>
 

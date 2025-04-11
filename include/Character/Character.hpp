@@ -3,7 +3,7 @@
 
 #include "Util/Animation.hpp"
 
-#include "MapObj.hpp"
+#include "Abstract/MapObj.hpp"
 #include "SolidObj.hpp"
 
 #include <unordered_map>

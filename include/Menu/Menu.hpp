@@ -1,7 +1,7 @@
 #ifndef MENU_HPP
 #define MENU_HPP
 
-#include "Button.hpp"
+#include "Menu/Button.hpp"
 
 #include "Util/GameObject.hpp"
 #include "Util/Input.hpp"

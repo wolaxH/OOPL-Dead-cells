@@ -1,7 +1,7 @@
 #ifndef BACKGROUND_HPP
 #define BACKGROUND_HPP
 
-#include "MapObj.hpp"
+#include "Abstract/MapObj.hpp"
 
 #include "Util/Image.hpp"
 

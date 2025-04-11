@@ -1,8 +1,8 @@
 #ifndef MOB_HPP
 #define MOB_HPP
 
-#include "Character.hpp"
-#include "Player.hpp"
+#include "Character/Character.hpp"
+#include "Character/Player.hpp"
 
 enum class mob_state{
     trace,
