@@ -2,9 +2,12 @@
 
 #include "Util/Logger.hpp"
 
-Character::Character(std::vector<std::string>& path, int Hp, const std::vector<std::shared_ptr<SolidObj>>& SolidObjs) 
+Character::Character(std::vector<std::string>& path, int Hp, 
+    const std::vector<std::shared_ptr<SolidObj>>& SolidObjs, 
+    const std::vector<std::shared_ptr<OneSidedPlatform>>& OSP) 
                 : Hp(Hp)
-                , r_SolidObjs(SolidObjs) {
+                , r_SolidObjs(SolidObjs)
+                ,r_OneSidedPlatforms(OSP) {
     m_Drawable = std::make_shared<Util::Animation>(path, true, 20, true, 0);
     State = c_state::idle;
     D_Manager[State] = m_Drawable;
@@ -88,8 +91,16 @@ void Character::applyGravity(){
 
 void Character::FixPos(){
     int breakFlag = 0;
+
+    /**
+     * This is a temporary solution, as the one sided platform is a solid object.
+     */
+    std::vector<std::shared_ptr<SolidObj>> r_temp;
+    r_temp.reserve(r_SolidObjs.size() + r_OneSidedPlatforms.size());
+    r_temp.insert(r_temp.end(), r_SolidObjs.begin(), r_SolidObjs.end());
+    r_temp.insert(r_temp.end(), r_OneSidedPlatforms.begin(), r_OneSidedPlatforms.end());
     
-    for (auto& Solid : r_SolidObjs){
+    for (auto& Solid : r_temp){
         breakFlag = 0;
         
         m_WorldPos.x += VelocityX;
@@ -107,8 +118,13 @@ void Character::FixPos(){
             breakFlag++;
         }
         m_WorldPos.y -= VelocityY;
+
         
-        if (breakFlag == 2) break;
+        
+        if (breakFlag == 2){
+           m_WorldPos.y -= 1;
+            break;
+        }
     }
 }
 
@@ -120,7 +136,15 @@ bool Character::InGround(){
     
     float x, y;
 
-    for (const auto& Solid : r_SolidObjs){
+    /**
+     * This also is a temporary solution, as the one sided platform is a solid object.
+    */
+    std::vector<std::shared_ptr<SolidObj>> r_temp;
+    r_temp.reserve(r_SolidObjs.size() + r_OneSidedPlatforms.size());
+    r_temp.insert(r_temp.end(), r_SolidObjs.begin(), r_SolidObjs.end());
+    r_temp.insert(r_temp.end(), r_OneSidedPlatforms.begin(), r_OneSidedPlatforms.end());
+
+    for (const auto& Solid : r_temp){
         other_Pos = Solid->m_WorldPos;
         other_scale = abs(Solid->GetScaledSize());
 

@@ -10,6 +10,18 @@ void App::InGameUpdate() {
     zombie->Update();
     root.Update();
 
+    /**
+     * @brief switch solid objects visable, press Q.
+     */
+    if (Util::Input::IsKeyDown(Util::Keycode::Q)){
+        for (auto& temp : SolidObjs){
+            temp->SetVisible(!temp->GetVisible());
+        }
+        for (auto& temp : OneSidedPlatforms){
+            temp->SetVisible(!temp->GetVisible());
+        }
+    }
+
     /*
      * Do not touch the code below as they serve the purpose for
      * closing the window.

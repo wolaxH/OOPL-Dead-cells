@@ -11,11 +11,11 @@
 #include "Character/Player.hpp"
 #include "SolidObj.hpp"
 #include "MyUtil/Camera.hpp"
-//#include "Abstract/MapObj.hpp"
 #include "Character/Zombie.hpp"
 #include "Menu/Button.hpp"
 #include "Menu/Menu.hpp"
 #include "BackGround.hpp"
+#include "OneSidedPlatform.hpp"
 
 
 #include <thread>
@@ -41,8 +41,6 @@ public:
 
     void End(); // NOLINT(readability-convert-member-functions-to-static)
 
-private:
-    void ValidTask();
 
 private:    //App Objs
     State m_CurrentState = State::INIT_MENU;
@@ -59,11 +57,11 @@ private:    //Menu Objs
 
 private:    //ingame Objs
     std::shared_ptr<Player> player;
-    std::shared_ptr<SolidObj> ground, ground2, ground3;
     std::shared_ptr<Zombie> zombie;
     std::vector<std::shared_ptr<MapObj>> MapObjs;
     Camera camera;
     std::vector<std::shared_ptr<SolidObj>> SolidObjs;
+    std::vector<std::shared_ptr<OneSidedPlatform>> OneSidedPlatforms;
     std::vector<std::shared_ptr<Mob>> Mobs;
     
     std::shared_ptr<BG> bg1, bg2, bg3;

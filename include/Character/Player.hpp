@@ -2,14 +2,13 @@
 #define PLAYER_HPP
 
 #include "Character/Character.hpp"
-//#include "Mob.hpp"
-
-//extern std::vector<std::shared_ptr<Mob>> Mobs;
 
 
 class Player : public Character{
 public:
-    Player(std::vector<std::string>& path, int Hp, const std::vector<std::shared_ptr<SolidObj>>& SolidObjs);
+    Player(std::vector<std::string>& path, int Hp, 
+        const std::vector<std::shared_ptr<SolidObj>>& SolidObjs, 
+        const std::vector<std::shared_ptr<OneSidedPlatform>>& OSP);
     ~Player() noexcept = default;
 
     void Attack() override;

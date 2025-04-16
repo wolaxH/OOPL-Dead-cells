@@ -28,7 +28,8 @@ set(INCLUDE_FILES
     MyUtil/Camera.hpp
     MyUtil/Timer.hpp
 
-    SolidObj.hpp    
+    SolidObj.hpp
+    OneSidedPlatform.hpp  
     BackGround.hpp
 
 )

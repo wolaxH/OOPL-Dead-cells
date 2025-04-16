@@ -5,6 +5,7 @@
 
 #include "Abstract/MapObj.hpp"
 #include "SolidObj.hpp"
+#include "OneSidedPlatform.hpp"
 
 #include <unordered_map>
 #include <algorithm>
@@ -22,7 +23,9 @@ enum class c_state{ //Character state
 
 class Character : public MapObj{
 public:    
-    Character(std::vector<std::string>& path, int Hp, const std::vector<std::shared_ptr<SolidObj>>& SolidObjs);
+    Character(  std::vector<std::string>& path, int Hp,
+                const std::vector<std::shared_ptr<SolidObj>>& SolidObjs, 
+                const std::vector<std::shared_ptr<OneSidedPlatform>>& OSP);
     ~Character() noexcept = default;
 
     void SetPos(glm::vec2 pos){ m_WorldPos = pos;}
@@ -61,7 +64,7 @@ protected:
 
 protected:
     float VelocityX = 0, VelocityY = 0; //speed
-    float MaxSpeed = 15.0f;
+    float MaxSpeed = 12.0f;
     float AccelerationX = 2;    //加速度
     const float Friction = 1.5f;   //摩擦力(減速速度)
     const float Gravity = 0.8f;
@@ -71,6 +74,7 @@ protected:
     float AtkRange;
     int Hp;
     const std::vector<std::shared_ptr<SolidObj>>& r_SolidObjs; //reference of SolidObjs
+    const std::vector<std::shared_ptr<OneSidedPlatform>>& r_OneSidedPlatforms; //reference of OneSidedPlatforms
 
 private:
     std::unordered_map<c_state, std::shared_ptr<Core::Drawable>> D_Manager;  //Drawable Manager

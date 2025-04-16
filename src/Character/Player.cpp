@@ -5,20 +5,20 @@
 #include "Util/Logger.hpp"
 
 void Player::TestP(){
-    if (Util::Input::IsKeyDown(Util::Keycode::P)){
-        LOG_DEBUG(m_WorldPos);
-    }
+    if (Util::Input::IsKeyDown(Util::Keycode::P)) LOG_DEBUG(m_WorldPos);
 }
 
 
-Player::Player(std::vector<std::string>& path, int Hp, const std::vector<std::shared_ptr<SolidObj>>& SolidObjs) : Character(path, Hp, SolidObjs){
+Player::Player(std::vector<std::string>& path, int Hp, 
+    const std::vector<std::shared_ptr<SolidObj>>& SolidObjs, 
+    const std::vector<std::shared_ptr<OneSidedPlatform>>& OSP)
+     : Character(path, Hp, SolidObjs, OSP){
     m_Transform.scale = {2.0f, 2.0f};
     m_Transform.translation = {0.0f, -100.0f};
     top = 60, bottom = 0, left = 10, right = 10;
 }
 
-void Player::Attack(){
-    //WIP
+void Player::Attack(){//WIP
 }
 
 /*-----------------------------------move-----------------------------------*/
@@ -58,6 +58,7 @@ void Player::Move(){
     }
     else if (InGround()){   //do nothing
         //if (!InGround()) return;
+
         // idle
         if (GetState() != c_state::idle) SetState(c_state::idle);//  set state
         
@@ -90,7 +91,7 @@ void Player::Move(){
 
 void Player::Jump(){
     if (InGround()) jumpStep = 0;   
-    //if (jumpStep == 2) return;
+    // if (jumpStep == 2) return;
     
     jumpStep++;
     if (GetState() != c_state::jump){
@@ -101,7 +102,7 @@ void Player::Jump(){
 }
 
 /*
-function Clinb:
+ Clinb:
     setPos
     當動畫撥放完之前不能move
     動畫播完後c_state = idle
@@ -118,7 +119,17 @@ void Player::Clinb(){   //complete the function, but animation can be optimized
         if (temp->GetCurrentFrameIndex() == temp->GetFrameCount() - 1) SetState(c_state::idle);
     }
 
-    for (auto Solid :r_SolidObjs){
+    /**
+     * This is the temporary solution for the one sided platform.
+     */
+
+    std::vector<std::shared_ptr<SolidObj>> temps;
+    temps.reserve(r_SolidObjs.size() + r_OneSidedPlatforms.size());
+    temps.insert(temps.end(), r_SolidObjs.begin(), r_SolidObjs.end());
+    temps.insert(temps.end(), r_OneSidedPlatforms.begin(), r_OneSidedPlatforms.end());
+
+    
+    for (auto Solid :temps){
         if ((m_WorldPos.y + top*m_Transform.scale.y > Solid->m_WorldPos.y + Solid->top*Solid->m_Transform.scale.y &&
             m_WorldPos.y < Solid->m_WorldPos.y + Solid->top*Solid->m_Transform.scale.y) &&
             ((m_WorldPos.x - abs(left*m_Transform.scale.x) < Solid->m_WorldPos.x + abs(Solid->right*Solid->m_Transform.scale.x) + 3 &&
@@ -151,7 +162,7 @@ void Player::Clinb(){   //complete the function, but animation can be optimized
 }
 
 /*
-function roll:
+ roll:
     設置c_state 跟 Rednering
     現所面相的方向移動一段距離
     結束時候設置c_state = idle
@@ -187,8 +198,8 @@ void Player::roll(){
     //rendering, c_state end
 
     //set Velocity 
-    if (m_Transform.scale.x > 0) VelocityX = 20.0f;
-    else VelocityX = -20.0f;
+    if (m_Transform.scale.x > 0) VelocityX = 15.0f;
+    else VelocityX = -15.0f;
     //set Velocity end
 }
 

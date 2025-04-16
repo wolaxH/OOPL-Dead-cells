@@ -5,6 +5,7 @@
 #include <fstream>
 
 
+
 SolidObj::SolidObj(const std::string& path){
     m_Drawable = std::make_shared<Util::Image>(path);
     m_ZIndex = 10.0f;
@@ -15,11 +16,11 @@ SolidObj::SolidObj(const std::string& path){
     right = left;
 }
 
-void SolidObj::get_data_from_json(int index){
+void SolidObj::get_data_from_json(std::string JsonFileName, int index){
     
-   std::ifstream file(RESOURCE_DIR"/SolidObjs.json");
+   std::ifstream file(std::string(DATA_DIR) + "/" + JsonFileName);
    if (!file.is_open()){
-       LOG_ERROR("Failed to open SolidObjs.json file.");
+       LOG_ERROR("Failed to open " + JsonFileName +" file.");
        return;
    }
    nlohmann::json j;

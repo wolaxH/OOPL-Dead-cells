@@ -11,7 +11,9 @@ public:
     SolidObj(const std::string& path);
     ~SolidObj() =  default;
 
-    void get_data_from_json(int  index = 0);
+    void get_data_from_json(std::string JsonFileName, int index = 0);
+
+    bool GetVisible() const { return m_Visible; }
 private:
     void from_json(const nlohmann::json& j, glm::vec2& v) {
         j.at("x").get_to(v.x);
