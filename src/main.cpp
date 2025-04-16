@@ -8,12 +8,17 @@ int main(int, char**) {
 
     while (!context->GetExit()) {
         switch (app.GetCurrentState()) {
-            case App::State::START:
-                app.Start();
+            case App::State::INIT_MENU:
+                app.MainPageInit();
                 break;
-
+            case App::State::MENU:
+                app.MainPage();
+                break;
+            case App::State::INIT_UPDATE:
+                app.InGameInit();
+                break;
             case App::State::UPDATE:
-                app.Update();
+                app.InGameUpdate();
                 break;
 
             case App::State::END:
