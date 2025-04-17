@@ -119,13 +119,12 @@ void Character::FixPos(){
         }
         m_WorldPos.y -= VelocityY;
 
-        
-        
         if (breakFlag == 2){
            m_WorldPos.y -= 1;
             break;
         }
     }
+
 }
 
 bool Character::InGround(){
@@ -138,7 +137,7 @@ bool Character::InGround(){
 
     /**
      * This also is a temporary solution, as the one sided platform is a solid object.
-    */
+     */
     std::vector<std::shared_ptr<SolidObj>> r_temp;
     r_temp.reserve(r_SolidObjs.size() + r_OneSidedPlatforms.size());
     r_temp.insert(r_temp.end(), r_SolidObjs.begin(), r_SolidObjs.end());

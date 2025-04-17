@@ -44,16 +44,18 @@ public:
 protected:
     bool IsContainState(c_state State){return (D_Manager.find(State) != D_Manager.end()) ? true : false;}
 
-    //player util
     bool InGround();
-    /*
-        @param path eg:RESOURCE_DIR"Zombie/move/move_"
-    */
+
+    /**
+     * @param path eg:RESOURCE_DIR"Zombie/move/move_"
+     */
     void InitState(c_state state, const std::vector<std::size_t>& frames = {}, const std::vector<std::string>& paths = {});
     
 
 
-    /*only for set VelocityY，不修改c_state*/
+    /**
+     * only for set VelocityY，不修改c_state
+     */
     void applyGravity();
 
     /*用來修正位置，使其不會穿牆，不修改c_state*/
