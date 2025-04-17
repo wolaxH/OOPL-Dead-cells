@@ -7,7 +7,6 @@
 #include "Util/Logger.hpp"
 
 
-
 #include "Character/Player.hpp"
 #include "SolidObj.hpp"
 #include "MyUtil/Camera.hpp"
@@ -18,6 +17,9 @@
 #include "OneSidedPlatform.hpp"
 
 
+#include "json.hpp"
+
+#include <fstream>
 #include <thread>
 #include <chrono>
 
@@ -41,7 +43,31 @@ public:
 
     void End(); // NOLINT(readability-convert-member-functions-to-static)
 
+private:
+    template <typename T>
+    void InitColliders(const std::string& fileName, std::vector<std::shared_ptr<T>>& container){
+        std::string path;
+        if constexpr (std::is_same_v<T, SolidObj>){
+            path = RESOURCE_DIR"/bg/green.png";
+        } else if constexpr (std::is_same_v<T, OneSidedPlatform>){
+            path = RESOURCE_DIR"/bg/red.png";
+        } else {
+            throw std::runtime_error("Unsupported type for InitColliders");
+        }
 
+        std::ifstream file(std::string(DATA_DIR) + "/" + fileName);
+        nlohmann::json j;
+        file >> j;
+
+        container.reserve(j.size());
+        for (size_t i = 0; i < j.size(); i++){
+            auto obj = std::make_shared<T>(path);
+            container.push_back(obj);
+            MapObjs.push_back(obj);
+            obj->get_data_from_json(fileName, i);
+            obj->SetVisible(false);
+        } 
+    }
 private:    //App Objs
     State m_CurrentState = State::INIT_MENU;
     Util::Renderer root;

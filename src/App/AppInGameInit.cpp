@@ -33,59 +33,28 @@ void App::InGameInit() {
 
     //bg
     glm::vec2 temp_pos(1, 1);
-    bg1 = std::make_shared<BG>(RESOURCE_DIR"/bg/bg1.png", temp_pos, 1.0f);
-    bg2 = std::make_shared<BG>(RESOURCE_DIR"/bg/bg2.png", temp_pos, 1.0f);
-    bg2->m_WorldPos = {1518.0f, 144.0f};
-    bg3 = std::make_shared<BG>(RESOURCE_DIR"/bg/back3.png", temp_pos, 1.0f);
-    bg3->m_Transform.scale = {1.5f, 1.5f};
-    bg3->m_WorldPos = {3717.0f, 391.5f};
-    BGs.push_back(bg1);
-    BGs.push_back(bg2);
-    BGs.push_back(bg3);
-    MapObjs.push_back(bg1);
-    MapObjs.push_back(bg2);
-    MapObjs.push_back(bg3);
-    root.AddChild(bg1);
-    root.AddChild(bg2);
-    root.AddChild(bg3);
+    BGs.resize(2);
+    BGs[0] = std::make_shared<BG>(RESOURCE_DIR"/bg/bg1.png", temp_pos, glm::vec2{0.8f, 0.8f});
+    BGs[1] = std::make_shared<BG>(RESOURCE_DIR"/bg/bg2.png", glm::vec2{1616.0f, 174.0f}, glm::vec2{0.9f, 0.9f});
+    // BGs[2] = std::make_shared<BG>(RESOURCE_DIR"/bg/back3.png", glm::vec2{3717.0f, 391.5f}, glm::vec2{1.5f, 1.5f});
 
+    for (auto& temp : BGs){
+        MapObjs.push_back(temp);
+        root.AddChild(temp);
+    }
 
 
     /**
      * To create a one sided platform object
      */
-    std::ifstream file(std::string(DATA_DIR) + "/" + "OSPs.json");
-    nlohmann::json j;
-    file >> j;
-    OneSidedPlatforms.reserve(j.size());
-    for (size_t i = 0; i < j.size(); i++){
-        auto OSP = std::make_shared<OneSidedPlatform>(RESOURCE_DIR"/bg/red.png");
-        OneSidedPlatforms.push_back(OSP);
-    }
-    for (size_t i = 0; i < OneSidedPlatforms.size(); i++){
-        OneSidedPlatforms[i]->get_data_from_json("OSPs.json", i);
-        MapObjs.push_back(OneSidedPlatforms[i]);
-    }
-    file.close();
-
+    InitColliders<OneSidedPlatform>("OSPs.json", OneSidedPlatforms);
+    
 
 
     /**
      * To create a solid object
      */
-    file.open(std::string(DATA_DIR) + "/" + "SolidObjs.json");
-    file >> j;
-    SolidObjs.reserve(j.size());
-    for (size_t i = 0; i < j.size(); i++){
-        auto Solid = std::make_shared<SolidObj>(RESOURCE_DIR"/bg/green.png");
-        SolidObjs.push_back(Solid);   
-    }
-
-    for (size_t i = 0; i < SolidObjs.size(); i++){
-        SolidObjs[i]->get_data_from_json("SolidObjs.json", i);
-        MapObjs.push_back(SolidObjs[i]);
-    }
-
+    InitColliders<SolidObj>("SolidObjs.json", SolidObjs);
     
     /**
      * Add all solid objects to the root object for rendering.
@@ -95,11 +64,6 @@ void App::InGameInit() {
     for (auto& temp : OneSidedPlatforms){ temps.push_back(temp);}
     root.AddChildren(temps);
 
-    
-   
-   
     LOG_TRACE("Start");
     m_CurrentState = State::UPDATE;
 }
-
-

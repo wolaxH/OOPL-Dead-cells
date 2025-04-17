@@ -7,11 +7,11 @@
 
 class BG : public MapObj {
 public:
-    BG(const std::string& path, glm::vec2 pos = {0, 0}, float Zindex = 1.0f){
+    BG(const std::string& path, glm::vec2 pos = {0, 0}, const glm::vec2& scale = {0.8f, 0.8f}){
         m_Drawable = std::make_shared<Util::Image>(path);
-        m_ZIndex = Zindex;
+        m_ZIndex = 1.0f;
         m_WorldPos = pos;
-        m_Transform.scale = {0.8f, 0.8f};
+        m_Transform.scale = scale;
     }
     ~BG() = default;
 
