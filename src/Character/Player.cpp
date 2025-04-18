@@ -152,32 +152,83 @@ void Player::Jump(){
 
 void Player::Clinb(){
     if (GetState() == c_state::roll) return; //翻滾時不能攀爬
+    if (InGround()) return; //平地不會攀爬
 
-    if (InGround()) return;
     if (GetState() == c_state::clinb){
         VelocityY = 0;
         auto temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
         //結束動畫
         if (temp->GetCurrentFrameIndex() == temp->GetFrameCount() - 1) SetState(c_state::idle);
     }
-
-    /**
-     * This is the temporary solution for the one sided platform.
-     */
+    if (IsUnderOSP()) return;
 
     std::vector<std::shared_ptr<SolidObj>> temps;
     temps.reserve(r_SolidObjs.size() + r_OneSidedPlatforms.size());
     temps.insert(temps.end(), r_SolidObjs.begin(), r_SolidObjs.end());
     temps.insert(temps.end(), r_OneSidedPlatforms.begin(), r_OneSidedPlatforms.end());
 
+    float solidTop;
+    float solidLeft;
+    float solidRight;
     
+    float playerTop;
+
+
+    bool inYRange;
+    bool leftCheck;
+    bool rightCheck;
+
+
+    for (auto& Solid : temps) {
+        solidTop = Solid->top * Solid->m_Transform.scale.y;
+        solidLeft = Solid->left * Solid->m_Transform.scale.x;
+        solidRight = Solid->right * Solid->m_Transform.scale.x;
+
+        playerTop = m_WorldPos.y + top * m_Transform.scale.y;
+
+        inYRange = playerTop > Solid->m_WorldPos.y + solidTop &&
+                        m_WorldPos.y < Solid->m_WorldPos.y + solidTop;
+
+        leftCheck = m_WorldPos.x - std::abs(left * m_Transform.scale.x) <
+                         Solid->m_WorldPos.x + std::abs(solidRight) + 3 &&
+                         m_WorldPos.x > Solid->m_WorldPos.x + std::abs(solidLeft);
+
+        rightCheck = m_WorldPos.x + right * m_Transform.scale.x >
+                          Solid->m_WorldPos.x - solidLeft - 3 &&
+                          m_WorldPos.x < Solid->m_WorldPos.x - solidRight;
+
+        if (inYRange && (leftCheck || rightCheck)) {
+            // 設定狀態
+            if (IsContainState(c_state::clinb)) {
+                SetState(c_state::clinb, {}, false);
+            } else {
+                InitState(c_state::clinb, {4}, {RESOURCE_DIR"/Beheaded/jump/jumpThrough_"});
+                auto anim = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
+                anim->SetInterval(50);
+            }
+
+            // 設定位置
+            m_WorldPos.y = Solid->m_WorldPos.y + solidTop + 10;
+            VelocityX = VelocityY = 0;
+
+            if (m_Transform.scale.x > 0) {
+                m_WorldPos.x = Solid->m_WorldPos.x - solidLeft + 1;
+            } else {
+                m_WorldPos.x = Solid->m_WorldPos.x + solidRight - 1;
+            }
+
+            break; // 成功攀爬後跳出迴圈
+        }
+    }
+    /*
     for (auto Solid :temps){
+
         if ((m_WorldPos.y + top*m_Transform.scale.y > Solid->m_WorldPos.y + Solid->top*Solid->m_Transform.scale.y &&
             m_WorldPos.y < Solid->m_WorldPos.y + Solid->top*Solid->m_Transform.scale.y) &&
             ((m_WorldPos.x - abs(left*m_Transform.scale.x) < Solid->m_WorldPos.x + abs(Solid->right*Solid->m_Transform.scale.x) + 3 &&
-            m_WorldPos.x > Solid->m_WorldPos.x - abs(Solid->left*Solid->m_Transform.scale.x)) ||
+            m_WorldPos.x > Solid->m_WorldPos.x + abs(Solid->left*Solid->m_Transform.scale.x)) ||
             (m_WorldPos.x + right*m_Transform.scale.x > Solid->m_WorldPos.x - Solid->left*Solid->m_Transform.scale.x - 3 && 
-            m_WorldPos.x < Solid->m_WorldPos.x + Solid->right*Solid->m_Transform.scale.x))){
+            m_WorldPos.x < Solid->m_WorldPos.x - Solid->right*Solid->m_Transform.scale.x))){
 
                 //rendering, c_state
                 if (IsContainState(c_state::clinb)){
@@ -200,8 +251,10 @@ void Player::Clinb(){
                 }
                 break;
         }
-    }
+    */
+
 }
+
 
 
 void Player::roll(){
@@ -257,10 +310,6 @@ void Player::Update(){
     
     Clinb();
     FixPos();
-
-    if (IsUnderOSP()){
-        LOG_DEBUG("Under OSP");
-    }
 
     m_WorldPos.x += VelocityX;
     m_WorldPos.y += VelocityY;
