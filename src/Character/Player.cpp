@@ -4,82 +4,112 @@
 
 #include "Util/Logger.hpp"
 
+Player::Player(std::vector<std::string>& path, int Hp, 
+    const std::vector<std::shared_ptr<SolidObj>>& SolidObjs, 
+    const std::vector<std::shared_ptr<OneSidedPlatform>>& OSP)
+    : Character(path, Hp, SolidObjs, OSP){
+        m_Transform.scale = {2.0f, 2.0f};
+        m_Transform.translation = {0.0f, -100.0f};
+        top = 60, bottom = 0, left = 10, right = 10;
+}
+
+//WIP
+void Player::Attack(){}
+
+/*-----------------------------------util-----------------------------------*/
+
 void Player::TestP(){
     if (Util::Input::IsKeyDown(Util::Keycode::P)) LOG_DEBUG(m_WorldPos);
 }
 
 
-Player::Player(std::vector<std::string>& path, int Hp, 
-    const std::vector<std::shared_ptr<SolidObj>>& SolidObjs, 
-    const std::vector<std::shared_ptr<OneSidedPlatform>>& OSP)
-     : Character(path, Hp, SolidObjs, OSP){
-    m_Transform.scale = {2.0f, 2.0f};
-    m_Transform.translation = {0.0f, -100.0f};
-    top = 60, bottom = 0, left = 10, right = 10;
-}
+bool Player::IsOnOSP(){
+    if (!InGround()) return false;
 
-void Player::Attack(){//WIP
+    glm::vec2 Pos = m_WorldPos;
+    glm::vec2 OSP_Pos;
+    glm::vec2 OSP_scale;
+    float x, y;
+
+    for (auto& OSP : r_OneSidedPlatforms){
+        OSP_Pos = OSP->m_WorldPos;
+        OSP_scale = abs(OSP->GetScaledSize());
+
+        x = !((Pos.x < OSP_Pos.x - OSP_scale.x/2 - 1) || (Pos.x > OSP_Pos.x + OSP_scale.x/2 + 1));
+        y = (Pos.y > OSP_Pos.y - OSP_scale.y/2) && (Pos.y < OSP_Pos.y + OSP_scale.y/2 + 2);
+        if (x && y) return true;
+    }
+    return false;
 }
 
 /*-----------------------------------move-----------------------------------*/
 
 void Player::Move(){
-    /*特定狀態不能移動*/
+    /**
+     * 特定狀態不能移動
+     */
     if (GetState() == c_state::clinb) return; //攀爬時不能移動
-    if (GetState() == c_state::roll) return; //滾動時不能移動
+    // if (GetState() == c_state::roll) return; //滾動時不能移動
 
 
-
-    if (Util::Input::IsKeyPressed(Util::Keycode::LEFT)){    //press right
-        
-        if (m_Transform.scale.x > 0) m_Transform.scale.x *= -1; //turn the player Img
-        
-        if (GetState() != c_state::L_move && InGround()){   //  change the state or add a new one
-            if (IsContainState(c_state::L_move)){ SetState(c_state::L_move);}
-            else{ InitState(c_state::L_move, {20}, {RESOURCE_DIR"/Beheaded/runA/runA_"});}
+    /**
+     * 這裡的do while 是為了當無法左右移動時，jump() 也能被執行
+     * 正個do while 裡的內容若涉及更改c_state都要求InGround() == true
+     * VelocityX 則不要求InGround() == true
+     * for jump 打斷roll
+     */
+    do{
+        if (Util::Input::IsKeyPressed(Util::Keycode::LEFT)){    //press right
+            if (GetState() == c_state::roll && m_Transform.scale.x < 0) break;;
+            
+            if (m_Transform.scale.x > 0) m_Transform.scale.x *= -1; //turn the player Img
+            
+            if (GetState() != c_state::L_move && InGround()){   //  change the state or add a new one
+                if (IsContainState(c_state::L_move)){ SetState(c_state::L_move);}
+                else{ InitState(c_state::L_move, {20}, {RESOURCE_DIR"/Beheaded/runA/runA_"});}
+            }
+            
+            //  chaenge pos
+            if (VelocityX > -1*MaxSpeed) VelocityX += -1*AccelerationX;
+            else if (VelocityX < -1*MaxSpeed) VelocityX = -1*MaxSpeed;
         }
-        
-        //  chaenge pos
-        if (VelocityX > -1*MaxSpeed) VelocityX += -1*AccelerationX;
-        else if (VelocityX < -1*MaxSpeed) VelocityX = -1*MaxSpeed;
-    }
-    else if (Util::Input::IsKeyPressed(Util::Keycode::RIGHT)){  //press right
-        
-        if (m_Transform.scale.x < 0) m_Transform.scale.x *= -1;  //turn the player Img
-        
-        if (GetState() != c_state::R_move && InGround()){   //  change the state or add a new one
-            if (IsContainState(c_state::R_move)){ SetState(c_state::R_move);}
-            else{ InitState(c_state::L_move, {20}, {RESOURCE_DIR"/Beheaded/runA/runA_"});}
+        else if (Util::Input::IsKeyPressed(Util::Keycode::RIGHT)){  //press right
+            if (GetState() == c_state::roll && m_Transform.scale.x > 0) break;
+            
+            if (m_Transform.scale.x < 0) m_Transform.scale.x *= -1;  //turn the player Img
+            
+            if (GetState() != c_state::R_move && InGround()){   //  change the state or add a new one
+                if (IsContainState(c_state::R_move)){ SetState(c_state::R_move);}
+                else{ InitState(c_state::L_move, {20}, {RESOURCE_DIR"/Beheaded/runA/runA_"});}
+            }
+            
+            //  set Velocity
+            if (VelocityX < MaxSpeed) VelocityX += AccelerationX;
+            else if (VelocityX > MaxSpeed) VelocityX = MaxSpeed;
         }
-        
-        //  set Velocity
-        if (VelocityX < MaxSpeed) VelocityX += AccelerationX;
-        else if (VelocityX > MaxSpeed) VelocityX = MaxSpeed;
-    }
-    else if (InGround()){   //do nothing
-        //if (!InGround()) return;
-
-        // idle
-        if (GetState() != c_state::idle) SetState(c_state::idle);//  set state
-        
-        if (VelocityX > 0){ //slow down
-            VelocityX -= Friction;
-            if (VelocityX < 0) VelocityX = 0;
+        else if (InGround() && GetState() != c_state::roll){   //do nothing
+            //滾動狀態不會進入idle狀態
+    
+            // idle
+            if (GetState() != c_state::idle) SetState(c_state::idle);//  set state
+            
+            if (VelocityX > 0){ //slow down
+                VelocityX -= Friction;
+                if (VelocityX < 0) VelocityX = 0;
+            }
+            else if(VelocityX < 0){
+                VelocityX += Friction;
+                if (VelocityX > 0) VelocityX = 0;
+            }    
         }
-        else if(VelocityX < 0){
-            VelocityX += Friction;
-            if (VelocityX > 0) VelocityX = 0;
-        }    
-    }
+    }while (false);
+    
     
     if (Util::Input::IsKeyDown(Util::Keycode::UP)){Jump();}
-    else if (!InGround()){
+    else if (!InGround() && GetState() != c_state::roll){
         if (GetState() != c_state::fall && VelocityY <= 0){   //fall
-            
             //rendering, c_state
-            if(IsContainState(c_state::fall)){
-                SetState(c_state::fall, {}, false);
-            }
+            if(IsContainState(c_state::fall)) SetState(c_state::fall, {}, false);
             else{
                 std::vector<std::string> Img =  {RESOURCE_DIR"/Beheaded/jump/jumpTrans_",
                                                  RESOURCE_DIR"/Beheaded/jump/jumpDown_"};
@@ -101,14 +131,8 @@ void Player::Jump(){
     VelocityY = 12.5f; 
 }
 
-/*
- Clinb:
-    setPos
-    當動畫撥放完之前不能move
-    動畫播完後c_state = idle
-*/
-void Player::Clinb(){   //complete the function, but animation can be optimized
 
+void Player::Clinb(){
     if (GetState() == c_state::roll) return; //翻滾時不能攀爬
 
     if (InGround()) return;
@@ -161,16 +185,11 @@ void Player::Clinb(){   //complete the function, but animation can be optimized
     }
 }
 
-/*
- roll:
-    設置c_state 跟 Rednering
-    現所面相的方向移動一段距離
-    結束時候設置c_state = idle
-*/
+
 void Player::roll(){
 
     //roll end detect
-    if (!InGround() && GetState() != c_state::roll) return;
+    // if (!InGround() && GetState() != c_state::roll) return;
     if (GetState() == c_state::roll){
         auto temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
         if (temp->GetCurrentFrameIndex() == temp->GetFrameCount() - 1){ //結束動畫
@@ -186,6 +205,8 @@ void Player::roll(){
     
 
     //rendering, c_state
+    if (!timer.IsTimeout()) return;//翻滾冷卻
+
     if (IsContainState(c_state::roll)){
         SetState(c_state::roll, {}, false);
     }
@@ -201,6 +222,8 @@ void Player::roll(){
     if (m_Transform.scale.x > 0) VelocityX = 15.0f;
     else VelocityX = -15.0f;
     //set Velocity end
+    timer.SetChangeTime(700, 700);
+    timer.ResetCheckTime();
 }
 
 /*-----------------------------------update-----------------------------------*/
@@ -214,11 +237,11 @@ void Player::Update(){
         roll();
     }
     
-
     Clinb();
     FixPos();
 
     m_WorldPos.x += VelocityX;
     m_WorldPos.y += VelocityY;
+
     TestP();
 }

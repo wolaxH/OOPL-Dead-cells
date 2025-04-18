@@ -28,15 +28,16 @@ void App::InGameInit() {
     zombie->SetZIndex(100);
     zombie->SetVisible(true);
     MapObjs.push_back(zombie);
-    // root.AddChild(zombie);
+    root.AddChild(zombie);
 
 
     //bg
     glm::vec2 temp_pos(1, 1);
-    BGs.resize(2);
+    BGs.resize(4);
     BGs[0] = std::make_shared<BG>(RESOURCE_DIR"/bg/bg1.png", temp_pos, glm::vec2{0.8f, 0.8f});
     BGs[1] = std::make_shared<BG>(RESOURCE_DIR"/bg/bg2.png", glm::vec2{1616.0f, 174.0f}, glm::vec2{0.9f, 0.9f});
-    // BGs[2] = std::make_shared<BG>(RESOURCE_DIR"/bg/back3.png", glm::vec2{3717.0f, 391.5f}, glm::vec2{1.5f, 1.5f});
+    BGs[2] = std::make_shared<BG>(RESOURCE_DIR"/bg/bg3.png", glm::vec2{3817.0f, 318.5f}, glm::vec2{1.4f, 1.4f});
+    BGs[3] = std::make_shared<BG>(RESOURCE_DIR"/bg/bg4.png", glm::vec2{1616.0f, -673.0f}, glm::vec2{0.9f, 0.9f});
 
     for (auto& temp : BGs){
         MapObjs.push_back(temp);
