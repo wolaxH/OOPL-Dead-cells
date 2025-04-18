@@ -3,7 +3,7 @@
 
 #include "Util/GameObject.hpp"
 
-#include "Hp.hpp"
+#include "UI/Hp.hpp"
 
 
 

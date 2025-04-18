@@ -69,7 +69,7 @@ void App::InGameInit() {
 
     playerui = std::make_shared<PlayerUI>();
     playerui->AddToRender(root);
-    playerui->SetHp(50);
+    // playerui->SetHp(30);
 
     LOG_TRACE("Start");
     m_CurrentState = State::UPDATE;
