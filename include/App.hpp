@@ -15,6 +15,7 @@
 #include "Menu/Menu.hpp"
 #include "BackGround.hpp"
 #include "OneSidedPlatform.hpp"
+#include "PlayerUI.hpp"
 
 
 #include "json.hpp"
@@ -82,6 +83,7 @@ private:    //Menu Objs
     std::shared_ptr<Button> ExitButton;
 
 private:    //ingame Objs
+    std::shared_ptr<PlayerUI>playerui;
     std::shared_ptr<Player> player;
     std::shared_ptr<Zombie> zombie;
     std::vector<std::shared_ptr<MapObj>> MapObjs;
@@ -90,7 +92,7 @@ private:    //ingame Objs
     std::vector<std::shared_ptr<OneSidedPlatform>> OneSidedPlatforms;
     std::vector<std::shared_ptr<Mob>> Mobs;
     
-    std::shared_ptr<BG> bg1, bg2, bg3;
+    // std::shared_ptr<BG> bg1, bg2, bg3;
     std::vector<std::shared_ptr<BG>> BGs;
 };
 

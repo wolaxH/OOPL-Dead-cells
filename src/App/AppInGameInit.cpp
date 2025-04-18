@@ -65,6 +65,12 @@ void App::InGameInit() {
     for (auto& temp : OneSidedPlatforms){ temps.push_back(temp);}
     root.AddChildren(temps);
 
+
+
+    playerui = std::make_shared<PlayerUI>();
+    playerui->AddToRender(root);
+    playerui->SetHp(50);
+
     LOG_TRACE("Start");
     m_CurrentState = State::UPDATE;
 }

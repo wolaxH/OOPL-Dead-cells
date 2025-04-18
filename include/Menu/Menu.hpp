@@ -16,23 +16,6 @@ public:
 
     void AddButton(const std::shared_ptr<Button>& button) {Buttons.push_back(button);}
 
-    // void RemoveButton(const std::string& label) {
-    //     Buttons.erase(std::remove_if(Buttons.begin(), Buttons.end(),
-    //                                   [&label](const Button& button) {
-    //                                       return button.GetLabel() == label;
-    //                                   }),
-    //                    Buttons.end());
-    // }
-
-    // void ClickButton(const std::string& label) {
-    //     for (auto& button : Buttons) {
-    //         if (button.GetLabel() == label) {
-    //             button.Click();
-    //             break;
-    //         }
-    //     }
-    // }
-
     void Update();
 
 private:

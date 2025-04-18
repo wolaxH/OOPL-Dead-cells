@@ -59,7 +59,7 @@ void Player::Move(){
      * for jump 打斷roll
      */
     do{
-        if (Util::Input::IsKeyPressed(Util::Keycode::LEFT)){    //press right
+        if (Util::Input::IsKeyPressed(Util::Keycode::LEFT) || Util::Input::IsKeyPressed(Util::Keycode::A)){    //press right
             if (GetState() == c_state::roll && m_Transform.scale.x < 0) break;;
             
             if (m_Transform.scale.x > 0) m_Transform.scale.x *= -1; //turn the player Img
@@ -73,7 +73,7 @@ void Player::Move(){
             if (VelocityX > -1*MaxSpeed) VelocityX += -1*AccelerationX;
             else if (VelocityX < -1*MaxSpeed) VelocityX = -1*MaxSpeed;
         }
-        else if (Util::Input::IsKeyPressed(Util::Keycode::RIGHT)){  //press right
+        else if (Util::Input::IsKeyPressed(Util::Keycode::RIGHT) || Util::Input::IsKeyPressed(Util::Keycode::D)){  //press right
             if (GetState() == c_state::roll && m_Transform.scale.x > 0) break;
             
             if (m_Transform.scale.x < 0) m_Transform.scale.x *= -1;  //turn the player Img
@@ -105,7 +105,7 @@ void Player::Move(){
     }while (false);
     
     
-    if (Util::Input::IsKeyDown(Util::Keycode::UP)){Jump();}
+    if (Util::Input::IsKeyDown(Util::Keycode::UP) || Util::Input::IsKeyPressed(Util::Keycode::W)){Jump();}
     else if (!InGround() && GetState() != c_state::roll){
         if (GetState() != c_state::fall && VelocityY <= 0){   //fall
             //rendering, c_state
