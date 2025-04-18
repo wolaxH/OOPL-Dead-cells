@@ -29,7 +29,7 @@ bool Player::IsOnOSP(){
     glm::vec2 Pos = m_WorldPos;
     glm::vec2 OSP_Pos;
     glm::vec2 OSP_scale;
-    float x, y;
+    bool x, y;
 
     for (auto& OSP : r_OneSidedPlatforms){
         OSP_Pos = OSP->m_WorldPos;
@@ -37,6 +37,24 @@ bool Player::IsOnOSP(){
 
         x = !((Pos.x < OSP_Pos.x - OSP_scale.x/2 - 1) || (Pos.x > OSP_Pos.x + OSP_scale.x/2 + 1));
         y = (Pos.y > OSP_Pos.y - OSP_scale.y/2) && (Pos.y < OSP_Pos.y + OSP_scale.y/2 + 2);
+        if (x && y) return true;
+    }
+    return false;
+}
+
+bool Player::IsUnderOSP(){
+    if (InGround()) return false;
+
+    glm::vec2 Pos = m_WorldPos;
+    glm::vec2 OSP_scale;
+    bool x, y;
+
+    for (auto& OSP : r_OneSidedPlatforms){
+        OSP_scale = abs(OSP->GetScaledSize());
+
+        x = !((Pos.x < OSP->m_WorldPos.x - OSP_scale.x/2 - 1) || (Pos.x > OSP->m_WorldPos.x + OSP_scale.x/2 + 1));
+        y = (Pos.y < OSP->m_WorldPos.y - OSP_scale.y/2.0f) && (Pos.y + top*m_Transform.scale.x > OSP->m_WorldPos.y - 20.0f);
+
         if (x && y) return true;
     }
     return false;
@@ -239,6 +257,10 @@ void Player::Update(){
     
     Clinb();
     FixPos();
+
+    if (IsUnderOSP()){
+        LOG_DEBUG("Under OSP");
+    }
 
     m_WorldPos.x += VelocityX;
     m_WorldPos.y += VelocityY;

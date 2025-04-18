@@ -63,7 +63,14 @@ private:
     void Jump();
 
     //Util function ; OSP mean OneSidedPlatform
+    /**
+     * return ture if player stand on any OSP
+     */
     bool IsOnOSP();
+    /**
+     * return true if player under any OSP, and the padding of OSP is 5px
+     */
+    bool IsUnderOSP();
 
 
     //a special function for test, development function, to Log player current position
