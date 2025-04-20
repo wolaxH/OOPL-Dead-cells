@@ -80,6 +80,7 @@ void Character::InitState(c_state state, const std::vector<std::size_t>& frames,
 }
 
 void Character::applyGravity(){
+
     if (!InGround()){
         VelocityY -= Gravity;
         if (VelocityY < -1*MaxFallSpeed) VelocityY = -1*MaxFallSpeed;
@@ -97,15 +98,6 @@ void Character::FixPos(){
      *      遍歷OSP 並製作OSP的fix邏輯
      *      OSP邏輯: 玩家在OSP上
      */
-
-    /**
-     * This is a temporary solution, as the one sided platform is a solid object.
-     */
-    std::vector<std::shared_ptr<SolidObj>> r_temp;
-    r_temp.reserve(r_SolidObjs.size() + r_OneSidedPlatforms.size());
-    r_temp.insert(r_temp.end(), r_SolidObjs.begin(), r_SolidObjs.end());
-    r_temp.insert(r_temp.end(), r_OneSidedPlatforms.begin(), r_OneSidedPlatforms.end());
-    
     for (auto& Solid : r_SolidObjs){
         breakFlag = 0;
         
