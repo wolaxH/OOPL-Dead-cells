@@ -66,7 +66,7 @@ void Character::InitState(c_state state, const std::vector<std::size_t>& frames,
     std::vector<std::string> Img;
     std::vector<std::string> temp;
 
-    std::vector<c_state> NotLoopingState = {c_state::jump, c_state::fall, c_state::atk, c_state::clinb, c_state::roll};
+    std::vector<c_state> NotLoopingState = {c_state::jump, c_state::fall, c_state::atk, c_state::clinb, c_state::roll, c_state::crouch};
 
 
     for (std::size_t i =0; i < frames.size(); i++){

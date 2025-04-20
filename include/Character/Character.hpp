@@ -19,6 +19,7 @@ enum class c_state{ //Character state
     atk,
     clinb,
     clinbOSP,
+    crouch,
     roll
 };
 

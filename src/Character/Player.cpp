@@ -68,6 +68,27 @@ void Player::Move(){
      */
     if (GetState() == c_state::clinb) return; //攀爬時不能移動
 
+    if (Util::Input::IsKeyPressed(Util::Keycode::DOWN) && GetState() == c_state::crouch) {
+        if (VelocityX > 0){ //slow down
+            VelocityX -= Friction;
+            if (VelocityX < 0) VelocityX = 0;
+        }
+        else if(VelocityX < 0){
+            VelocityX += Friction;
+            if (VelocityX > 0) VelocityX = 0;
+        }  
+        return;
+    };
+    
+    if (GetState() == c_state::crouch){
+        auto temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
+        if (Util::Input::IsKeyUp(Util::Keycode::DOWN)){
+            temp->Play();
+        }
+        else if (temp->GetCurrentFrameIndex() == temp->GetFrameCount()-1){
+            SetState(c_state::idle);   
+        }
+    }
 
 
     /**
@@ -77,6 +98,7 @@ void Player::Move(){
      * for jump 打斷roll
      */
     do{
+
         if (Util::Input::IsKeyPressed(Util::Keycode::LEFT) || Util::Input::IsKeyPressed(Util::Keycode::A)){    //press right
             if (GetState() == c_state::roll && m_Transform.scale.x < 0) break;;
             
@@ -107,6 +129,8 @@ void Player::Move(){
         }
         else if (InGround() && GetState() != c_state::roll){   //do nothing
             //滾動狀態不會進入idle狀態
+
+            if (GetState() == c_state::crouch) break;
     
             // idle
             if (GetState() != c_state::idle) SetState(c_state::idle);//  set state
@@ -124,6 +148,22 @@ void Player::Move(){
     
     
     if (Util::Input::IsKeyDown(Util::Keycode::UP) || Util::Input::IsKeyPressed(Util::Keycode::W)){Jump();}
+    else if (Util::Input::IsKeyPressed(Util::Keycode::DOWN)){
+        if (InGround()){   //crouch
+            if (IsContainState(c_state::crouch)){
+                SetState(c_state::crouch);
+                auto temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
+                temp->SetCurrentFrame(0);
+                temp->Pause();
+            }
+            else{
+                InitState(c_state::crouch, {6}, {RESOURCE_DIR"/Beheaded/crouch/crouch_"});
+                auto temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
+                temp->Pause();
+                //temp->SetInterval();
+            }
+        }
+    }
     else if (!InGround() && GetState() != c_state::roll){
         if (GetState() != c_state::fall && VelocityY <= 0){   //fall
             //rendering, c_state
@@ -225,11 +265,13 @@ void Player::Clinb(){
 }
 
 void Player::ClinbOSP(){
+    if (VelocityY < 0) return;
 
     if (GetState() == c_state::clinbOSP && !IsUnderOSP()){
         VelocityY = 0;
         SetState(c_state::idle);
     }
+
 
     float P_Head = m_WorldPos.y + top * m_Transform.scale.y;
     float P_Bottom = m_WorldPos.y;
