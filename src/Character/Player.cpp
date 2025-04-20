@@ -67,7 +67,7 @@ void Player::Move(){
      * 特定狀態不能移動
      */
     if (GetState() == c_state::clinb) return; //攀爬時不能移動
-    // if (GetState() == c_state::roll) return; //滾動時不能移動
+
 
 
     /**
@@ -152,6 +152,8 @@ void Player::Jump(){
 
 void Player::Clinb(){
     if (GetState() == c_state::roll) return; //翻滾時不能攀爬
+    if (GetState() == c_state::clinbOSP) return;
+    if (IsUnderOSP()) return;
     if (InGround()) return; //平地不會攀爬
 
     if (GetState() == c_state::clinb){
@@ -220,42 +222,41 @@ void Player::Clinb(){
             break; // 成功攀爬後跳出迴圈
         }
     }
-    /*
-    for (auto Solid :temps){
-
-        if ((m_WorldPos.y + top*m_Transform.scale.y > Solid->m_WorldPos.y + Solid->top*Solid->m_Transform.scale.y &&
-            m_WorldPos.y < Solid->m_WorldPos.y + Solid->top*Solid->m_Transform.scale.y) &&
-            ((m_WorldPos.x - abs(left*m_Transform.scale.x) < Solid->m_WorldPos.x + abs(Solid->right*Solid->m_Transform.scale.x) + 3 &&
-            m_WorldPos.x > Solid->m_WorldPos.x + abs(Solid->left*Solid->m_Transform.scale.x)) ||
-            (m_WorldPos.x + right*m_Transform.scale.x > Solid->m_WorldPos.x - Solid->left*Solid->m_Transform.scale.x - 3 && 
-            m_WorldPos.x < Solid->m_WorldPos.x - Solid->right*Solid->m_Transform.scale.x))){
-
-                //rendering, c_state
-                if (IsContainState(c_state::clinb)){
-                    SetState(c_state::clinb, {}, false);
-                }
-                else{
-                    InitState(c_state::clinb, {4}, {RESOURCE_DIR"/Beheaded/jump/jumpThrough_"});
-                    auto temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
-                    temp->SetInterval(50);
-                }
-
-                //set pos
-                m_WorldPos.y = Solid->m_WorldPos.y + Solid->top*Solid->m_Transform.scale.y + 10;
-                VelocityY = 0, VelocityX = 0;
-                if(m_Transform.scale.x > 0){
-                    m_WorldPos.x = Solid->m_WorldPos.x - Solid->left*Solid->m_Transform.scale.x + 1;
-                }
-                else if (m_Transform.scale.x < 0){
-                    m_WorldPos.x = Solid->m_WorldPos.x + Solid->right*Solid->m_Transform.scale.x - 1;
-                }
-                break;
-        }
-    */
-
 }
 
+void Player::ClinbOSP(){
 
+    if (GetState() == c_state::clinbOSP && !IsUnderOSP()){
+        VelocityY = 0;
+        SetState(c_state::idle);
+    }
+
+    float P_Head = m_WorldPos.y + top * m_Transform.scale.y;
+    float P_Bottom = m_WorldPos.y;
+
+    bool IsHeadOver, IsbottomUnder, IsXInRange;
+
+    for (auto& OSP : r_OneSidedPlatforms){
+        IsHeadOver = P_Head > OSP->m_WorldPos.y;
+        IsbottomUnder = P_Bottom < OSP->m_WorldPos.y-3;
+        IsXInRange = !((m_WorldPos.x < OSP->m_WorldPos.x - OSP->GetScaledSize().x/2 - 1) || (m_WorldPos.x > OSP->m_WorldPos.x + OSP->GetScaledSize().x/2 + 1));
+        if ((IsbottomUnder &&  IsHeadOver && IsXInRange) ||
+            (!InGround() && IsUnderOSP())){
+
+                if (GetState() != c_state::clinbOSP) m_WorldPos.y += 50;
+
+                //rendering, c_state
+                if (IsContainState(c_state::clinbOSP)) SetState(c_state::clinbOSP);
+                else InitState(c_state::clinbOSP, {2}, {RESOURCE_DIR"/Beheaded/land/land_"});
+
+                //Move logic
+                
+                VelocityY = 10.0f;
+                return;
+            }
+
+    }
+}
 
 void Player::roll(){
 
@@ -309,6 +310,7 @@ void Player::Update(){
     }
     
     Clinb();
+    ClinbOSP();
     FixPos();
 
     m_WorldPos.x += VelocityX;

@@ -46,7 +46,12 @@ private:
      * 當動畫撥放完之前不能move
      * 動畫播完後c_state = idle
      */
-    void Clinb();   //攀爬
+    void Clinb();
+
+    /**
+     * 
+     */
+    void ClinbOSP();
 
     /**
      * set Velocity
