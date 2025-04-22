@@ -22,6 +22,17 @@ void Player::TestP(){
     if (Util::Input::IsKeyDown(Util::Keycode::P)) LOG_DEBUG(m_WorldPos);
 }
 
+void Player::SlowDown(){
+    if (VelocityX > 0){ //slow down
+        VelocityX -= Friction;
+        if (VelocityX < 0) VelocityX = 0;
+    }
+    else if(VelocityX < 0){
+        VelocityX += Friction;
+        if (VelocityX > 0) VelocityX = 0;
+    } 
+}
+
 
 bool Player::IsOnOSP(){
     if (!InGround()) return false;
@@ -69,16 +80,13 @@ void Player::Move(){
     if (GetState() == c_state::clinb) return; //攀爬時不能移動
 
     if (Util::Input::IsKeyPressed(Util::Keycode::DOWN) && GetState() == c_state::crouch) {
-        if (VelocityX > 0){ //slow down
-            VelocityX -= Friction;
-            if (VelocityX < 0) VelocityX = 0;
+        SlowDown();
+        if (Util::Input::IsKeyPressed(Util::Keycode::UP) || Util::Input::IsKeyPressed(Util::Keycode::SPACE)){
+            m_WorldPos.y -= 10;
+            fall();
         }
-        else if(VelocityX < 0){
-            VelocityX += Friction;
-            if (VelocityX > 0) VelocityX = 0;
-        }  
         return;
-    };
+    }
     
     if (GetState() == c_state::crouch){
         auto temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
@@ -128,21 +136,11 @@ void Player::Move(){
             else if (VelocityX > MaxSpeed) VelocityX = MaxSpeed;
         }
         else if (InGround() && GetState() != c_state::roll){   //do nothing
-            //滾動狀態不會進入idle狀態
-
-            if (GetState() == c_state::crouch) break;
     
             // idle
-            if (GetState() != c_state::idle) SetState(c_state::idle);//  set state
+            if (GetState() != c_state::idle && GetState() != c_state::crouch) SetState(c_state::idle);//  set state
             
-            if (VelocityX > 0){ //slow down
-                VelocityX -= Friction;
-                if (VelocityX < 0) VelocityX = 0;
-            }
-            else if(VelocityX < 0){
-                VelocityX += Friction;
-                if (VelocityX > 0) VelocityX = 0;
-            }    
+            SlowDown();  
         }
     }while (false);
     
@@ -160,19 +158,12 @@ void Player::Move(){
                 InitState(c_state::crouch, {6}, {RESOURCE_DIR"/Beheaded/crouch/crouch_"});
                 auto temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
                 temp->Pause();
-                //temp->SetInterval();
             }
         }
     }
-    else if (!InGround() && GetState() != c_state::roll){
+    else if (!InGround() && GetState() != c_state::roll){   //在地面跟翻滾狀態不會進Fall state
         if (GetState() != c_state::fall && VelocityY <= 0){   //fall
-            //rendering, c_state
-            if(IsContainState(c_state::fall)) SetState(c_state::fall, {}, false);
-            else{
-                std::vector<std::string> Img =  {RESOURCE_DIR"/Beheaded/jump/jumpTrans_",
-                                                 RESOURCE_DIR"/Beheaded/jump/jumpDown_"};
-                InitState(c_state::fall, {5, 5}, Img);
-            }
+            fall(); //rendering, c_state
         }
     }
 }
@@ -189,6 +180,15 @@ void Player::Jump(){
     VelocityY = 12.5f; 
 }
 
+
+void Player::fall(){
+    if(IsContainState(c_state::fall)) SetState(c_state::fall, {}, false);
+    else{
+        std::vector<std::string> Img =  {RESOURCE_DIR"/Beheaded/jump/jumpTrans_",
+                                            RESOURCE_DIR"/Beheaded/jump/jumpDown_"};
+        InitState(c_state::fall, {5, 5}, Img);
+    }
+}
 
 void Player::Clinb(){
     if (GetState() == c_state::roll) return; //翻滾時不能攀爬

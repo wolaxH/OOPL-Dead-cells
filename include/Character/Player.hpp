@@ -67,6 +67,13 @@ private:
      */
     void Jump();
 
+    /**
+     * 這沒什麼好寫的同move, 且只有在 move 中call
+     * only set or init state
+     * 往下的功能由applyGravity完成
+     */
+    void fall();
+
     //Util function ; OSP mean OneSidedPlatform
     /**
      * return ture if player stand on any OSP
@@ -76,6 +83,11 @@ private:
      * return true if player under any OSP, and the padding of OSP is 5px
      */
     bool IsUnderOSP();
+
+    /**
+     * To make player slowdown
+     */
+    void SlowDown();
 
 
     //a special function for test, development function, to Log player current position
