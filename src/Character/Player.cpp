@@ -4,6 +4,13 @@
 
 #include "Util/Logger.hpp"
 
+
+#define IS_LEFT_PRESSED()   Util::Input::IsKeyPressed(Util::Keycode::LEFT)  || Util::Input::IsKeyPressed(Util::Keycode::A)
+#define IS_RIGHT_PRESSED()  Util::Input::IsKeyPressed(Util::Keycode::RIGHT) || Util::Input::IsKeyPressed(Util::Keycode::D)
+#define IS_DOWN_PRESSED()   Util::Input::IsKeyPressed(Util::Keycode::DOWN)  || Util::Input::IsKeyPressed(Util::Keycode::S)
+#define IS_UP_DOWN()        Util::Input::IsKeyDown(Util::Keycode::UP)       || Util::Input::IsKeyDown(Util::Keycode::W) || Util::Input::IsKeyDown(Util::Keycode::SPACE)
+#define IS_ROLL_DOWN()      Util::Input::IsKeyDown(Util::Keycode::LSHIFT)   || Util::Input::IsKeyDown(Util::Keycode::LCTRL)
+
 Player::Player(std::vector<std::string>& path, int Hp, 
     const std::vector<std::shared_ptr<SolidObj>>& SolidObjs, 
     const std::vector<std::shared_ptr<OneSidedPlatform>>& OSP)
@@ -20,6 +27,18 @@ void Player::Attack(){}
 
 void Player::TestP(){
     if (Util::Input::IsKeyDown(Util::Keycode::P)) LOG_DEBUG(m_WorldPos);
+}
+
+void Player::SlowDown(){
+    //slow down
+    if (VelocityX > 0){
+        VelocityX -= Friction;
+        if (VelocityX < 0) VelocityX = 0;
+    }
+    else if(VelocityX < 0){
+        VelocityX += Friction;
+        if (VelocityX > 0) VelocityX = 0;
+    } 
 }
 
 
@@ -68,21 +87,18 @@ void Player::Move(){
      */
     if (GetState() == c_state::clinb) return; //攀爬時不能移動
 
-    if (Util::Input::IsKeyPressed(Util::Keycode::DOWN) && GetState() == c_state::crouch) {
-        if (VelocityX > 0){ //slow down
-            VelocityX -= Friction;
-            if (VelocityX < 0) VelocityX = 0;
+    if ((IS_DOWN_PRESSED()) && (GetState() == c_state::crouch)) {
+        SlowDown();
+        if ((IS_UP_DOWN()) && IsOnOSP()){
+            m_WorldPos.y -= 10;
+            fall();
         }
-        else if(VelocityX < 0){
-            VelocityX += Friction;
-            if (VelocityX > 0) VelocityX = 0;
-        }  
         return;
-    };
+    }
     
     if (GetState() == c_state::crouch){
         auto temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
-        if (Util::Input::IsKeyUp(Util::Keycode::DOWN)){
+        if (Util::Input::IsKeyUp(Util::Keycode::DOWN) || Util::Input::IsKeyUp(Util::Keycode::S)){
             temp->Play();
         }
         else if (temp->GetCurrentFrameIndex() == temp->GetFrameCount()-1){
@@ -98,13 +114,16 @@ void Player::Move(){
      * for jump 打斷roll
      */
     do{
-
-        if (Util::Input::IsKeyPressed(Util::Keycode::LEFT) || Util::Input::IsKeyPressed(Util::Keycode::A)){    //press right
+        //press right
+        if (IS_LEFT_PRESSED()){
+            //與翻滾不同方向才會打斷翻滾狀態
             if (GetState() == c_state::roll && m_Transform.scale.x < 0) break;;
             
-            if (m_Transform.scale.x > 0) m_Transform.scale.x *= -1; //turn the player Img
+            //turn the player Img
+            if (m_Transform.scale.x > 0) m_Transform.scale.x *= -1;
             
-            if (GetState() != c_state::L_move && InGround()){   //  change the state or add a new one
+            //  change the state or add a new one
+            if (GetState() != c_state::L_move && InGround()){
                 if (IsContainState(c_state::L_move)){ SetState(c_state::L_move);}
                 else{ InitState(c_state::L_move, {20}, {RESOURCE_DIR"/Beheaded/runA/runA_"});}
             }
@@ -112,13 +131,16 @@ void Player::Move(){
             //  chaenge pos
             if (VelocityX > -1*MaxSpeed) VelocityX += -1*AccelerationX;
             else if (VelocityX < -1*MaxSpeed) VelocityX = -1*MaxSpeed;
-        }
-        else if (Util::Input::IsKeyPressed(Util::Keycode::RIGHT) || Util::Input::IsKeyPressed(Util::Keycode::D)){  //press right
+        } //press right
+        else if (IS_RIGHT_PRESSED()){  
+            //與翻滾不同方向才會打斷翻滾狀態
             if (GetState() == c_state::roll && m_Transform.scale.x > 0) break;
             
-            if (m_Transform.scale.x < 0) m_Transform.scale.x *= -1;  //turn the player Img
+            //turn the player Img
+            if (m_Transform.scale.x < 0) m_Transform.scale.x *= -1;
             
-            if (GetState() != c_state::R_move && InGround()){   //  change the state or add a new one
+            //  change the state or add a new one
+            if (GetState() != c_state::R_move && InGround()){
                 if (IsContainState(c_state::R_move)){ SetState(c_state::R_move);}
                 else{ InitState(c_state::L_move, {20}, {RESOURCE_DIR"/Beheaded/runA/runA_"});}
             }
@@ -126,53 +148,39 @@ void Player::Move(){
             //  set Velocity
             if (VelocityX < MaxSpeed) VelocityX += AccelerationX;
             else if (VelocityX > MaxSpeed) VelocityX = MaxSpeed;
-        }
-        else if (InGround() && GetState() != c_state::roll){   //do nothing
-            //滾動狀態不會進入idle狀態
-
-            if (GetState() == c_state::crouch) break;
-    
+        } //do nothing
+        else if (InGround() && GetState() != c_state::roll){  
             // idle
-            if (GetState() != c_state::idle) SetState(c_state::idle);//  set state
+            if (GetState() != c_state::idle && GetState() != c_state::crouch) SetState(c_state::idle);//  set state
             
-            if (VelocityX > 0){ //slow down
-                VelocityX -= Friction;
-                if (VelocityX < 0) VelocityX = 0;
-            }
-            else if(VelocityX < 0){
-                VelocityX += Friction;
-                if (VelocityX > 0) VelocityX = 0;
-            }    
+            SlowDown();  
         }
     }while (false);
     
-    
-    if (Util::Input::IsKeyDown(Util::Keycode::UP) || Util::Input::IsKeyPressed(Util::Keycode::W)){Jump();}
-    else if (Util::Input::IsKeyPressed(Util::Keycode::DOWN)){
-        if (InGround()){   //crouch
-            if (IsContainState(c_state::crouch)){
-                SetState(c_state::crouch);
-                auto temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
-                temp->SetCurrentFrame(0);
-                temp->Pause();
-            }
-            else{
-                InitState(c_state::crouch, {6}, {RESOURCE_DIR"/Beheaded/crouch/crouch_"});
-                auto temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
-                temp->Pause();
-                //temp->SetInterval();
-            }
+    /**
+     * 控制上下移動
+     */
+    if (IS_UP_DOWN()){
+        //rendering, c_state, SET VelocityY
+        Jump();
+    } //Pressed Down
+    else if (IS_DOWN_PRESSED()){
+        //crouch
+        if (InGround()){
+
+            if (IsContainState(c_state::crouch)) SetState(c_state::crouch);
+            else InitState(c_state::crouch, {6}, {RESOURCE_DIR"/Beheaded/crouch/crouch_"});
+
+            auto temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
+            temp->SetCurrentFrame(0);
+            temp->Pause();
         }
-    }
-    else if (!InGround() && GetState() != c_state::roll){
-        if (GetState() != c_state::fall && VelocityY <= 0){   //fall
+    } //在地面跟翻滾狀態不會進Fall state
+    else if (!InGround() && GetState() != c_state::roll){\
+        //fall
+        if (GetState() != c_state::fall && VelocityY <= 0){
             //rendering, c_state
-            if(IsContainState(c_state::fall)) SetState(c_state::fall, {}, false);
-            else{
-                std::vector<std::string> Img =  {RESOURCE_DIR"/Beheaded/jump/jumpTrans_",
-                                                 RESOURCE_DIR"/Beheaded/jump/jumpDown_"};
-                InitState(c_state::fall, {5, 5}, Img);
-            }
+            fall();
         }
     }
 }
@@ -189,6 +197,14 @@ void Player::Jump(){
     VelocityY = 12.5f; 
 }
 
+void Player::fall(){
+    if(IsContainState(c_state::fall)) SetState(c_state::fall, {}, false);
+    else{
+        std::vector<std::string> Img =  {RESOURCE_DIR"/Beheaded/jump/jumpTrans_",
+                                         RESOURCE_DIR"/Beheaded/jump/jumpDown_"};
+        InitState(c_state::fall, {5, 5}, Img);
+    }
+}
 
 void Player::Clinb(){
     if (GetState() == c_state::roll) return; //翻滾時不能攀爬
@@ -230,14 +246,16 @@ void Player::Clinb(){
 
         inYRange = playerTop > Solid->m_WorldPos.y + solidTop &&
                         m_WorldPos.y < Solid->m_WorldPos.y + solidTop;
-
+        //玩家朝左
         leftCheck = m_WorldPos.x - std::abs(left * m_Transform.scale.x) <
                          Solid->m_WorldPos.x + std::abs(solidRight) + 3 &&
-                         m_WorldPos.x > Solid->m_WorldPos.x + std::abs(solidLeft);
-
-        rightCheck = m_WorldPos.x + right * m_Transform.scale.x >
+                         m_WorldPos.x > Solid->m_WorldPos.x + std::abs(solidRight) - 1 &&    //m_WorldPos.x > Solid->m_WorldPos.x - std::abs(solidLeft)
+                         m_Transform.scale.x < 0;
+        //玩家朝右
+        rightCheck = m_WorldPos.x + std::abs(right * m_Transform.scale.x) >
                           Solid->m_WorldPos.x - solidLeft - 3 &&
-                          m_WorldPos.x < Solid->m_WorldPos.x - solidRight;
+                          m_WorldPos.x < Solid->m_WorldPos.x - solidLeft + 1 && //m_WorldPos.x < Solid->m_WorldPos.x + solidRight
+                          m_Transform.scale.x > 0;
 
         if (inYRange && (leftCheck || rightCheck)) {
             // 設定狀態
@@ -345,9 +363,7 @@ void Player::Update(){
     Move();
     applyGravity();
 
-    if (Util::Input::IsKeyDown(Util::Keycode::LSHIFT) || 
-        Util::Input::IsKeyDown(Util::Keycode::LCTRL) ||
-        GetState() == c_state::roll){
+    if (IS_ROLL_DOWN() || GetState() == c_state::roll){
         roll();
     }
     
