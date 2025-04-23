@@ -30,8 +30,10 @@ void Player::TestP(){
 }
 
 void Player::SlowDown(){
+
     //slow down
     if (VelocityX > 0){
+
         VelocityX -= Friction;
         if (VelocityX < 0) VelocityX = 0;
     }
@@ -87,9 +89,11 @@ void Player::Move(){
      */
     if (GetState() == c_state::clinb) return; //攀爬時不能移動
 
+
     if ((IS_DOWN_PRESSED()) && (GetState() == c_state::crouch)) {
         SlowDown();
         if ((IS_UP_DOWN()) && IsOnOSP()){
+
             m_WorldPos.y -= 10;
             fall();
         }
@@ -98,7 +102,9 @@ void Player::Move(){
     
     if (GetState() == c_state::crouch){
         auto temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
+
         if (Util::Input::IsKeyUp(Util::Keycode::DOWN) || Util::Input::IsKeyUp(Util::Keycode::S)){
+
             temp->Play();
         }
         else if (temp->GetCurrentFrameIndex() == temp->GetFrameCount()-1){
@@ -114,6 +120,7 @@ void Player::Move(){
      * for jump 打斷roll
      */
     do{
+
         //press right
         if (IS_LEFT_PRESSED()){
             //與翻滾不同方向才會打斷翻滾狀態
@@ -183,6 +190,11 @@ void Player::Move(){
             fall();
         }
     }
+    else if (!InGround() && GetState() != c_state::roll){   //在地面跟翻滾狀態不會進Fall state
+        if (GetState() != c_state::fall && VelocityY <= 0){   //fall
+            fall(); //rendering, c_state
+        }
+    }
 }
 
 void Player::Jump(){
@@ -202,6 +214,15 @@ void Player::fall(){
     else{
         std::vector<std::string> Img =  {RESOURCE_DIR"/Beheaded/jump/jumpTrans_",
                                          RESOURCE_DIR"/Beheaded/jump/jumpDown_"};
+        InitState(c_state::fall, {5, 5}, Img);
+    }
+}
+
+void Player::fall(){
+    if(IsContainState(c_state::fall)) SetState(c_state::fall, {}, false);
+    else{
+        std::vector<std::string> Img =  {RESOURCE_DIR"/Beheaded/jump/jumpTrans_",
+                                            RESOURCE_DIR"/Beheaded/jump/jumpDown_"};
         InitState(c_state::fall, {5, 5}, Img);
     }
 }
@@ -230,6 +251,7 @@ void Player::Clinb(){
     float solidRight;
     
     float playerTop;
+
 
 
     bool inYRange;
@@ -266,7 +288,6 @@ void Player::Clinb(){
                 auto anim = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
                 anim->SetInterval(50);
             }
-
             // 設定位置
             m_WorldPos.y = Solid->m_WorldPos.y + solidTop + 10;
             VelocityX = VelocityY = 0;
