@@ -31,6 +31,8 @@ set(INCLUDE_FILES
     SolidObj.hpp
     OneSidedPlatform.hpp  
     BackGround.hpp
+    PlayerUI.hpp
+    Hp.hpp
 
 )
 

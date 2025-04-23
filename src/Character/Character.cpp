@@ -66,7 +66,7 @@ void Character::InitState(c_state state, const std::vector<std::size_t>& frames,
     std::vector<std::string> Img;
     std::vector<std::string> temp;
 
-    std::vector<c_state> NotLoopingState = {c_state::jump, c_state::fall, c_state::atk, c_state::clinb, c_state::roll};
+    std::vector<c_state> NotLoopingState = {c_state::jump, c_state::fall, c_state::atk, c_state::clinb, c_state::roll, c_state::crouch};
 
 
     for (std::size_t i =0; i < frames.size(); i++){
@@ -80,6 +80,7 @@ void Character::InitState(c_state state, const std::vector<std::size_t>& frames,
 }
 
 void Character::applyGravity(){
+
     if (!InGround()){
         VelocityY -= Gravity;
         if (VelocityY < -1*MaxFallSpeed) VelocityY = -1*MaxFallSpeed;
@@ -93,14 +94,11 @@ void Character::FixPos(){
     int breakFlag = 0;
 
     /**
-     * This is a temporary solution, as the one sided platform is a solid object.
+     * TODO:遍歷SolidObj 並使用舊邏輯修正
+     *      遍歷OSP 並製作OSP的fix邏輯
+     *      OSP邏輯: 玩家在OSP上
      */
-    std::vector<std::shared_ptr<SolidObj>> r_temp;
-    r_temp.reserve(r_SolidObjs.size() + r_OneSidedPlatforms.size());
-    r_temp.insert(r_temp.end(), r_SolidObjs.begin(), r_SolidObjs.end());
-    r_temp.insert(r_temp.end(), r_OneSidedPlatforms.begin(), r_OneSidedPlatforms.end());
-    
-    for (auto& Solid : r_temp){
+    for (auto& Solid : r_SolidObjs){
         breakFlag = 0;
         
         m_WorldPos.x += VelocityX;
@@ -121,10 +119,22 @@ void Character::FixPos(){
 
         if (breakFlag == 2){
            m_WorldPos.y -= 1;
-            break;
+            return;
         }
     }
-
+    
+    for (auto& OSP : r_OneSidedPlatforms){
+        if (m_WorldPos.y < OSP->m_WorldPos.y) continue;
+        
+        m_WorldPos.y += VelocityY;
+        if (m_WorldPos.y < OSP->m_WorldPos.y && 
+            !((m_WorldPos.x < OSP->m_WorldPos.x - OSP->GetScaledSize().x/2 - 1) || (m_WorldPos.x > OSP->m_WorldPos.x + OSP->GetScaledSize().x/2 + 1))){
+            m_WorldPos.y -= VelocityY;
+            VelocityY = 0;
+            break;
+        }
+        m_WorldPos.y -= VelocityY;
+    }
 }
 
 bool Character::InGround(){

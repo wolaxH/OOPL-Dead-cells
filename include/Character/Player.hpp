@@ -46,7 +46,12 @@ private:
      * 當動畫撥放完之前不能move
      * 動畫播完後c_state = idle
      */
-    void Clinb();   //攀爬
+    void Clinb();
+
+    /**
+     * 
+     */
+    void ClinbOSP();
 
     /**
      * set Velocity
@@ -62,8 +67,27 @@ private:
      */
     void Jump();
 
+    /**
+     * 這沒什麼好寫的同move, 且只有在 move 中call
+     * only set or init state
+     * 往下的功能由applyGravity完成
+     */
+    void fall();
+
     //Util function ; OSP mean OneSidedPlatform
+    /**
+     * return ture if player stand on any OSP
+     */
     bool IsOnOSP();
+    /**
+     * return true if player under any OSP, and the padding of OSP is 5px
+     */
+    bool IsUnderOSP();
+
+    /**
+     * To make player slowdown
+     */
+    void SlowDown();
 
 
     //a special function for test, development function, to Log player current position
