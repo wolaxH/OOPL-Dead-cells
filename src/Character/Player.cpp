@@ -209,14 +209,6 @@ void Player::Jump(){
     VelocityY = 12.5f; 
 }
 
-void Player::fall(){
-    if(IsContainState(c_state::fall)) SetState(c_state::fall, {}, false);
-    else{
-        std::vector<std::string> Img =  {RESOURCE_DIR"/Beheaded/jump/jumpTrans_",
-                                         RESOURCE_DIR"/Beheaded/jump/jumpDown_"};
-        InitState(c_state::fall, {5, 5}, Img);
-    }
-}
 
 void Player::fall(){
     if(IsContainState(c_state::fall)) SetState(c_state::fall, {}, false);
