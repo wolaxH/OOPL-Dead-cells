@@ -104,7 +104,6 @@ void Player::Move(){
         auto temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
 
         if (Util::Input::IsKeyUp(Util::Keycode::DOWN) || Util::Input::IsKeyUp(Util::Keycode::S)){
-
             temp->Play();
         }
         else if (temp->GetCurrentFrameIndex() == temp->GetFrameCount()-1){
@@ -183,16 +182,11 @@ void Player::Move(){
             temp->Pause();
         }
     } //在地面跟翻滾狀態不會進Fall state
-    else if (!InGround() && GetState() != c_state::roll){\
+    else if (!InGround() && GetState() != c_state::roll){
         //fall
         if (GetState() != c_state::fall && VelocityY <= 0){
             //rendering, c_state
             fall();
-        }
-    }
-    else if (!InGround() && GetState() != c_state::roll){   //在地面跟翻滾狀態不會進Fall state
-        if (GetState() != c_state::fall && VelocityY <= 0){   //fall
-            fall(); //rendering, c_state
         }
     }
 }
