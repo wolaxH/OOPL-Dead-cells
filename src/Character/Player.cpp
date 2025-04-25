@@ -23,6 +23,27 @@ Player::Player(std::vector<std::string>& path, int Hp,
 //WIP
 void Player::Attack(){}
 
+bool Player::IsNearbyDrops(std::shared_ptr<Drops> drops){
+    glm::vec2 D = m_WorldPos - drops->m_WorldPos;
+    return glm::length(D) <= 50.0f;
+}
+
+void Player::PickUpDrops(std::shared_ptr<Drops> drops){
+    auto temp = std::dynamic_pointer_cast<Weapon>(drops->GetItem());
+    //如果是武器
+    if (temp){
+        if (!m_Weapon1) m_Weapon1 = temp;
+        else if (!m_Weapon2) m_Weapon2 = temp;
+        else{ //WIP
+            //彈出更換武器視窗
+            //將被替換的武器變成掉落物
+        }
+    } //如果是卷軸
+    else{ //WIP
+        //卷軸效果加乘
+    }
+}
+
 /*-----------------------------------util-----------------------------------*/
 
 void Player::TestP(){

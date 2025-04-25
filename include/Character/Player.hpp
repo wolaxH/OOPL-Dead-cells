@@ -3,35 +3,55 @@
 
 #include "Character/Character.hpp"
 #include"MyUtil/Timer.hpp"
+#include "Item/Item.hpp"
+#include "Item/Drops.hpp"
+#include "Item/Weapon/Weapon.hpp"
+
 
 
 class Player : public Character{
-public:
+    public:
     Player(std::vector<std::string>& path, int Hp, 
         const std::vector<std::shared_ptr<SolidObj>>& SolidObjs, 
         const std::vector<std::shared_ptr<OneSidedPlatform>>& OSP);
-    ~Player() noexcept = default;
-
-    void Attack() override;
-
-    void Update() override;
-
-    void Attacked(int damage){Hp -= damage;}
-
-    //for mob push
-    void Pushed(){ 
-        if (GetState() == c_state::roll) return;    //翻滾狀態不回被怪物推動減少速度
-
-        if (VelocityX > 0){
-            VelocityX *= 0.5f;
-            if (VelocityX < 5) VelocityX = 5.0f;
+        ~Player() noexcept = default;
+        
+        void Attack() override;
+        
+        void Update() override;
+        
+        void Attacked(int damage){Hp -= damage;}
+        
+        //for mob push
+        void Pushed(){ 
+            if (GetState() == c_state::roll) return;    //翻滾狀態不回被怪物推動減少速度
+            
+            if (VelocityX > 0){
+                VelocityX *= 0.5f;
+                if (VelocityX < 5) VelocityX = 5.0f;
+            }
+            else if (VelocityX < 0){
+                VelocityX *= 0.5f;
+                if (VelocityX > -5) VelocityX = -5.0f;
+            }
         }
-        else if (VelocityX < 0){
-            VelocityX *= 0.5f;
-            if (VelocityX > -5) VelocityX = -5.0f;
-        }
-    }
-    
+        
+    /**Get item logic
+     * * 1. 玩家靠近掉落物      complete
+     * * 2. 掉落物出現撿取提示
+     * * 3. 玩家按下R
+     * * 4. 根據掉落物的物品觸發不同邏輯
+     * * * 4.1. 若為武器且武器slot滿了需要彈出更換視窗，且被替換的武器需要變回掉落物(or 直接消失)
+     * * * 4.2. 若為卷軸則直接使用
+     * * 5. 掉落物消失
+     */
+    bool IsNearbyDrops(std::shared_ptr<Drops> drops);
+
+    /**
+     * When Press R, call this function
+     */
+    void PickUpDrops(std::shared_ptr<Drops> drops);
+
 private:
     /**
      * 設置c_state 跟 Rednering
@@ -97,6 +117,7 @@ private:
     void TestP();
 
 private:
+    std::shared_ptr<Weapon> m_Weapon1 = nullptr, m_Weapon2 = nullptr; //武器槽
     
     int jumpStep = 0;   //double jump counter
     Timer timer;   //for count the roll cooling time
