@@ -28,6 +28,10 @@ set(INCLUDE_FILES
     MyUtil/Camera.hpp
     MyUtil/Timer.hpp
 
+    Item/PickUp.hpp
+    Item/Weapon/Weapon.hpp
+    Item/Weapon/Knife.hpp
+
     SolidObj.hpp
     OneSidedPlatform.hpp  
     BackGround.hpp

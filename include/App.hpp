@@ -83,16 +83,18 @@ private:    //Menu Objs
     std::shared_ptr<Button> ExitButton;
 
 private:    //ingame Objs
+    Camera camera;
+
     std::shared_ptr<PlayerUI>playerui;
     std::shared_ptr<Player> player;
     std::shared_ptr<Zombie> zombie;
+
     std::vector<std::shared_ptr<MapObj>> MapObjs;
-    Camera camera;
     std::vector<std::shared_ptr<SolidObj>> SolidObjs;
     std::vector<std::shared_ptr<OneSidedPlatform>> OneSidedPlatforms;
     std::vector<std::shared_ptr<Mob>> Mobs;
+    std::vector<std::shared_ptr<Drops>> WorldDrops;
     
-    // std::shared_ptr<BG> bg1, bg2, bg3;
     std::vector<std::shared_ptr<BG>> BGs;
 };
 

@@ -12,7 +12,7 @@ void App::InGameInit() {
     for (int i = 0; i < 46; i++){
         Img.push_back(RESOURCE_DIR"/Beheaded/idle/idle_" + std::to_string(i) + ".png");
     }
-    player = std::make_shared<Player>(Img, 100, SolidObjs, OneSidedPlatforms);
+    player = std::make_shared<Player>(Img, 100, SolidObjs, OneSidedPlatforms, WorldDrops);
     player->SetPos({0, 0});
     player->SetZIndex(5);
     player->SetVisible(true);

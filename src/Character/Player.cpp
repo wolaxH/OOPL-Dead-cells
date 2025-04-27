@@ -13,8 +13,10 @@
 
 Player::Player(std::vector<std::string>& path, int Hp, 
     const std::vector<std::shared_ptr<SolidObj>>& SolidObjs, 
-    const std::vector<std::shared_ptr<OneSidedPlatform>>& OSP)
-    : Character(path, Hp, SolidObjs, OSP){
+    const std::vector<std::shared_ptr<OneSidedPlatform>>& OSP,
+    std::vector<std::shared_ptr<Drops>>& Drops)
+    : Character(path, Hp, SolidObjs, OSP), 
+    r_WorldDrops(Drops){
         m_Transform.scale = {2.0f, 2.0f};
         m_Transform.translation = {0.0f, -100.0f};
         top = 60, bottom = 0, left = 10, right = 10;
@@ -29,18 +31,41 @@ bool Player::IsNearbyDrops(std::shared_ptr<Drops> drops){
 }
 
 void Player::PickUpDrops(std::shared_ptr<Drops> drops){
-    auto temp = std::dynamic_pointer_cast<Weapon>(drops->GetItem());
     //如果是武器
-    if (temp){
-        if (!m_Weapon1) m_Weapon1 = temp;
-        else if (!m_Weapon2) m_Weapon2 = temp;
+    auto NewWeapon = std::dynamic_pointer_cast<Weapon>(drops->ToItem());
+    
+    if (NewWeapon){
+        if (!m_Weapon1) m_Weapon1 = NewWeapon;
+        else if (!m_Weapon2) m_Weapon2 = NewWeapon;
         else{ //WIP
             //彈出更換武器視窗
+
+
             //將被替換的武器變成掉落物
+            auto temp = m_Weapon1->ToDrops();
+            temp->m_WorldPos = m_WorldPos + glm::vec2(0, 10);
+            r_WorldDrops.push_back(temp);
+            m_Weapon1 = NewWeapon;
+            r_WorldDrops.erase(std::remove(r_WorldDrops.begin(), r_WorldDrops.end(), drops), r_WorldDrops.end());
         }
     } //如果是卷軸
     else{ //WIP
         //卷軸效果加乘
+    }
+}
+
+void Player::PickUp(){
+    if (!InGround()) return;
+    if (GetState() == c_state::roll) return; //翻滾狀態不能撿東西
+    if (GetState() == c_state::atk) return; //攻擊狀態不能撿東西
+
+    if (Util::Input::IsKeyPressed(Util::Keycode::R)){
+        for (auto& drop : r_WorldDrops){
+            if (IsNearbyDrops(drop)){
+                PickUpDrops(drop);
+                return;
+            }
+        }
     }
 }
 
@@ -403,4 +428,7 @@ void Player::Update(){
     m_WorldPos.y += VelocityY;
 
     TestP();
+
+
+    //PickUp();
 }

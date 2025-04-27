@@ -3,8 +3,7 @@
 
 #include "Character/Character.hpp"
 #include"MyUtil/Timer.hpp"
-#include "Item/Item.hpp"
-#include "Item/Drops.hpp"
+#include "Item/PickUp.hpp"
 #include "Item/Weapon/Weapon.hpp"
 
 
@@ -13,7 +12,8 @@ class Player : public Character{
     public:
     Player(std::vector<std::string>& path, int Hp, 
         const std::vector<std::shared_ptr<SolidObj>>& SolidObjs, 
-        const std::vector<std::shared_ptr<OneSidedPlatform>>& OSP);
+        const std::vector<std::shared_ptr<OneSidedPlatform>>& OSP,
+        std::vector<std::shared_ptr<Drops>>& Drops);
         ~Player() noexcept = default;
         
         void Attack() override;
@@ -36,14 +36,20 @@ class Player : public Character{
             }
         }
         
+        
+        
+private:
+    
+    void PickUp();
+
     /**Get item logic
      * * 1. 玩家靠近掉落物      complete
      * * 2. 掉落物出現撿取提示
-     * * 3. 玩家按下R
+     * * 3. 玩家按下R           complete
      * * 4. 根據掉落物的物品觸發不同邏輯
-     * * * 4.1. 若為武器且武器slot滿了需要彈出更換視窗，且被替換的武器需要變回掉落物(or 直接消失)
+     * * * 4.1. 若為武器且武器slot滿了需要彈出更換視窗，且被替換的武器需要變回掉落物    complete
      * * * 4.2. 若為卷軸則直接使用
-     * * 5. 掉落物消失
+     * * 5. 掉落物消失     complete
      */
     bool IsNearbyDrops(std::shared_ptr<Drops> drops);
 
@@ -52,7 +58,6 @@ class Player : public Character{
      */
     void PickUpDrops(std::shared_ptr<Drops> drops);
 
-private:
     /**
      * 設置c_state 跟 Rednering
      * 向所面相的方向移動一段距離 (set VelocityX)
@@ -118,7 +123,8 @@ private:
 
 private:
     std::shared_ptr<Weapon> m_Weapon1 = nullptr, m_Weapon2 = nullptr; //武器槽
-    
+
+    std::vector<std::shared_ptr<Drops>>& r_WorldDrops;
     int jumpStep = 0;   //double jump counter
     Timer timer;   //for count the roll cooling time
 };
