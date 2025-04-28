@@ -6,6 +6,7 @@
 #include "Abstract/MapObj.hpp"
 #include "SolidObj.hpp"
 #include "OneSidedPlatform.hpp"
+#include "MyUtil/AccessKey.hpp"
 
 #include <unordered_map>
 #include <algorithm>
@@ -65,6 +66,10 @@ protected:
 
     //移動
     virtual void Move() = 0;
+
+    bool IsNearBy(std::shared_ptr<MapObj> other, float distance = 1000.0f);
+
+    void ChangeDrawable(AccessKey key, std::shared_ptr<Util::Animation> PlayerDrawable, c_state state = c_state::atk);
 
 protected:
     float VelocityX = 0, VelocityY = 0; //speed

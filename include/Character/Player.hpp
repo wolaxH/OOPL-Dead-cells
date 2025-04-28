@@ -117,7 +117,6 @@ private:
     void SlowDown();
 
 
-
     //a special function for test, development function, to Log player current position
     void TestP();
 

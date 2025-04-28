@@ -47,6 +47,7 @@ void Player::PickUpDrops(std::shared_ptr<Drops> drops){
             r_WorldDrops.push_back(temp);
             m_Weapon1 = NewWeapon;
             r_WorldDrops.erase(std::remove(r_WorldDrops.begin(), r_WorldDrops.end(), drops), r_WorldDrops.end());
+            ChangeDrawable(AccessKey(), m_Weapon1->GetPlayerDrawable());
         }
     } //如果是卷軸
     else{ //WIP
@@ -89,7 +90,6 @@ void Player::SlowDown(){
     } 
 }
 
-
 bool Player::IsOnOSP(){
     if (!InGround()) return false;
 
@@ -99,6 +99,7 @@ bool Player::IsOnOSP(){
     bool x, y;
 
     for (auto& OSP : r_OneSidedPlatforms){
+        if (!IsNearBy(OSP, 640.0f)) continue;
         OSP_Pos = OSP->m_WorldPos;
         OSP_scale = abs(OSP->GetScaledSize());
 
@@ -117,6 +118,7 @@ bool Player::IsUnderOSP(){
     bool x, y;
 
     for (auto& OSP : r_OneSidedPlatforms){
+        if (!IsNearBy(OSP, 640.0f)) continue;
         OSP_scale = abs(OSP->GetScaledSize());
 
         x = !((Pos.x < OSP->m_WorldPos.x - OSP_scale.x/2 - 1) || (Pos.x > OSP->m_WorldPos.x + OSP_scale.x/2 + 1));
@@ -249,7 +251,6 @@ void Player::Jump(){
     VelocityY = 12.5f; 
 }
 
-
 void Player::fall(){
     if(IsContainState(c_state::fall)) SetState(c_state::fall, {}, false);
     else{
@@ -284,14 +285,13 @@ void Player::Clinb(){
     
     float playerTop;
 
-
-
     bool inYRange;
     bool leftCheck;
     bool rightCheck;
 
 
     for (auto& Solid : temps) {
+        if (!IsNearBy(Solid, 3000.0f)) continue; //如果不在附近就跳過
         solidTop = Solid->top * Solid->m_Transform.scale.y;
         solidLeft = Solid->left * Solid->m_Transform.scale.x;
         solidRight = Solid->right * Solid->m_Transform.scale.x;
@@ -343,7 +343,6 @@ void Player::ClinbOSP(){
         SetState(c_state::idle);
     }
 
-
     float P_Head = m_WorldPos.y + top * m_Transform.scale.y;
     float P_Bottom = m_WorldPos.y;
 
@@ -367,7 +366,6 @@ void Player::ClinbOSP(){
                 VelocityY = 10.0f;
                 return;
             }
-
     }
 }
 
