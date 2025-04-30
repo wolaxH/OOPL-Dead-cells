@@ -89,6 +89,9 @@ private:    //ingame Objs
     std::shared_ptr<Player> player;
     std::shared_ptr<Zombie> zombie;
 
+    //UI
+
+
     std::vector<std::shared_ptr<MapObj>> MapObjs;
     std::vector<std::shared_ptr<SolidObj>> SolidObjs;
     std::vector<std::shared_ptr<OneSidedPlatform>> OneSidedPlatforms;

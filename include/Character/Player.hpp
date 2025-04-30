@@ -5,6 +5,7 @@
 #include"MyUtil/Timer.hpp"
 #include "Item/PickUp.hpp"
 #include "Item/Weapon/Weapon.hpp"
+#include "UI/PlayerUI.hpp"
 
 
 
@@ -122,6 +123,7 @@ private:
 
 private:
     std::shared_ptr<Weapon> m_Weapon1 = nullptr, m_Weapon2 = nullptr; //武器槽
+    std::shared_ptr<PlayerUI> m_PlayerINFO; //玩家UI
 
     std::vector<std::shared_ptr<Drops>>& r_WorldDrops;
     int jumpStep = 0;   //double jump counter

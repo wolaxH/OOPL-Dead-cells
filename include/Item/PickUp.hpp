@@ -22,7 +22,7 @@ public:
         m_Drawable = std::make_shared<Util::Image>(path);
         
         auto I = std::make_shared<Util::Image>(RESOURCE_DIR"/UI/notifBox.png");
-        m_DescribeBox = std::make_shared<Util::GameObject>(I, 15.0f);
+        m_DescribeBox = std::make_shared<Util::GameObject>(I, 15.2f);
         m_DescribeBox->SetVisible(false);
         
         //建立DescribeBox 跟 Describe

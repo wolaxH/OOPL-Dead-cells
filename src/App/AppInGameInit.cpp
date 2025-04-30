@@ -14,7 +14,7 @@ void App::InGameInit() {
     }
     player = std::make_shared<Player>(Img, 100, SolidObjs, OneSidedPlatforms, WorldDrops);
     player->SetPos({0, 0});
-    player->SetZIndex(5);
+    player->SetZIndex(30);
     player->SetVisible(true);
     root.AddChild(player);
     camera.SetPos(player->m_WorldPos);
@@ -25,7 +25,7 @@ void App::InGameInit() {
     }
     zombie = std::make_shared<Zombie>(Img, 100, player, SolidObjs, OneSidedPlatforms);
     zombie->SetPos({0, 0});
-    zombie->SetZIndex(100);
+    zombie->SetZIndex(30);
     zombie->SetVisible(true);
     MapObjs.push_back(zombie);
     root.AddChild(zombie);
@@ -65,10 +65,6 @@ void App::InGameInit() {
     for (auto& temp : OneSidedPlatforms){ temps.push_back(temp);}
     root.AddChildren(temps);
 
-
-
-    playerui = std::make_shared<PlayerUI>();
-    playerui->AddToRender(root);
     // playerui->SetHp(30);
 
     LOG_TRACE("Start");

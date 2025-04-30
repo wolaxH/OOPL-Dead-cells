@@ -20,6 +20,10 @@ Player::Player(std::vector<std::string>& path, int Hp,
         m_Transform.scale = {2.0f, 2.0f};
         m_Transform.translation = {0.0f, -100.0f};
         top = 60, bottom = 0, left = 10, right = 10;
+
+        m_PlayerINFO = std::make_shared<PlayerUI>();
+        
+        AddChild(m_PlayerINFO);
 }
 
 //WIP
@@ -73,7 +77,14 @@ void Player::PickUp(){
 /*-----------------------------------util-----------------------------------*/
 
 void Player::TestP(){
-    if (Util::Input::IsKeyDown(Util::Keycode::P)) LOG_DEBUG(m_WorldPos);
+    if (Util::Input::IsKeyDown(Util::Keycode::P)){
+        m_PlayerINFO->SetHp(m_PlayerINFO->GetCurrentHp() - 5);
+        if (m_PlayerINFO->GetCurrentHp() <= 0){
+            m_PlayerINFO->SetHp(100);
+        }
+        //LOG_DEBUG(m_WorldPos);
+    }
+
 }
 
 void Player::SlowDown(){

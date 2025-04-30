@@ -32,11 +32,13 @@ set(INCLUDE_FILES
     Item/Weapon/Weapon.hpp
     Item/Weapon/Knife.hpp
 
+    UI/PlayerUI.hpp
+    UI/Hp.hpp
+    UI/SkillSlot.hpp
+
     SolidObj.hpp
     OneSidedPlatform.hpp  
     BackGround.hpp
-    PlayerUI.hpp
-    Hp.hpp
 
 )
 
