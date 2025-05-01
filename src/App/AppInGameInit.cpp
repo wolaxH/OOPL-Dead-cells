@@ -29,6 +29,7 @@ void App::InGameInit() {
     zombie->SetVisible(true);
     MapObjs.push_back(zombie);
     root.AddChild(zombie);
+    
 
 
     //bg

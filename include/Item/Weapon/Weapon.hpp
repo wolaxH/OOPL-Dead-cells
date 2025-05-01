@@ -18,6 +18,8 @@ public:
             m_Describe->SetVisible(false);
     }
 
+    auto GetIcon() const {return m_Drawable;}
+
     auto GetPlayerDrawable() const {return Player_Drawable;}
 protected:
     int m_AtkPoint; //攻擊力

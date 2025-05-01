@@ -35,12 +35,13 @@ bool Player::IsNearbyDrops(std::shared_ptr<Drops> drops){
 }
 
 void Player::PickUpDrops(std::shared_ptr<Drops> drops){
-    //如果是武器
-    auto NewWeapon = std::dynamic_pointer_cast<Weapon>(drops->ToItem());
     
-    if (NewWeapon){
-        if (!m_Weapon1) m_Weapon1 = NewWeapon;
-        else if (!m_Weapon2) m_Weapon2 = NewWeapon;
+    auto NewItem = std::dynamic_pointer_cast<Weapon>(drops->ToItem());
+
+    //如果是武器
+    if (NewItem){
+        if (!m_Weapon1) m_Weapon1 = NewItem;
+        else if (!m_Weapon2) m_Weapon2 = NewItem;
         else{ //WIP
             //彈出更換武器視窗
 
@@ -49,9 +50,12 @@ void Player::PickUpDrops(std::shared_ptr<Drops> drops){
             auto temp = m_Weapon1->ToDrops();
             temp->m_WorldPos = m_WorldPos + glm::vec2(0, 10);
             r_WorldDrops.push_back(temp);
-            m_Weapon1 = NewWeapon;
+            m_Weapon1 = NewItem;
             r_WorldDrops.erase(std::remove(r_WorldDrops.begin(), r_WorldDrops.end(), drops), r_WorldDrops.end());
             ChangeDrawable(AccessKey(), m_Weapon1->GetPlayerDrawable());
+
+            //更換slot圖案
+            m_PlayerINFO->SetSkill(m_Weapon1, 1);
         }
     } //如果是卷軸
     else{ //WIP

@@ -29,8 +29,11 @@ public:
         AddChild(m_DescribeBox);
         AddChild(m_Describe);
     }
+    virtual ~Item() = default;
     
     std::shared_ptr<Drops> ToDrops() {return std::make_shared<Drops>(m_Drawable, shared_from_this());}
+
+    auto GetIcon() const {return m_Drawable;}
     
     void SetDescribeVisible(bool visible){
         m_Describe->SetVisible(visible);
@@ -46,7 +49,9 @@ protected:
     std::shared_ptr<Util::GameObject> m_Describe;
     //Image
     std::shared_ptr<Util::GameObject> m_DescribeBox;
-};
+};  // Item
+
+
 /**
  * Drops是掉落物的基底類別
  * 目前只有武器和卷軸兩種物品
@@ -66,6 +71,6 @@ public:
     std::shared_ptr<Item> ToItem() {return m_Item;}
 private:
     std::shared_ptr<Item> m_Item;
-};
+};  // Drops
 
 #endif // PICKUP_HPP
