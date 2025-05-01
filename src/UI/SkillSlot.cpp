@@ -8,16 +8,16 @@ SkillSlot::SkillSlot(){
     resource = std::make_shared<Util::Image>(RESOURCE_DIR"/UI/skillSlotBg.png");
     m_SkillSlotBg = std::make_shared<Util::GameObject>(resource, 60.1f);
 
-    m_SkillIcon = nullptr;
-    m_SkillIconBg = nullptr;
+    // m_SkillIcon = nullptr;
+    // m_SkillIconBg = nullptr;
 
     m_SkillBg->m_Transform.scale *= 2.5f;
     m_SkillSlotBg->m_Transform.scale *= 2.5f;
 
     AddChild(m_SkillBg);    //60.0f
     AddChild(m_SkillSlotBg);//60.1f
-    AddChild(m_SkillIconBg);//60.2f
-    AddChild(m_SkillIcon);  //60.3f
+    // AddChild(m_SkillIconBg);//60.2f
+    // AddChild(m_SkillIcon);  //60.3f
 }
 
 void SkillSlot::SetPos(const glm::vec2& pos){
@@ -26,6 +26,12 @@ void SkillSlot::SetPos(const glm::vec2& pos){
 }
 
 void SkillSlot::SetSkillIcon(const std::shared_ptr<Util::Image>& Icon){
-    // slotBg
+    /*slotBg*/
+
+    //remove old icon ptr
+    RemoveChild(m_SkillIcon);
+
+    //Add new icon ptr
     m_SkillIcon = std::make_shared<Util::GameObject>(Icon, 60.3f);
+    AddChild(m_SkillIcon);
 }
