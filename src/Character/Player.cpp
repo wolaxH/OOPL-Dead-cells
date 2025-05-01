@@ -29,11 +29,6 @@ Player::Player(std::vector<std::string>& path, int Hp,
 //WIP
 void Player::Attack(){}
 
-bool Player::IsNearbyDrops(std::shared_ptr<Drops> drops){
-    glm::vec2 D = m_WorldPos - drops->m_WorldPos;
-    return glm::length(D) <= 50.0f;
-}
-
 void Player::PickUpDrops(std::shared_ptr<Drops> drops){
     
     auto NewItem = std::dynamic_pointer_cast<Weapon>(drops->ToItem());
@@ -44,7 +39,7 @@ void Player::PickUpDrops(std::shared_ptr<Drops> drops){
         else if (!m_Weapon2) m_Weapon2 = NewItem;
         else{ //WIP
             //彈出更換武器視窗
-
+            int select = 1;
 
             //將被替換的武器變成掉落物
             auto temp = m_Weapon1->ToDrops();
@@ -55,7 +50,7 @@ void Player::PickUpDrops(std::shared_ptr<Drops> drops){
             ChangeDrawable(AccessKey(), m_Weapon1->GetPlayerDrawable());
 
             //更換slot圖案
-            m_PlayerINFO->SetSkill(m_Weapon1, 1);
+            m_PlayerINFO->SetSkill(m_Weapon1, select);
         }
     } //如果是卷軸
     else{ //WIP
@@ -70,7 +65,7 @@ void Player::PickUp(){
 
     if (Util::Input::IsKeyPressed(Util::Keycode::R)){
         for (auto& drop : r_WorldDrops){
-            if (IsNearbyDrops(drop)){
+            if (IsNearBy(drop, 50.0f)){
                 PickUpDrops(drop);
                 return;
             }
@@ -146,7 +141,7 @@ bool Player::IsUnderOSP(){
 
 /*-----------------------------------move-----------------------------------*/
 
-void Player::Move(){
+void Player::Move(float dt){
     /**
      * 特定狀態不能移動
      */
@@ -198,7 +193,7 @@ void Player::Move(){
             }
             
             //  chaenge pos
-            if (VelocityX > -1*MaxSpeed) VelocityX += -1*AccelerationX;
+            if (VelocityX > -1*MaxSpeed) VelocityX += -1*AccelerationX*dt;
             else if (VelocityX < -1*MaxSpeed) VelocityX = -1*MaxSpeed;
         } //press right
         else if (IS_RIGHT_PRESSED()){  
@@ -215,7 +210,7 @@ void Player::Move(){
             }
             
             //  set Velocity
-            if (VelocityX < MaxSpeed) VelocityX += AccelerationX;
+            if (VelocityX < MaxSpeed) VelocityX += AccelerationX * dt;
             else if (VelocityX > MaxSpeed) VelocityX = MaxSpeed;
         } //do nothing
         else if (InGround() && GetState() != c_state::roll){  
@@ -425,9 +420,9 @@ void Player::roll(){
 }
 
 /*-----------------------------------update-----------------------------------*/
-void Player::Update(){
-    Move();
-    applyGravity();
+void Player::Update(float dt){
+    Move(dt);
+    applyGravity(dt);
 
     if (IS_ROLL_DOWN() || GetState() == c_state::roll){
         roll();
@@ -437,11 +432,11 @@ void Player::Update(){
     ClinbOSP();
     FixPos();
 
-    m_WorldPos.x += VelocityX;
-    m_WorldPos.y += VelocityY;
+    m_WorldPos.x += VelocityX * dt;
+    m_WorldPos.y += VelocityY * dt;
 
-    TestP();
+    // TestP();
 
 
-    //PickUp();
+    // PickUp();
 }

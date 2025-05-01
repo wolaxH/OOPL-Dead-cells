@@ -42,7 +42,7 @@ bool Zombie::IsPlayerNearby(){
     return glm::length(D) <= DetectRange;
 }
 
-void Zombie::Move(){
+void Zombie::Move(float dt){
     if (GetState() == c_state::atk) return; //atk cannot move
 
     //trace player
@@ -116,9 +116,9 @@ void Zombie::Move(){
     } 
 }
 
-void Zombie::Update(){
-    Move();
-    applyGravity();
+void Zombie::Update(float dt){
+    Move(dt);
+    applyGravity(dt);
     
     //atk behavior
     if ((VelocityX > 0 && player->m_WorldPos.x > m_WorldPos.x && player->m_WorldPos.x < m_WorldPos.x + right) ||

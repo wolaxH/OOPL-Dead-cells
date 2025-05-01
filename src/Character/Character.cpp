@@ -89,10 +89,10 @@ void Character::ChangeDrawable(AccessKey , std::shared_ptr<Util::Animation> Play
     D_Manager[state] = m_Drawable;
 }
 
-void Character::applyGravity(){
+void Character::applyGravity(float dt){
 
     if (!InGround()){
-        VelocityY -= Gravity;
+        VelocityY -= Gravity * dt;
         if (VelocityY < -1*MaxFallSpeed) VelocityY = -1*MaxFallSpeed;
     }
     else{

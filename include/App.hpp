@@ -40,7 +40,7 @@ public:
     void MainPage();    
 
     void InGameInit();   //into game
-    void InGameUpdate();
+    void InGameUpdate(float dt);
 
     void End(); // NOLINT(readability-convert-member-functions-to-static)
 
@@ -85,7 +85,6 @@ private:    //Menu Objs
 private:    //ingame Objs
     Camera camera;
 
-    std::shared_ptr<PlayerUI>playerui;
     std::shared_ptr<Player> player;
     std::shared_ptr<Zombie> zombie;
 

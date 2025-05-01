@@ -19,7 +19,7 @@ public:
     
     void Attack() override;
     
-    void Update() override;
+    void Update(float dt) override;
     
     void Attacked(int damage){Hp -= damage;}
     
@@ -52,8 +52,6 @@ private:
      * * * 4.2. 若為卷軸則直接使用
      * * 5. 掉落物消失     complete
      */
-    bool IsNearbyDrops(std::shared_ptr<Drops> drops);
-
     /**
      * When Press R, call this function
      */
@@ -84,7 +82,7 @@ private:
      * also set c_state
      * clinb and roll 等特殊狀態期間無法move
      */
-    void Move() override;
+    void Move(float dt) override;
 
     /**
      * 這沒什麼好寫的同move, 且只有在 move 中call

@@ -19,11 +19,11 @@ public:
     }
     ~Zombie() = default;
 
-    void Update() override;
+    void Update(float dt) override;
     void Attack() override;
 
 private:
-    void Move() override;
+    void Move(float dt) override;
     bool IsPlayerNearby() override;
 
 private:

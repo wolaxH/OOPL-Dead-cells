@@ -22,7 +22,7 @@ public:
 private:
     std::shared_ptr<Hp> m_Hp;
     std::shared_ptr<SkillSlot> m_WaterSlot; 
-    std::vector<std::shared_ptr<SkillSlot>> m_SkillSlot;
+    std::vector<std::shared_ptr<SkillSlot>> m_SkillSlot;    //capacity = 2
 };
 
 #endif

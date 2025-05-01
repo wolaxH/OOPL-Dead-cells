@@ -33,7 +33,7 @@ public:
 
     void SetPos(glm::vec2 pos){ m_WorldPos = pos;}
 
-    void virtual Update() = 0;
+    void virtual Update(float dt) = 0;
 
     void SetState(c_state State, std::vector<std::string> path = {}, bool Isloop = true);
 
@@ -59,13 +59,13 @@ protected:
     /**
      * only for set VelocityY，不修改c_state
      */
-    void applyGravity();
+    void applyGravity(float dt);
 
     /*用來修正位置，使其不會穿牆，不修改c_state*/
     void FixPos();
 
     //移動
-    virtual void Move() = 0;
+    virtual void Move(float dt) = 0;
 
     bool IsNearBy(std::shared_ptr<MapObj> other, float distance = 1000.0f);
 
