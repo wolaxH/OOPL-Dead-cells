@@ -20,12 +20,13 @@ public:
     
     auto GetIcon() const {return m_Drawable;}
 
-    auto GetPlayerDrawable() const {return Player_Drawable;}
+    std::vector<std::shared_ptr<Util::Animation>> GetPlayerDrawable() const {return m_Player_Drawables;}
+
 protected:
     int m_AtkPoint; //攻擊力
     float m_AtkRange; //攻擊範圍
 
-    std::shared_ptr<Util::Animation> Player_Drawable; //玩家的攻擊動畫
+    std::vector<std::shared_ptr<Util::Animation>> m_Player_Drawables; //玩家的攻擊動畫
 };
 
 #endif

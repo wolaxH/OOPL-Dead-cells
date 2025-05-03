@@ -1,28 +1,48 @@
 #ifndef ATKMANAGER_HPP
 #define ATKMANAGER_HPP
 
+
+#include "Item/Weapon/Weapon.hpp"
+
+#include "Util/Animation.hpp"
+
+class Player;
+
+
 enum class AttackPhase {
     None,
-    AttackA,
-    AttackB,
-    AttackC
+    A,
+    B,
+    C,
+    D,
+    E,
+    F
 };
 
 class AttackManager {
 public:
-    AttackManager();
 
-    void Update(float deltaTime);
-    void OnAttackInput();
-    void InterruptAttack();
+    AttackManager() = default;
+    AttackManager(std::weak_ptr<Player> player);
+    ~AttackManager() = default;
+
+    bool IsAttacking() const {return m_IsAttacking;}
+
+    void Update(float dt);
+    void StartAttack(int SlotNumber, std::shared_ptr<Weapon> weapon);
+    void Interrupt();
 
 private:
-    AttackPhase currentPhase;
-    float attackTimer;
-    bool canChain;
+    int m_ComboIndex = 0;
+    float m_ComboTimer = 0.0f;
+    bool m_IsAttacking = false;
+    int m_WeaponSlotNUmber = 0;
+    std::shared_ptr<Weapon> m_Weapon = nullptr;
+    std::weak_ptr<Player> m_Player;
 
-    void StartAttack(AttackPhase phase);
-    void EndAttack();
+    bool NextSegFlag = false;
+
+    void ResetCombo();
 };
     
 

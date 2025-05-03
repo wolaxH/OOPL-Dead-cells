@@ -88,14 +88,12 @@ private:    //ingame Objs
     std::shared_ptr<Player> player;
     std::shared_ptr<Zombie> zombie;
 
-    //UI
-
-
     std::vector<std::shared_ptr<MapObj>> MapObjs;
     std::vector<std::shared_ptr<SolidObj>> SolidObjs;
     std::vector<std::shared_ptr<OneSidedPlatform>> OneSidedPlatforms;
     std::vector<std::shared_ptr<Mob>> Mobs;
-    std::vector<std::shared_ptr<Drops>> WorldDrops;
+    //這個GameObject 很特別，他被當作Drops 的容器使用，只會用GetChildren 跟 AddChild 跟 RemoveChild
+    std::shared_ptr<Util::GameObject> WorldDrops;   
     
     std::vector<std::shared_ptr<BG>> BGs;
 };

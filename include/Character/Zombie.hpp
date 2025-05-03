@@ -20,7 +20,7 @@ public:
     ~Zombie() = default;
 
     void Update(float dt) override;
-    void Attack() override;
+    void Attack(float dt) override;
 
 private:
     void Move(float dt) override;

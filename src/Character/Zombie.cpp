@@ -5,7 +5,7 @@
 #include "Util/Logger.hpp"
 
 
-void Zombie::Attack(){  //player
+void Zombie::Attack(float dt){  //player
 
     //rendering 
     auto temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
@@ -104,11 +104,11 @@ void Zombie::Move(float dt){
         VelocityX = 0;
         break;
     case c_state::L_move :
-        VelocityX -= AccelerationX;
+        VelocityX -= AccelerationX * dt;
         if (VelocityX < -1*MaxSpeed) VelocityX = -1 * MaxSpeed;
         break;
     case c_state::R_move :
-        VelocityX += AccelerationX;
+        VelocityX += AccelerationX * dt;
         if (VelocityX > MaxSpeed) VelocityX = MaxSpeed;
         break;
     default:
@@ -129,14 +129,14 @@ void Zombie::Update(float dt){
         //set atk state
         if (IsContainState(c_state::atk)) SetState(c_state::atk, {}, false);
         else InitState(c_state::atk, {28}, {RESOURCE_DIR"/Zombie/atk/atk_"});
-        Attack();
+        Attack(dt);
     }
-    else if (GetState() == c_state::atk) Attack();
+    else if (GetState() == c_state::atk) Attack(dt);
     //atk end
     
     PushPlayer();
     FixPos();
 
-    m_WorldPos.x += VelocityX;
-    m_WorldPos.y += VelocityY;
+    m_WorldPos.x += VelocityX * dt;
+    m_WorldPos.y += VelocityY * dt;
 }

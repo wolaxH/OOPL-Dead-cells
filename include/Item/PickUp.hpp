@@ -3,7 +3,6 @@
 
 #include "Abstract/MapObj.hpp"
 
-
 #include "Util/Image.hpp"
 #include "Util/GameObject.hpp"
 #include "Util/Text.hpp"
@@ -31,7 +30,7 @@ public:
     }
     virtual ~Item() = default;
     
-    std::shared_ptr<Drops> ToDrops() {return std::make_shared<Drops>(m_Drawable, shared_from_this());}
+    std::shared_ptr<Drops> ToDrops() {return std::make_shared<Drops>(shared_from_this());}
 
     auto GetIcon() const {return m_Drawable;}
     
@@ -41,6 +40,7 @@ public:
     }
     
 protected:
+    friend class Drops;
     /**
      * Describe與DescribeBox需要依照物品的種類來改變
      * 故只在Item 類別中宣告
@@ -59,9 +59,10 @@ protected:
  */
 class Drops : public MapObj{
 public:
-    Drops(std::shared_ptr<Core::Drawable> drawable, std::shared_ptr<Item> item) : 
+    Drops(std::shared_ptr<Item> item) : 
         m_Item(item){
-        m_Drawable = drawable;
+        m_Drawable = item->m_Drawable;
+        m_Transform.scale = {2, 2};
     }
 
     void PopUpDescribeBox(){ m_Item->SetDescribeVisible(true);}

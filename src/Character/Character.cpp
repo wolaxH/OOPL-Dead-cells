@@ -24,6 +24,7 @@ void Character::SetState(c_state State, std::vector<std::string> path, bool Islo
             temp->Play();
         }
     } catch (const std::out_of_range &e){
+        
         if (!path.empty()){
             m_Drawable = std::make_shared<Util::Animation>(path, true, 20, Isloop, 0);
             D_Manager[State] = m_Drawable;
@@ -48,6 +49,13 @@ void Character::InitState(c_state state, const std::vector<std::size_t>& frames,
     
     if (std::find(NotLoopingState.begin(), NotLoopingState.end(), state) != NotLoopingState.end()) SetState(state, Img, false);
     else SetState(state, Img);
+}
+
+void Character::InitState(c_state State, std::shared_ptr<Core::Drawable> drawable){
+    if (IsContainState(State)) return;
+    m_Drawable = drawable;
+    D_Manager[State] = m_Drawable;
+    this->State = State;
 }
 
 bool Character::IsNearBy(std::shared_ptr<MapObj> other, float distance){
@@ -103,11 +111,6 @@ void Character::applyGravity(float dt){
 void Character::FixPos(){
     int breakFlag = 0;
 
-    /**
-     * TODO:遍歷SolidObj 並使用舊邏輯修正
-     *      遍歷OSP 並製作OSP的fix邏輯
-     *      OSP邏輯: 玩家在OSP上
-     */
     for (auto& Solid : r_SolidObjs){
         if (!IsNearBy(Solid, 3000.0f)) continue;
         breakFlag = 0;

@@ -2,22 +2,26 @@
 #define PLAYER_HPP
 
 #include "Character/Character.hpp"
-#include"MyUtil/Timer.hpp"
+#include "MyUtil/Timer.hpp"
 #include "Item/PickUp.hpp"
 #include "Item/Weapon/Weapon.hpp"
 #include "UI/PlayerUI.hpp"
+#include "MyUtil/AtkManager.hpp"
+#include "Item/Weapon/RustySword.hpp"
 
 
 
-class Player : public Character{
+class Player : public Character, public std::enable_shared_from_this<Player>{
 public:
     Player(std::vector<std::string>& path, int Hp, 
         const std::vector<std::shared_ptr<SolidObj>>& SolidObjs, 
         const std::vector<std::shared_ptr<OneSidedPlatform>>& OSP,
-        std::vector<std::shared_ptr<Drops>>& Drops);
+        std::shared_ptr<GameObject>& Drops);
     ~Player() noexcept = default;
+
+    void Init(){m_AttackManager = AttackManager(std::weak_ptr<Player>(shared_from_this()));}
     
-    void Attack() override;
+    void Attack(float dt) override;
     
     void Update(float dt) override;
     
@@ -115,15 +119,22 @@ private:
      */
     void SlowDown();
 
+    void RequastToChangeDrawable(std::shared_ptr<Util::Animation> PD){
+        ChangeDrawable(AccessKey(), PD, c_state::atk);
+    }
+
 
     //a special function for test, development function, to Log player current position
     void TestP();
 
 private:
+    friend class AttackManager;
+
     std::shared_ptr<Weapon> m_Weapon1 = nullptr, m_Weapon2 = nullptr; //武器槽
     std::shared_ptr<PlayerUI> m_PlayerINFO; //玩家UI
+    AttackManager m_AttackManager; //攻擊管理器
 
-    std::vector<std::shared_ptr<Drops>>& r_WorldDrops;
+    std::shared_ptr<GameObject>& r_WorldDrops;
     int jumpStep = 0;   //double jump counter
     Timer timer;   //for count the roll cooling time
 };

@@ -37,11 +37,13 @@ public:
 
     void SetState(c_state State, std::vector<std::string> path = {}, bool Isloop = true);
 
+    
+
     c_state GetState(){ return State;}
 
     bool IsCollsion(std::shared_ptr<MapObj> other);
 
-    void virtual Attack() = 0;
+    void virtual Attack(float dt) = 0;
 
 
 protected:
@@ -53,6 +55,8 @@ protected:
      * @param path eg:RESOURCE_DIR"Zombie/move/move_"
      */
     void InitState(c_state state, const std::vector<std::size_t>& frames = {}, const std::vector<std::string>& paths = {});
+
+    void InitState(c_state State, std::shared_ptr<Core::Drawable> drawable);
     
 
 
