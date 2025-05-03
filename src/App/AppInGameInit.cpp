@@ -76,8 +76,9 @@ void App::InGameInit() {
     std::vector<std::shared_ptr<Util::GameObject>> temps;
     for (auto& temp : SolidObjs){ temps.push_back(temp);}
     for (auto& temp : OneSidedPlatforms){ temps.push_back(temp);}
-    for (auto& temp : WorldDrops->GetChildren()) {temps.push_back(temp);}
     root.AddChildren(temps);
+
+    root.AddChild(WorldDrops);
 
     // playerui->SetHp(30);
 

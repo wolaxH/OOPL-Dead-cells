@@ -93,7 +93,7 @@ private:    //ingame Objs
     std::vector<std::shared_ptr<OneSidedPlatform>> OneSidedPlatforms;
     std::vector<std::shared_ptr<Mob>> Mobs;
     //這個GameObject 很特別，他被當作Drops 的容器使用，只會用GetChildren 跟 AddChild 跟 RemoveChild
-    std::shared_ptr<Util::GameObject> WorldDrops;   
+    std::shared_ptr<Util::GameObject> WorldDrops = std::make_shared<Util::GameObject>();
     
     std::vector<std::shared_ptr<BG>> BGs;
 };
