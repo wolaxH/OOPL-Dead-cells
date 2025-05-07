@@ -6,7 +6,6 @@
 #include "Util/Text.hpp"
 #include "Util/Logger.hpp"
 
-
 #include "Character/Player.hpp"
 #include "SolidObj.hpp"
 #include "MyUtil/Camera.hpp"
@@ -16,7 +15,7 @@
 #include "BackGround.hpp"
 #include "OneSidedPlatform.hpp"
 #include "UI/PlayerUI.hpp"
-
+#include "MyUtil/RemovableManager.hpp"
 
 #include "json.hpp"
 
@@ -91,9 +90,8 @@ private:    //ingame Objs
     std::vector<std::shared_ptr<MapObj>> MapObjs;
     std::vector<std::shared_ptr<SolidObj>> SolidObjs;
     std::vector<std::shared_ptr<OneSidedPlatform>> OneSidedPlatforms;
-    std::vector<std::shared_ptr<Mob>> Mobs;
-    //這個GameObject 很特別，他被當作Drops 的容器使用，只會用GetChildren 跟 AddChild 跟 RemoveChild
-    std::shared_ptr<Util::GameObject> WorldDrops = std::make_shared<Util::GameObject>();
+    std::shared_ptr<RemovableManager> Mobs = std::make_shared<RemovableManager>();
+    std::shared_ptr<RemovableManager> WorldDrops = std::make_shared<RemovableManager>();
     
     std::vector<std::shared_ptr<BG>> BGs;
 };

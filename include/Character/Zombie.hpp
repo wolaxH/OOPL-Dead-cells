@@ -19,8 +19,11 @@ public:
     }
     ~Zombie() = default;
 
-    void Update(float dt) override;
     void Attack(float dt) override;
+
+    void Attacked(int Damage, glm::vec2 Dir) override;
+
+    void Update(float dt) override;
 
 private:
     void Move(float dt) override;

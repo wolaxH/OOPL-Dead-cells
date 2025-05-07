@@ -23,3 +23,9 @@ RustySword::RustySword() : Weapon(RESOURCE_DIR"/Item/RustySword/Icon.png", 20, 5
 void RustySword::Use(const glm::vec2& Pos, const glm::vec2& Dir){
     
 }
+
+Rect RustySword::GetHitBox(const glm::vec2& Pos, const glm::vec2& Dir){
+    if (Dir.x > 0) {
+        
+    }
+}

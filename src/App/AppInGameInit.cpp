@@ -12,7 +12,7 @@ void App::InGameInit() {
     for (int i = 0; i < 46; i++){
         Img.push_back(RESOURCE_DIR"/Beheaded/idle/idle_" + std::to_string(i) + ".png");
     }
-    player = std::make_shared<Player>(Img, 100, SolidObjs, OneSidedPlatforms, WorldDrops);
+    player = std::make_shared<Player>(Img, 100, SolidObjs, OneSidedPlatforms, WorldDrops, Mobs);
     player->Init();
     player->SetPos({0, 100});
     player->SetZIndex(30);
@@ -30,14 +30,14 @@ void App::InGameInit() {
     zombie->SetZIndex(30);
     zombie->SetVisible(true);
     MapObjs.push_back(zombie);
-    root.AddChild(zombie);
+    Mobs->AddObj(zombie);
     
 
     //test
     auto aa = std::make_shared<RustySword>();
     auto t = aa->ToDrops();
     t->SetZIndex(20.0f);
-    WorldDrops->AddChild(t);
+    WorldDrops->AddObj(t);
     MapObjs.push_back(t);
     //test
 
@@ -78,9 +78,9 @@ void App::InGameInit() {
     for (auto& temp : OneSidedPlatforms){ temps.push_back(temp);}
     root.AddChildren(temps);
 
-    root.AddChild(WorldDrops);
 
-    // playerui->SetHp(30);
+    root.AddChild(WorldDrops);
+    root.AddChild(Mobs);
 
     LOG_TRACE("Start");
     

@@ -2,12 +2,13 @@
 #define PLAYER_HPP
 
 #include "Character/Character.hpp"
-#include "MyUtil/Timer.hpp"
 #include "Item/PickUp.hpp"
 #include "Item/Weapon/Weapon.hpp"
-#include "UI/PlayerUI.hpp"
-#include "MyUtil/AtkManager.hpp"
 #include "Item/Weapon/RustySword.hpp"
+#include "MyUtil/Timer.hpp"
+#include "MyUtil/AtkManager.hpp"
+#include "MyUtil/RemovableManager.hpp"
+#include "UI/PlayerUI.hpp"
 
 
 
@@ -16,7 +17,8 @@ public:
     Player(std::vector<std::string>& path, int Hp, 
         const std::vector<std::shared_ptr<SolidObj>>& SolidObjs, 
         const std::vector<std::shared_ptr<OneSidedPlatform>>& OSP,
-        std::shared_ptr<GameObject>& Drops);
+        std::shared_ptr<RemovableManager>& Drops,
+        std::shared_ptr<RemovableManager>& Mobs);
     ~Player() noexcept = default;
 
     void Init(){m_AttackManager = AttackManager(std::weak_ptr<Player>(shared_from_this()));}
@@ -40,6 +42,8 @@ public:
             if (VelocityX > -5) VelocityX = -5.0f;
         }
     }
+
+    void Attacked(int Damage, glm::vec2 Dir) override;
         
         
         
@@ -134,7 +138,9 @@ private:
     std::shared_ptr<PlayerUI> m_PlayerINFO; //玩家UI
     AttackManager m_AttackManager; //攻擊管理器
 
-    std::shared_ptr<GameObject>& r_WorldDrops;
+    std::shared_ptr<RemovableManager>& r_WorldDrops;
+    std::shared_ptr<RemovableManager>& r_Mobs;
+    
     int jumpStep = 0;   //double jump counter
     Timer timer;   //for count the roll cooling time
 };

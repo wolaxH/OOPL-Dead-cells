@@ -2,6 +2,7 @@
 #define WEAPON_HPP
 
 #include "Item/PickUp.hpp"
+#include "MyUtil/Rect.hpp"
 
 #include "Util/Animation.hpp"
 
@@ -22,9 +23,12 @@ public:
 
     std::vector<std::shared_ptr<Util::Animation>> GetPlayerDrawable() const {return m_Player_Drawables;}
 
+    Rect virtual GetHitBox(const glm::vec2& Pos, const glm::vec2& Dir) = 0;
+
 protected:
     int m_AtkPoint; //攻擊力
     float m_AtkRange; //攻擊範圍
+
 
     std::vector<std::shared_ptr<Util::Animation>> m_Player_Drawables; //玩家的攻擊動畫
 };

@@ -45,6 +45,8 @@ public:
 
     void virtual Attack(float dt) = 0;
 
+    void virtual Attacked(int Damage, glm::vec2 Dir) = 0;
+
 
 protected:
     bool IsContainState(c_state State){return (D_Manager.find(State) != D_Manager.end()) ? true : false;}

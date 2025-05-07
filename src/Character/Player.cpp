@@ -14,9 +14,10 @@
 Player::Player(std::vector<std::string>& path, int Hp, 
     const std::vector<std::shared_ptr<SolidObj>>& SolidObjs, 
     const std::vector<std::shared_ptr<OneSidedPlatform>>& OSP,
-    std::shared_ptr<GameObject>& Drops): 
+    std::shared_ptr<RemovableManager>& Drops,
+    std::shared_ptr<RemovableManager>& Mobs): 
     Character(path, Hp, SolidObjs, OSP), 
-    r_WorldDrops(Drops){
+    r_WorldDrops(Drops), r_Mobs(Mobs){
         m_Transform.scale = {2.0f, 2.0f};
         m_Transform.translation = {0.0f, -100.0f};
         top = 60, bottom = 0, left = 10, right = 10;
@@ -30,7 +31,6 @@ Player::Player(std::vector<std::string>& path, int Hp,
 void Player::Attack(float dt){
     if (GetState() == c_state::roll) return; //翻滾狀態不能攻擊
     if (GetState() == c_state::clinb) return; //攀爬狀態不能攻擊
-
     
     
     if (Util::Input::IsKeyDown(Util::Keycode::J)){
@@ -46,6 +46,10 @@ void Player::Attack(float dt){
     }
     m_AttackManager.Update(dt);
     
+}
+
+void Player::Attacked(int Damage, glm::vec2 Dir){
+
 }
 
 void Player::PickUpDrops(std::shared_ptr<Drops> drops){
@@ -458,12 +462,12 @@ void Player::Update(float dt){
     
     Clinb();
     ClinbOSP();
+    
+    PickUp();
+    Attack(dt);
+
     FixPos();
 
     m_WorldPos.x += VelocityX * dt;
-    m_WorldPos.y += VelocityY;
-
-
-    PickUp();
-    Attack(dt);
+    m_WorldPos.y += VelocityY * dt;
 }

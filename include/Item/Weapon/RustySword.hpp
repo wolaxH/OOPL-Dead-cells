@@ -10,8 +10,10 @@ public:
 
     void Use(const glm::vec2& Pos, const glm::vec2& Dir) override;
 
-private:
+    Rect GetHitBox(const glm::vec2& Pos, const glm::vec2& Dir) override;
 
+private:
+   Rect HitBox;
 };
 
 

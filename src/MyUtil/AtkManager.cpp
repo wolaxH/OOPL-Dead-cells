@@ -18,8 +18,8 @@ void AttackManager::StartAttack(int SlotNumber, std::shared_ptr<Weapon> weapon){
     m_ComboTimer = 0.0f;
     m_IsAttacking = true;
     m_Player.lock()->RequastToChangeDrawable(m_Weapon->GetPlayerDrawable()[0]);
-    if (Util::Input::IsKeyPressed(Util::Keycode::RIGHT) || Util::Input::IsKeyPressed(Util::Keycode::D)) m_Player.lock()->m_WorldPos.x += 5;
-    else if (Util::Input::IsKeyPressed(Util::Keycode::LEFT)  || Util::Input::IsKeyPressed(Util::Keycode::A)) m_Player.lock()->m_WorldPos.x -= 5;
+    if (Util::Input::IsKeyPressed(Util::Keycode::RIGHT) || Util::Input::IsKeyPressed(Util::Keycode::D)) m_Player.lock()->VelocityX += 5;
+    else if (Util::Input::IsKeyPressed(Util::Keycode::LEFT)  || Util::Input::IsKeyPressed(Util::Keycode::A)) m_Player.lock()->VelocityX -= 5;
 }
 
 void AttackManager::Interrupt(){
@@ -50,7 +50,6 @@ void AttackManager::Update(float dt) {
     bool hasNextCombo = (m_ComboIndex + 1 < m_Weapon->GetPlayerDrawable().size());
 
     
-
     // 若在攻擊動畫結束時按下按鍵 → 進入下一段
     if (NextSegFlag && hasNextCombo) {
         m_ComboIndex++;
