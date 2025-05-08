@@ -6,6 +6,7 @@
 #include "Abstract/MapObj.hpp"
 #include "SolidObj.hpp"
 #include "OneSidedPlatform.hpp"
+#include "MyUtil/AccessKey.hpp"
 
 #include <unordered_map>
 #include <algorithm>
@@ -28,19 +29,23 @@ public:
     Character(  std::vector<std::string>& path, int Hp,
                 const std::vector<std::shared_ptr<SolidObj>>& SolidObjs, 
                 const std::vector<std::shared_ptr<OneSidedPlatform>>& OSP);
-    ~Character() noexcept = default;
+    virtual ~Character() = default;
 
     void SetPos(glm::vec2 pos){ m_WorldPos = pos;}
 
-    void virtual Update() = 0;
+    void virtual Update(float dt) = 0;
 
     void SetState(c_state State, std::vector<std::string> path = {}, bool Isloop = true);
+
+    
 
     c_state GetState(){ return State;}
 
     bool IsCollsion(std::shared_ptr<MapObj> other);
 
-    void virtual Attack() = 0;
+    void virtual Attack(float dt) = 0;
+
+    void virtual Attacked(int Damage, glm::vec2 Dir) = 0;
 
 
 protected:
@@ -52,19 +57,25 @@ protected:
      * @param path eg:RESOURCE_DIR"Zombie/move/move_"
      */
     void InitState(c_state state, const std::vector<std::size_t>& frames = {}, const std::vector<std::string>& paths = {});
+
+    void InitState(c_state State, std::shared_ptr<Core::Drawable> drawable);
     
 
 
     /**
      * only for set VelocityY，不修改c_state
      */
-    void applyGravity();
+    void applyGravity(float dt);
 
     /*用來修正位置，使其不會穿牆，不修改c_state*/
     void FixPos();
 
     //移動
-    virtual void Move() = 0;
+    virtual void Move(float dt) = 0;
+
+    bool IsNearBy(std::shared_ptr<MapObj> other, float distance = 1000.0f);
+
+    void ChangeDrawable(AccessKey key, std::shared_ptr<Util::Animation> PlayerDrawable, c_state state = c_state::atk);
 
 protected:
     float VelocityX = 0, VelocityY = 0; //speed

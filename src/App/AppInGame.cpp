@@ -1,14 +1,17 @@
 #include "App.hpp"
 
-void App::InGameUpdate() {
+void App::InGameUpdate(float dt) {
     
-    player->Update();
+    player->Update(dt);
+    
     camera.Update(player);
     for (auto& temp : MapObjs){
         temp->m_Transform.translation = temp->m_WorldPos - camera.GetPos();
     }
-    zombie->Update();
+    zombie->Update(dt);
+    
     root.Update();
+    
 
     /**
      * @brief switch solid objects visable, press Q.

@@ -6,7 +6,6 @@
 #include "Util/Text.hpp"
 #include "Util/Logger.hpp"
 
-
 #include "Character/Player.hpp"
 #include "SolidObj.hpp"
 #include "MyUtil/Camera.hpp"
@@ -16,7 +15,7 @@
 #include "BackGround.hpp"
 #include "OneSidedPlatform.hpp"
 #include "UI/PlayerUI.hpp"
-
+#include "MyUtil/RemovableManager.hpp"
 
 #include "json.hpp"
 
@@ -40,7 +39,7 @@ public:
     void MainPage();    
 
     void InGameInit();   //into game
-    void InGameUpdate();
+    void InGameUpdate(float dt);
 
     void End(); // NOLINT(readability-convert-member-functions-to-static)
 
@@ -83,16 +82,17 @@ private:    //Menu Objs
     std::shared_ptr<Button> ExitButton;
 
 private:    //ingame Objs
-    std::shared_ptr<PlayerUI>playerui;
+    Camera camera;
+
     std::shared_ptr<Player> player;
     std::shared_ptr<Zombie> zombie;
+
     std::vector<std::shared_ptr<MapObj>> MapObjs;
-    Camera camera;
     std::vector<std::shared_ptr<SolidObj>> SolidObjs;
     std::vector<std::shared_ptr<OneSidedPlatform>> OneSidedPlatforms;
-    std::vector<std::shared_ptr<Mob>> Mobs;
+    std::shared_ptr<RemovableManager> Mobs = std::make_shared<RemovableManager>();
+    std::shared_ptr<RemovableManager> WorldDrops = std::make_shared<RemovableManager>();
     
-    // std::shared_ptr<BG> bg1, bg2, bg3;
     std::vector<std::shared_ptr<BG>> BGs;
 };
 

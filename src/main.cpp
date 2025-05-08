@@ -2,11 +2,22 @@
 
 #include "Core/Context.hpp"
 
+#include <chrono>
+
 int main(int, char**) {
     auto context = Core::Context::GetInstance();
     App app;
 
+    auto previousTime = std::chrono::high_resolution_clock::now();
+
+
     while (!context->GetExit()) {
+
+        auto currentTime = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<float> elapsed = currentTime - previousTime;
+        previousTime = currentTime;
+        float deltaTime = std::min(elapsed.count(), 0.05f) * 60.0f;
+
         switch (app.GetCurrentState()) {
             case App::State::INIT_MENU:
                 app.MainPageInit();
@@ -18,7 +29,7 @@ int main(int, char**) {
                 app.InGameInit();
                 break;
             case App::State::UPDATE:
-                app.InGameUpdate();
+                app.InGameUpdate(deltaTime);
                 break;
 
             case App::State::END:

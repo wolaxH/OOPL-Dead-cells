@@ -24,6 +24,7 @@ void Character::SetState(c_state State, std::vector<std::string> path, bool Islo
             temp->Play();
         }
     } catch (const std::out_of_range &e){
+        
         if (!path.empty()){
             m_Drawable = std::make_shared<Util::Animation>(path, true, 20, Isloop, 0);
             D_Manager[State] = m_Drawable;
@@ -32,8 +33,37 @@ void Character::SetState(c_state State, std::vector<std::string> path, bool Islo
     }
 }
 
-bool Character::IsCollsion(std::shared_ptr<MapObj> other){
+void Character::InitState(c_state state, const std::vector<std::size_t>& frames, const std::vector<std::string>& paths){
+    
+    std::vector<std::string> Img;
+    std::vector<std::string> temp;
+    
+    std::vector<c_state> NotLoopingState = {c_state::jump, c_state::fall, c_state::atk, c_state::clinb, c_state::roll, c_state::crouch};
+    
+    
+    for (std::size_t i =0; i < frames.size(); i++){
+        temp.clear();
+        for (std::size_t j = 0; j < frames[i]; j++){temp.push_back(paths[i] + std::to_string(j) + ".png");}
+        Img.insert(Img.end(), temp.begin(), temp.end());
+    }
+    
+    if (std::find(NotLoopingState.begin(), NotLoopingState.end(), state) != NotLoopingState.end()) SetState(state, Img, false);
+    else SetState(state, Img);
+}
 
+void Character::InitState(c_state State, std::shared_ptr<Core::Drawable> drawable){
+    if (IsContainState(State)) return;
+    m_Drawable = drawable;
+    D_Manager[State] = m_Drawable;
+    this->State = State;
+}
+
+bool Character::IsNearBy(std::shared_ptr<MapObj> other, float distance){
+    glm::vec2 D = m_WorldPos - other->m_WorldPos;
+    return glm::length(D) <= distance;
+}
+
+bool Character::IsCollsion(std::shared_ptr<MapObj> other){
 
     glm::vec2 Pos = m_WorldPos;
     glm::vec2 other_Pos = other->m_WorldPos;
@@ -61,28 +91,16 @@ bool Character::IsCollsion(std::shared_ptr<MapObj> other){
     return x && y;
 }
 
-void Character::InitState(c_state state, const std::vector<std::size_t>& frames, const std::vector<std::string>& paths){
-
-    std::vector<std::string> Img;
-    std::vector<std::string> temp;
-
-    std::vector<c_state> NotLoopingState = {c_state::jump, c_state::fall, c_state::atk, c_state::clinb, c_state::roll, c_state::crouch};
-
-
-    for (std::size_t i =0; i < frames.size(); i++){
-        temp.clear();
-        for (std::size_t j = 0; j < frames[i]; j++){temp.push_back(paths[i] + std::to_string(j) + ".png");}
-        Img.insert(Img.end(), temp.begin(), temp.end());
-    }
-
-    if (std::find(NotLoopingState.begin(), NotLoopingState.end(), state) != NotLoopingState.end()) SetState(state, Img, false);
-    else SetState(state, Img);
+void Character::ChangeDrawable(AccessKey , std::shared_ptr<Util::Animation> PlayerDrawable, c_state state){
+    PlayerDrawable->SetCurrentFrame(0);
+    m_Drawable = PlayerDrawable;
+    D_Manager[state] = m_Drawable;
 }
 
-void Character::applyGravity(){
+void Character::applyGravity(float dt){
 
     if (!InGround()){
-        VelocityY -= Gravity;
+        VelocityY -= Gravity * dt;
         if (VelocityY < -1*MaxFallSpeed) VelocityY = -1*MaxFallSpeed;
     }
     else{
@@ -93,12 +111,8 @@ void Character::applyGravity(){
 void Character::FixPos(){
     int breakFlag = 0;
 
-    /**
-     * TODO:遍歷SolidObj 並使用舊邏輯修正
-     *      遍歷OSP 並製作OSP的fix邏輯
-     *      OSP邏輯: 玩家在OSP上
-     */
     for (auto& Solid : r_SolidObjs){
+        if (!IsNearBy(Solid, 3000.0f)) continue;
         breakFlag = 0;
         
         m_WorldPos.x += VelocityX;
@@ -125,7 +139,8 @@ void Character::FixPos(){
     
     for (auto& OSP : r_OneSidedPlatforms){
         if (m_WorldPos.y < OSP->m_WorldPos.y) continue;
-        
+        if (!IsNearBy(OSP, 640.0f)) continue;
+
         m_WorldPos.y += VelocityY;
         if (m_WorldPos.y < OSP->m_WorldPos.y && 
             !((m_WorldPos.x < OSP->m_WorldPos.x - OSP->GetScaledSize().x/2 - 1) || (m_WorldPos.x > OSP->m_WorldPos.x + OSP->GetScaledSize().x/2 + 1))){

@@ -9,21 +9,10 @@ from natsort import natsorted
 """
 
 Source_Path = os.getcwd().replace("\\", "/") + "/source"   #The folder path that you will replac
-Target_Path = os.getcwd().replace("\\", "/") + "/../Beheaded/crouch"   #The folder path that you will save
-# tmp = input("Target Path (Press enter to use the last time):")
-# if (tmp == ""):
-#     with open("target_path.txt","r+", encoding = "utf-8") as f:
-#         if (f.read() == ""):
-#             Target_Path = os.getcwd().replace("\\", "/") + "/default_target"
-#             f.write(Target_Path)
-#         else:
-#             Target_Path = f.readline().replace("\n", "")
-# else:
-#     with open("target_path.txt", "w", encoding = "utf-8") as f:
-#         Target_Path = tmp.replace("\\", "/")
-#         f.write(Target_Path)
+Target_Path = os.getcwd().replace("\\", "/") + "/../Item/ThrowingKnife/Behavior"   #The folder path that you will save
 
-prefix = "crouch_"    #The new name prefix eg: runB_{index}.png
+
+prefix = "Throw_"    #The new name prefix eg: runB_{index}.png
 errorItem = []
 temp = input("Please input the prefix or press enter to use source files prefix:")
 if (temp != ""):

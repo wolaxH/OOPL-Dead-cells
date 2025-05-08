@@ -15,13 +15,14 @@ public:
         const std::vector<std::shared_ptr<SolidObj>>& SolidObjs, 
         const std::vector<std::shared_ptr<OneSidedPlatform>>& OSP)
     : Character(path, Hp, SolidObjs, OSP), player(player){MaxSpeed = 5.0f, AccelerationX = 1.5f;}
-    ~Mob() = default;
+    virtual ~Mob() = default;
 
 protected:
     virtual bool IsPlayerNearby() = 0;
 
     void PushPlayer(){
-        if (IsCollsion(player)){
+        auto obj = std::static_pointer_cast<MapObj>(player);
+        if (IsCollsion(obj)){
             player->Pushed();            
         }    
     }

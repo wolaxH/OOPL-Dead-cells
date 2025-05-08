@@ -5,7 +5,7 @@
 #include "Util/Logger.hpp"
 
 
-void Zombie::Attack(){  //player
+void Zombie::Attack(float dt){  //player
 
     //rendering 
     auto temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
@@ -37,12 +37,17 @@ void Zombie::Attack(){  //player
     //atk logic end
 }
 
+void Zombie::Attacked(int Damage, glm::vec2 Dir){
+    LOG_DEBUG("Mob Attacked");
+
+}
+
 bool Zombie::IsPlayerNearby(){
     glm::vec2 D = player->m_WorldPos - m_WorldPos;
     return glm::length(D) <= DetectRange;
 }
 
-void Zombie::Move(){
+void Zombie::Move(float dt){
     if (GetState() == c_state::atk) return; //atk cannot move
 
     //trace player
@@ -104,11 +109,11 @@ void Zombie::Move(){
         VelocityX = 0;
         break;
     case c_state::L_move :
-        VelocityX -= AccelerationX;
+        VelocityX -= AccelerationX * dt;
         if (VelocityX < -1*MaxSpeed) VelocityX = -1 * MaxSpeed;
         break;
     case c_state::R_move :
-        VelocityX += AccelerationX;
+        VelocityX += AccelerationX * dt;
         if (VelocityX > MaxSpeed) VelocityX = MaxSpeed;
         break;
     default:
@@ -116,9 +121,9 @@ void Zombie::Move(){
     } 
 }
 
-void Zombie::Update(){
-    Move();
-    applyGravity();
+void Zombie::Update(float dt){
+    Move(dt);
+    applyGravity(dt);
     
     //atk behavior
     if ((VelocityX > 0 && player->m_WorldPos.x > m_WorldPos.x && player->m_WorldPos.x < m_WorldPos.x + right) ||
@@ -129,14 +134,14 @@ void Zombie::Update(){
         //set atk state
         if (IsContainState(c_state::atk)) SetState(c_state::atk, {}, false);
         else InitState(c_state::atk, {28}, {RESOURCE_DIR"/Zombie/atk/atk_"});
-        Attack();
+        Attack(dt);
     }
-    else if (GetState() == c_state::atk) Attack();
+    else if (GetState() == c_state::atk) Attack(dt);
     //atk end
     
     PushPlayer();
     FixPos();
 
-    m_WorldPos.x += VelocityX;
-    m_WorldPos.y += VelocityY;
+    m_WorldPos.x += VelocityX * dt;
+    m_WorldPos.y += VelocityY * dt;
 }

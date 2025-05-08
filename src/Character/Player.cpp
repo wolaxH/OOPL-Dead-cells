@@ -1,4 +1,5 @@
 #include "Character/Player.hpp"
+#include "Character/Mob.hpp"
 
 #include "Util/Input.hpp"
 
@@ -13,20 +14,118 @@
 
 Player::Player(std::vector<std::string>& path, int Hp, 
     const std::vector<std::shared_ptr<SolidObj>>& SolidObjs, 
-    const std::vector<std::shared_ptr<OneSidedPlatform>>& OSP)
-    : Character(path, Hp, SolidObjs, OSP){
+    const std::vector<std::shared_ptr<OneSidedPlatform>>& OSP,
+    std::shared_ptr<RemovableManager>& Drops,
+    std::shared_ptr<RemovableManager>& Mobs): 
+    Character(path, Hp, SolidObjs, OSP), 
+    r_WorldDrops(Drops), r_Mobs(Mobs){
         m_Transform.scale = {2.0f, 2.0f};
         m_Transform.translation = {0.0f, -100.0f};
         top = 60, bottom = 0, left = 10, right = 10;
+        
+        m_PlayerINFO = std::make_shared<PlayerUI>();
+
+        AddChild(m_PlayerINFO);
 }
 
 //WIP
-void Player::Attack(){}
+void Player::Attack(float dt){
+    if (GetState() == c_state::roll) return; //翻滾狀態不能攻擊
+    if (GetState() == c_state::clinb) return; //攀爬狀態不能攻擊
+    
+    
+    if (Util::Input::IsKeyDown(Util::Keycode::J)){
+        //使用武器1
+        if (m_Weapon1){
+            Rect HitBox = m_Weapon1->GetHitBox(m_WorldPos, m_Transform.scale);
+            Rect TempRect;
+            for (auto& mob : r_Mobs->GetChildren()){
+                auto MobObj = std::dynamic_pointer_cast<Mob>(mob);
+                if (MobObj == nullptr) continue;
+                LOG_DEBUG("point");
+                TempRect.x = MobObj->m_WorldPos.x, TempRect.y = MobObj->m_WorldPos.y;
+                TempRect.height = MobObj->top + MobObj->bottom;
+                TempRect.width = MobObj->left + MobObj->right;
+                if (HitBox.Intersects(TempRect)){
+                    m_Weapon1->Use(MobObj);
+                }
+            }
+
+            if (!m_AttackManager.IsAttacking()) m_AttackManager.StartAttack(0, m_Weapon1);
+            
+            if (IsContainState(c_state::atk)) SetState(c_state::atk);
+            else InitState(c_state::atk, nullptr);
+            
+        }
+    }
+    m_AttackManager.Update(dt);
+    
+}
+
+void Player::Attacked(int Damage, glm::vec2 Dir){
+
+}
+
+void Player::PickUpDrops(std::shared_ptr<Drops> drops){
+    
+    auto NewItem = std::dynamic_pointer_cast<Weapon>(drops->ToItem());
+
+    //如果是武器
+    if (NewItem){
+        if (!m_Weapon1){
+            m_Weapon1 = NewItem;
+            r_WorldDrops->RemoveChild(drops);
+            m_PlayerINFO->SetSkill(m_Weapon1, 0);
+        }
+        else if (!m_Weapon2) m_Weapon2 = NewItem;
+        else{ //WIP
+            //彈出更換武器視窗
+            int select = 0;
+
+            //將被替換的武器變成掉落物
+            auto temp = m_Weapon1->ToDrops();
+            temp->m_WorldPos = m_WorldPos + glm::vec2(0, 10);
+            r_WorldDrops->AddChild(temp);
+            m_Weapon1 = NewItem;
+            r_WorldDrops->RemoveChild(drops);
+
+            //更換slot圖案
+            m_PlayerINFO->SetSkill(m_Weapon1, select);
+        }
+    } //如果是卷軸
+    else{ //WIP
+        //卷軸效果加乘
+    }
+}
+
+void Player::PickUp(){
+    //if (!InGround()) return;
+    if (GetState() == c_state::roll) return; //翻滾狀態不能撿東西
+    if (GetState() == c_state::atk) return; //攻擊狀態不能撿東西
+
+    if (Util::Input::IsKeyDown(Util::Keycode::R)){
+        for (auto& temp : r_WorldDrops->GetChildren()){
+            auto drop = std::dynamic_pointer_cast<Drops>(temp);
+            if (IsNearBy(drop, 50.0f)){
+                LOG_DEBUG("Get");
+                PickUpDrops(drop);
+                return;
+            }
+        }
+    }
+}
 
 /*-----------------------------------util-----------------------------------*/
 
 void Player::TestP(){
-    if (Util::Input::IsKeyDown(Util::Keycode::P)) LOG_DEBUG(m_WorldPos);
+    if (Util::Input::IsKeyDown(Util::Keycode::P)){
+        m_PlayerINFO->SetHp(m_PlayerINFO->GetCurrentHp() - 5);
+        if (m_PlayerINFO->GetCurrentHp() <= 0){
+            m_PlayerINFO->SetHp(100);
+        }
+        //LOG_DEBUG(m_WorldPos);
+    }
+
 }
 
 void Player::SlowDown(){
@@ -43,7 +142,6 @@ void Player::SlowDown(){
     } 
 }
 
-
 bool Player::IsOnOSP(){
     if (!InGround()) return false;
 
@@ -53,6 +151,7 @@ bool Player::IsOnOSP(){
     bool x, y;
 
     for (auto& OSP : r_OneSidedPlatforms){
+        if (!IsNearBy(OSP, 640.0f)) continue;
         OSP_Pos = OSP->m_WorldPos;
         OSP_scale = abs(OSP->GetScaledSize());
 
@@ -71,6 +170,7 @@ bool Player::IsUnderOSP(){
     bool x, y;
 
     for (auto& OSP : r_OneSidedPlatforms){
+        if (!IsNearBy(OSP, 640.0f)) continue;
         OSP_scale = abs(OSP->GetScaledSize());
 
         x = !((Pos.x < OSP->m_WorldPos.x - OSP_scale.x/2 - 1) || (Pos.x > OSP->m_WorldPos.x + OSP_scale.x/2 + 1));
@@ -83,11 +183,15 @@ bool Player::IsUnderOSP(){
 
 /*-----------------------------------move-----------------------------------*/
 
-void Player::Move(){
+void Player::Move(float dt){
     /**
      * 特定狀態不能移動
      */
     if (GetState() == c_state::clinb) return; //攀爬時不能移動
+    if (GetState() == c_state::atk){
+        SlowDown();
+        return;
+    }
 
 
     if ((IS_DOWN_PRESSED()) && (GetState() == c_state::crouch)) {
@@ -104,7 +208,6 @@ void Player::Move(){
         auto temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
 
         if (Util::Input::IsKeyUp(Util::Keycode::DOWN) || Util::Input::IsKeyUp(Util::Keycode::S)){
-
             temp->Play();
         }
         else if (temp->GetCurrentFrameIndex() == temp->GetFrameCount()-1){
@@ -136,7 +239,7 @@ void Player::Move(){
             }
             
             //  chaenge pos
-            if (VelocityX > -1*MaxSpeed) VelocityX += -1*AccelerationX;
+            if (VelocityX > -1*MaxSpeed) VelocityX += -1*AccelerationX*dt;
             else if (VelocityX < -1*MaxSpeed) VelocityX = -1*MaxSpeed;
         } //press right
         else if (IS_RIGHT_PRESSED()){  
@@ -153,7 +256,7 @@ void Player::Move(){
             }
             
             //  set Velocity
-            if (VelocityX < MaxSpeed) VelocityX += AccelerationX;
+            if (VelocityX < MaxSpeed) VelocityX += AccelerationX * dt;
             else if (VelocityX > MaxSpeed) VelocityX = MaxSpeed;
         } //do nothing
         else if (InGround() && GetState() != c_state::roll){  
@@ -183,16 +286,11 @@ void Player::Move(){
             temp->Pause();
         }
     } //在地面跟翻滾狀態不會進Fall state
-    else if (!InGround() && GetState() != c_state::roll){\
+    else if (!InGround() && GetState() != c_state::roll){
         //fall
         if (GetState() != c_state::fall && VelocityY <= 0){
             //rendering, c_state
             fall();
-        }
-    }
-    else if (!InGround() && GetState() != c_state::roll){   //在地面跟翻滾狀態不會進Fall state
-        if (GetState() != c_state::fall && VelocityY <= 0){   //fall
-            fall(); //rendering, c_state
         }
     }
 }
@@ -208,7 +306,6 @@ void Player::Jump(){
     }
     VelocityY = 12.5f; 
 }
-
 
 void Player::fall(){
     if(IsContainState(c_state::fall)) SetState(c_state::fall, {}, false);
@@ -244,14 +341,13 @@ void Player::Clinb(){
     
     float playerTop;
 
-
-
     bool inYRange;
     bool leftCheck;
     bool rightCheck;
 
 
     for (auto& Solid : temps) {
+        if (!IsNearBy(Solid, 3000.0f)) continue; //如果不在附近就跳過
         solidTop = Solid->top * Solid->m_Transform.scale.y;
         solidLeft = Solid->left * Solid->m_Transform.scale.x;
         solidRight = Solid->right * Solid->m_Transform.scale.x;
@@ -303,7 +399,6 @@ void Player::ClinbOSP(){
         SetState(c_state::idle);
     }
 
-
     float P_Head = m_WorldPos.y + top * m_Transform.scale.y;
     float P_Bottom = m_WorldPos.y;
 
@@ -327,7 +422,6 @@ void Player::ClinbOSP(){
                 VelocityY = 10.0f;
                 return;
             }
-
     }
 }
 
@@ -372,9 +466,9 @@ void Player::roll(){
 }
 
 /*-----------------------------------update-----------------------------------*/
-void Player::Update(){
-    Move();
-    applyGravity();
+void Player::Update(float dt){
+    Move(dt);
+    applyGravity(dt);
 
     if (IS_ROLL_DOWN() || GetState() == c_state::roll){
         roll();
@@ -382,10 +476,12 @@ void Player::Update(){
     
     Clinb();
     ClinbOSP();
+    
+    PickUp();
+    Attack(dt);
+
     FixPos();
 
-    m_WorldPos.x += VelocityX;
-    m_WorldPos.y += VelocityY;
-
-    TestP();
+    m_WorldPos.x += VelocityX * dt;
+    m_WorldPos.y += VelocityY * dt;
 }
