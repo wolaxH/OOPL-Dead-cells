@@ -7,12 +7,14 @@
 #include "Util/Logger.hpp"
 void App::InGameInit() {
 
+    Drops::m_World = &m_World;
+
     std::vector<std::string> Img;
     Img.reserve(46);
     for (int i = 0; i < 46; i++){
         Img.push_back(RESOURCE_DIR"/Beheaded/idle/idle_" + std::to_string(i) + ".png");
     }
-    player = std::make_shared<Player>(Img, 100, SolidObjs, OneSidedPlatforms, WorldDrops, Mobs);
+    player = std::make_shared<Player>(Img, 100, m_World);
     player->Init();
     player->SetPos({0, 100});
     player->SetZIndex(30);
@@ -25,19 +27,20 @@ void App::InGameInit() {
     for (int i = 0; i < 24; i++){
         Img.push_back(RESOURCE_DIR"/Zombie/idle/idle_" + std::to_string(i) + ".png");
     }
-    zombie = std::make_shared<Zombie>(Img, 100, player, SolidObjs, OneSidedPlatforms);
+    zombie = std::make_shared<Zombie>(Img, 100, player, m_World);
     zombie->SetPos({0, 100});
     zombie->SetZIndex(30);
     zombie->SetVisible(true);
     MapObjs.push_back(zombie);
-    Mobs->AddObj(zombie);
+    m_World.Mobs->AddObj(zombie);
     
 
     //test
     auto aa = std::make_shared<RustySword>();
     auto t = aa->ToDrops();
     t->SetZIndex(20.0f);
-    WorldDrops->AddObj(t);
+    t->m_WorldPos = {0, -220.5f};
+    m_World.WorldDrops->AddObj(t);
     MapObjs.push_back(t);
     //test
 
@@ -62,26 +65,27 @@ void App::InGameInit() {
     /**
      * To create a one sided platform object
      */
-    InitColliders<OneSidedPlatform>("OSPs.json", OneSidedPlatforms);
+    InitColliders<OneSidedPlatform>("OSPs.json", m_World.OneSidedPlatforms);
     
 
 
     /**
      * To create a solid object
      */
-    InitColliders<SolidObj>("SolidObjs.json", SolidObjs);
+    InitColliders<SolidObj>("SolidObjs.json", m_World.SolidObjs);
+
     
     /**
      * Add all solid objects to the root object for rendering.
      */
     std::vector<std::shared_ptr<Util::GameObject>> temps;
-    for (auto& temp : SolidObjs){ temps.push_back(temp);}
-    for (auto& temp : OneSidedPlatforms){ temps.push_back(temp);}
+    for (auto& temp : m_World.SolidObjs){ temps.push_back(temp);}
+    for (auto& temp : m_World.OneSidedPlatforms){ temps.push_back(temp);}
     root.AddChildren(temps);
 
 
-    root.AddChild(WorldDrops);
-    root.AddChild(Mobs);
+    root.AddChild(m_World.WorldDrops);
+    root.AddChild(m_World.Mobs);
 
     LOG_TRACE("Start");
     

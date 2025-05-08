@@ -8,10 +8,8 @@
 
 class Zombie : public Mob{
 public:
-    Zombie(std::vector<std::string>& path, int Hp, std::shared_ptr<Player> player, 
-        const std::vector<std::shared_ptr<SolidObj>>& SolidObjs, 
-        const std::vector<std::shared_ptr<OneSidedPlatform>>& OSP) 
-        : Mob(path, Hp, player, SolidObjs, OSP){
+    Zombie(std::vector<std::string>& path, int Hp, std::shared_ptr<Player> player, GameWorldContext& World) 
+        : Mob(path, Hp, player, World){
         top = 50, bottom = 52, left = 13, right = 13;
         DetectRange = 300.0f;
         m_Transform.translation = {1.0f, 1.0f};

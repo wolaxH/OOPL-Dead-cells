@@ -9,13 +9,14 @@
 #include "Character/Player.hpp"
 #include "SolidObj.hpp"
 #include "MyUtil/Camera.hpp"
+#include "MyUtil/GameWorldContext.hpp"
 #include "Character/Zombie.hpp"
 #include "Menu/Button.hpp"
 #include "Menu/Menu.hpp"
 #include "BackGround.hpp"
 #include "OneSidedPlatform.hpp"
 #include "UI/PlayerUI.hpp"
-#include "MyUtil/RemovableManager.hpp"
+
 
 #include "json.hpp"
 
@@ -88,10 +89,8 @@ private:    //ingame Objs
     std::shared_ptr<Zombie> zombie;
 
     std::vector<std::shared_ptr<MapObj>> MapObjs;
-    std::vector<std::shared_ptr<SolidObj>> SolidObjs;
-    std::vector<std::shared_ptr<OneSidedPlatform>> OneSidedPlatforms;
-    std::shared_ptr<RemovableManager> Mobs = std::make_shared<RemovableManager>();
-    std::shared_ptr<RemovableManager> WorldDrops = std::make_shared<RemovableManager>();
+
+    GameWorldContext m_World;
     
     std::vector<std::shared_ptr<BG>> BGs;
 };

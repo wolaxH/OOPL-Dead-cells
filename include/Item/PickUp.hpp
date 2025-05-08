@@ -2,6 +2,7 @@
 #define PICKUP_HPP
 
 #include "Abstract/MapObj.hpp"
+#include "MyUtil/GameWorldContext.hpp"
 
 #include "Util/Image.hpp"
 #include "Util/GameObject.hpp"
@@ -63,6 +64,7 @@ public:
         m_Item(item){
         m_Drawable = item->m_Drawable;
         m_Transform.scale = {2, 2};
+        
     }
 
     void PopUpDescribeBox(){ m_Item->SetDescribeVisible(true);}
@@ -70,8 +72,12 @@ public:
     void HideDescribeBox(){ m_Item->SetDescribeVisible(false);}
 
     std::shared_ptr<Item> ToItem() {return m_Item;}
+    
+    static GameWorldContext* m_World;
 private:
     std::shared_ptr<Item> m_Item;
 };  // Drops
+
+
 
 #endif // PICKUP_HPP

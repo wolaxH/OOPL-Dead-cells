@@ -123,7 +123,9 @@ void Zombie::Move(float dt){
 
 void Zombie::Update(float dt){
     Move(dt);
-    applyGravity(dt);
+    InGround = Physics::IsOnGround(m_WorldPos, m_World.SolidObjs, m_World.OneSidedPlatforms);
+    Physics::ApplyGravity(VelocityY, InGround, Gravity, MaxFallSpeed);
+
     
     //atk behavior
     if ((VelocityX > 0 && player->m_WorldPos.x > m_WorldPos.x && player->m_WorldPos.x < m_WorldPos.x + right) ||

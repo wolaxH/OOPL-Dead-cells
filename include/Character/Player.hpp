@@ -7,7 +7,7 @@
 #include "Item/Weapon/RustySword.hpp"
 #include "MyUtil/Timer.hpp"
 #include "MyUtil/AtkManager.hpp"
-#include "MyUtil/RemovableManager.hpp"
+#include "MyUtil/GameWorldContext.hpp"
 #include "UI/PlayerUI.hpp"
 
 
@@ -15,11 +15,7 @@
 
 class Player : public Character, public std::enable_shared_from_this<Player>{
 public:
-    Player(std::vector<std::string>& path, int Hp, 
-        const std::vector<std::shared_ptr<SolidObj>>& SolidObjs, 
-        const std::vector<std::shared_ptr<OneSidedPlatform>>& OSP,
-        std::shared_ptr<RemovableManager>& Drops,
-        std::shared_ptr<RemovableManager>& Mobs);
+    Player(std::vector<std::string>& path, int Hp, GameWorldContext& World);
     ~Player() noexcept = default;
 
     void Init(){m_AttackManager = AttackManager(std::weak_ptr<Player>(shared_from_this()));}
@@ -138,11 +134,9 @@ private:
     std::shared_ptr<Weapon> m_Weapon1 = nullptr, m_Weapon2 = nullptr; //武器槽
     std::shared_ptr<PlayerUI> m_PlayerINFO; //玩家UI
     AttackManager m_AttackManager; //攻擊管理器
-
-    std::shared_ptr<RemovableManager>& r_WorldDrops;
-    std::shared_ptr<RemovableManager>& r_Mobs;
     
     int jumpStep = 0;   //double jump counter
     Timer timer;   //for count the roll cooling time
+    
 };
 #endif

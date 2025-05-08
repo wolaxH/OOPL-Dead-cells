@@ -4,9 +4,9 @@
 #include "Util/Animation.hpp"
 
 #include "Abstract/MapObj.hpp"
-#include "SolidObj.hpp"
-#include "OneSidedPlatform.hpp"
+#include "MyUtil/GameWorldContext.hpp"
 #include "MyUtil/AccessKey.hpp"
+#include "MyUtil/Physics.hpp"
 
 #include <unordered_map>
 #include <algorithm>
@@ -26,9 +26,7 @@ enum class c_state{ //Character state
 
 class Character : public MapObj{
 public:    
-    Character(  std::vector<std::string>& path, int Hp,
-                const std::vector<std::shared_ptr<SolidObj>>& SolidObjs, 
-                const std::vector<std::shared_ptr<OneSidedPlatform>>& OSP);
+    Character(std::vector<std::string>& path, int Hp, GameWorldContext& World);
     virtual ~Character() = default;
 
     void SetPos(glm::vec2 pos){ m_WorldPos = pos;}
@@ -51,7 +49,7 @@ public:
 protected:
     bool IsContainState(c_state State){return (D_Manager.find(State) != D_Manager.end()) ? true : false;}
 
-    bool InGround();
+    // bool InGround();
 
     /**
      * @param path eg:RESOURCE_DIR"Zombie/move/move_"
@@ -65,7 +63,7 @@ protected:
     /**
      * only for set VelocityY，不修改c_state
      */
-    void applyGravity(float dt);
+    // void applyGravity(float dt);
 
     /*用來修正位置，使其不會穿牆，不修改c_state*/
     void FixPos();
@@ -88,8 +86,8 @@ protected:
 
     float AtkRange;
     int Hp;
-    const std::vector<std::shared_ptr<SolidObj>>& r_SolidObjs; //reference of SolidObjs
-    const std::vector<std::shared_ptr<OneSidedPlatform>>& r_OneSidedPlatforms; //reference of OneSidedPlatforms
+    bool InGround;
+    GameWorldContext& m_World;   //reference of World resource
 
 private:
     std::unordered_map<c_state, std::shared_ptr<Core::Drawable>> D_Manager;  //Drawable Manager

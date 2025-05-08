@@ -12,13 +12,8 @@
 #define IS_UP_DOWN()        Util::Input::IsKeyDown(Util::Keycode::UP)       || Util::Input::IsKeyDown(Util::Keycode::W) || Util::Input::IsKeyDown(Util::Keycode::SPACE)
 #define IS_ROLL_DOWN()      Util::Input::IsKeyDown(Util::Keycode::LSHIFT)   || Util::Input::IsKeyDown(Util::Keycode::LCTRL)
 
-Player::Player(std::vector<std::string>& path, int Hp, 
-    const std::vector<std::shared_ptr<SolidObj>>& SolidObjs, 
-    const std::vector<std::shared_ptr<OneSidedPlatform>>& OSP,
-    std::shared_ptr<RemovableManager>& Drops,
-    std::shared_ptr<RemovableManager>& Mobs): 
-    Character(path, Hp, SolidObjs, OSP), 
-    r_WorldDrops(Drops), r_Mobs(Mobs){
+Player::Player(std::vector<std::string>& path, int Hp, GameWorldContext& World): 
+    Character(path, Hp, World){
         m_Transform.scale = {2.0f, 2.0f};
         m_Transform.translation = {0.0f, -100.0f};
         top = 60, bottom = 0, left = 10, right = 10;
@@ -39,7 +34,7 @@ void Player::Attack(float dt){
         if (m_Weapon1){
             Rect HitBox = m_Weapon1->GetHitBox(m_WorldPos, m_Transform.scale);
             Rect TempRect;
-            for (auto& mob : r_Mobs->GetChildren()){
+            for (auto& mob : m_World.Mobs->GetChildren()){
                 auto MobObj = std::dynamic_pointer_cast<Mob>(mob);
                 if (MobObj == nullptr) continue;
                 LOG_DEBUG("point");
@@ -74,7 +69,7 @@ void Player::PickUpDrops(std::shared_ptr<Drops> drops){
     if (NewItem){
         if (!m_Weapon1){
             m_Weapon1 = NewItem;
-            r_WorldDrops->RemoveChild(drops);
+            m_World.WorldDrops->RemoveChild(drops);
             m_PlayerINFO->SetSkill(m_Weapon1, 0);
         }
         else if (!m_Weapon2) m_Weapon2 = NewItem;
@@ -85,9 +80,9 @@ void Player::PickUpDrops(std::shared_ptr<Drops> drops){
             //將被替換的武器變成掉落物
             auto temp = m_Weapon1->ToDrops();
             temp->m_WorldPos = m_WorldPos + glm::vec2(0, 10);
-            r_WorldDrops->AddChild(temp);
+            m_World.WorldDrops->AddChild(temp);
             m_Weapon1 = NewItem;
-            r_WorldDrops->RemoveChild(drops);
+            m_World.WorldDrops->RemoveChild(drops);
 
             //更換slot圖案
             m_PlayerINFO->SetSkill(m_Weapon1, select);
@@ -99,12 +94,12 @@ void Player::PickUpDrops(std::shared_ptr<Drops> drops){
 }
 
 void Player::PickUp(){
-    //if (!InGround()) return;
+    //if (!InGround) return;
     if (GetState() == c_state::roll) return; //翻滾狀態不能撿東西
     if (GetState() == c_state::atk) return; //攻擊狀態不能撿東西
 
     if (Util::Input::IsKeyDown(Util::Keycode::R)){
-        for (auto& temp : r_WorldDrops->GetChildren()){
+        for (auto& temp : m_World.WorldDrops->GetChildren()){
             auto drop = std::dynamic_pointer_cast<Drops>(temp);
             if (IsNearBy(drop, 50.0f)){
                 LOG_DEBUG("Get");
@@ -119,11 +114,11 @@ void Player::PickUp(){
 
 void Player::TestP(){
     if (Util::Input::IsKeyDown(Util::Keycode::P)){
-        m_PlayerINFO->SetHp(m_PlayerINFO->GetCurrentHp() - 5);
-        if (m_PlayerINFO->GetCurrentHp() <= 0){
-            m_PlayerINFO->SetHp(100);
-        }
-        //LOG_DEBUG(m_WorldPos);
+        // m_PlayerINFO->SetHp(m_PlayerINFO->GetCurrentHp() - 5);
+        // if (m_PlayerINFO->GetCurrentHp() <= 0){
+        //     m_PlayerINFO->SetHp(100);
+        // }
+        LOG_DEBUG(m_WorldPos);
     }
 
 }
@@ -143,14 +138,14 @@ void Player::SlowDown(){
 }
 
 bool Player::IsOnOSP(){
-    if (!InGround()) return false;
+    if (!InGround) return false;
 
     glm::vec2 Pos = m_WorldPos;
     glm::vec2 OSP_Pos;
     glm::vec2 OSP_scale;
     bool x, y;
 
-    for (auto& OSP : r_OneSidedPlatforms){
+    for (auto& OSP : m_World.OneSidedPlatforms){
         if (!IsNearBy(OSP, 640.0f)) continue;
         OSP_Pos = OSP->m_WorldPos;
         OSP_scale = abs(OSP->GetScaledSize());
@@ -163,13 +158,13 @@ bool Player::IsOnOSP(){
 }
 
 bool Player::IsUnderOSP(){
-    if (InGround()) return false;
+    if (InGround) return false;
 
     glm::vec2 Pos = m_WorldPos;
     glm::vec2 OSP_scale;
     bool x, y;
 
-    for (auto& OSP : r_OneSidedPlatforms){
+    for (auto& OSP : m_World.OneSidedPlatforms){
         if (!IsNearBy(OSP, 640.0f)) continue;
         OSP_scale = abs(OSP->GetScaledSize());
 
@@ -218,8 +213,8 @@ void Player::Move(float dt){
 
     /**
      * 這裡的do while 是為了當無法左右移動時，jump() 也能被執行
-     * 正個do while 裡的內容若涉及更改c_state都要求InGround() == true
-     * VelocityX 則不要求InGround() == true
+     * 正個do while 裡的內容若涉及更改c_state都要求InGround == true
+     * VelocityX 則不要求InGround == true
      * for jump 打斷roll
      */
     do{
@@ -233,7 +228,7 @@ void Player::Move(float dt){
             if (m_Transform.scale.x > 0) m_Transform.scale.x *= -1;
             
             //  change the state or add a new one
-            if (GetState() != c_state::L_move && InGround()){
+            if (GetState() != c_state::L_move && InGround){
                 if (IsContainState(c_state::L_move)){ SetState(c_state::L_move);}
                 else{ InitState(c_state::L_move, {20}, {RESOURCE_DIR"/Beheaded/runA/runA_"});}
             }
@@ -250,7 +245,7 @@ void Player::Move(float dt){
             if (m_Transform.scale.x < 0) m_Transform.scale.x *= -1;
             
             //  change the state or add a new one
-            if (GetState() != c_state::R_move && InGround()){
+            if (GetState() != c_state::R_move && InGround){
                 if (IsContainState(c_state::R_move)){ SetState(c_state::R_move);}
                 else{ InitState(c_state::L_move, {20}, {RESOURCE_DIR"/Beheaded/runA/runA_"});}
             }
@@ -259,7 +254,7 @@ void Player::Move(float dt){
             if (VelocityX < MaxSpeed) VelocityX += AccelerationX * dt;
             else if (VelocityX > MaxSpeed) VelocityX = MaxSpeed;
         } //do nothing
-        else if (InGround() && GetState() != c_state::roll){  
+        else if (InGround && GetState() != c_state::roll){  
             // idle
             if (GetState() != c_state::idle && GetState() != c_state::crouch) SetState(c_state::idle);//  set state
             
@@ -276,7 +271,7 @@ void Player::Move(float dt){
     } //Pressed Down
     else if (IS_DOWN_PRESSED()){
         //crouch
-        if (InGround()){
+        if (InGround){
 
             if (IsContainState(c_state::crouch)) SetState(c_state::crouch);
             else InitState(c_state::crouch, {6}, {RESOURCE_DIR"/Beheaded/crouch/crouch_"});
@@ -286,7 +281,7 @@ void Player::Move(float dt){
             temp->Pause();
         }
     } //在地面跟翻滾狀態不會進Fall state
-    else if (!InGround() && GetState() != c_state::roll){
+    else if (!InGround && GetState() != c_state::roll){
         //fall
         if (GetState() != c_state::fall && VelocityY <= 0){
             //rendering, c_state
@@ -296,7 +291,7 @@ void Player::Move(float dt){
 }
 
 void Player::Jump(){
-    if (InGround()) jumpStep = 0;   
+    if (InGround) jumpStep = 0;   
     // if (jumpStep == 2) return;
     
     jumpStep++;
@@ -320,7 +315,7 @@ void Player::Clinb(){
     if (GetState() == c_state::roll) return; //翻滾時不能攀爬
     if (GetState() == c_state::clinbOSP) return;
     if (IsUnderOSP()) return;
-    if (InGround()) return; //平地不會攀爬
+    if (InGround) return; //平地不會攀爬
 
     if (GetState() == c_state::clinb){
         VelocityY = 0;
@@ -331,9 +326,9 @@ void Player::Clinb(){
     if (IsUnderOSP()) return;
 
     std::vector<std::shared_ptr<SolidObj>> temps;
-    temps.reserve(r_SolidObjs.size() + r_OneSidedPlatforms.size());
-    temps.insert(temps.end(), r_SolidObjs.begin(), r_SolidObjs.end());
-    temps.insert(temps.end(), r_OneSidedPlatforms.begin(), r_OneSidedPlatforms.end());
+    temps.reserve(m_World.SolidObjs.size() + m_World.OneSidedPlatforms.size());
+    temps.insert(temps.end(), m_World.SolidObjs.begin(), m_World.SolidObjs.end());
+    temps.insert(temps.end(), m_World.OneSidedPlatforms.begin(), m_World.OneSidedPlatforms.end());
 
     float solidTop;
     float solidLeft;
@@ -404,12 +399,12 @@ void Player::ClinbOSP(){
 
     bool IsHeadOver, IsbottomUnder, IsXInRange;
 
-    for (auto& OSP : r_OneSidedPlatforms){
+    for (auto& OSP : m_World.OneSidedPlatforms){
         IsHeadOver = P_Head > OSP->m_WorldPos.y;
         IsbottomUnder = P_Bottom < OSP->m_WorldPos.y-3;
         IsXInRange = !((m_WorldPos.x < OSP->m_WorldPos.x - OSP->GetScaledSize().x/2 - 1) || (m_WorldPos.x > OSP->m_WorldPos.x + OSP->GetScaledSize().x/2 + 1));
         if ((IsbottomUnder &&  IsHeadOver && IsXInRange) ||
-            (!InGround() && IsUnderOSP())){
+            (!InGround && IsUnderOSP())){
 
                 if (GetState() != c_state::clinbOSP) m_WorldPos.y += 50;
 
@@ -428,14 +423,14 @@ void Player::ClinbOSP(){
 void Player::roll(){
 
     //roll end detect
-    // if (!InGround() && GetState() != c_state::roll) return;
+    // if (!InGround && GetState() != c_state::roll) return;
     if (GetState() == c_state::roll){
         auto temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
         if (temp->GetCurrentFrameIndex() == temp->GetFrameCount() - 1){ //結束動畫
             if (m_Transform.scale.x > 0) VelocityX = MaxSpeed;
             else VelocityX = -1*MaxSpeed;
             
-            if (InGround()) SetState(c_state::idle);
+            if (InGround) SetState(c_state::idle);
             else SetState(c_state::fall, {}, false);
         }
         return;
@@ -468,7 +463,8 @@ void Player::roll(){
 /*-----------------------------------update-----------------------------------*/
 void Player::Update(float dt){
     Move(dt);
-    applyGravity(dt);
+    InGround = Physics::IsOnGround(m_WorldPos, m_World.SolidObjs, m_World.OneSidedPlatforms);
+    Physics::ApplyGravity(VelocityY, InGround, Gravity, MaxFallSpeed);
 
     if (IS_ROLL_DOWN() || GetState() == c_state::roll){
         roll();
@@ -481,6 +477,7 @@ void Player::Update(float dt){
     Attack(dt);
 
     FixPos();
+    TestP();
 
     m_WorldPos.x += VelocityX * dt;
     m_WorldPos.y += VelocityY * dt;

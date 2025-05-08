@@ -2,12 +2,8 @@
 
 #include "Util/Logger.hpp"
 
-Character::Character(std::vector<std::string>& path, int Hp, 
-    const std::vector<std::shared_ptr<SolidObj>>& SolidObjs, 
-    const std::vector<std::shared_ptr<OneSidedPlatform>>& OSP) 
-                : Hp(Hp)
-                , r_SolidObjs(SolidObjs)
-                ,r_OneSidedPlatforms(OSP) {
+Character::Character(std::vector<std::string>& path, int Hp, GameWorldContext& World) 
+    : Hp(Hp), m_World(World) {
     m_Drawable = std::make_shared<Util::Animation>(path, true, 20, true, 0);
     State = c_state::idle;
     D_Manager[State] = m_Drawable;
@@ -97,21 +93,11 @@ void Character::ChangeDrawable(AccessKey , std::shared_ptr<Util::Animation> Play
     D_Manager[state] = m_Drawable;
 }
 
-void Character::applyGravity(float dt){
-
-    if (!InGround()){
-        VelocityY -= Gravity * dt;
-        if (VelocityY < -1*MaxFallSpeed) VelocityY = -1*MaxFallSpeed;
-    }
-    else{
-        if (VelocityY < 0) VelocityY = 0;
-    }
-}
-
 void Character::FixPos(){
     int breakFlag = 0;
+    //LOG_INFO(m_World.SolidObjs.size());
+    for (auto& Solid : m_World.SolidObjs){
 
-    for (auto& Solid : r_SolidObjs){
         if (!IsNearBy(Solid, 3000.0f)) continue;
         breakFlag = 0;
         
@@ -137,7 +123,7 @@ void Character::FixPos(){
         }
     }
     
-    for (auto& OSP : r_OneSidedPlatforms){
+    for (auto& OSP : m_World.OneSidedPlatforms){
         if (m_WorldPos.y < OSP->m_WorldPos.y) continue;
         if (!IsNearBy(OSP, 640.0f)) continue;
 
@@ -151,32 +137,3 @@ void Character::FixPos(){
         m_WorldPos.y -= VelocityY;
     }
 }
-
-bool Character::InGround(){
-
-    glm::vec2 Pos = m_WorldPos;
-    glm::vec2 other_Pos;
-    glm::vec2 other_scale;
-    
-    float x, y;
-
-    /**
-     * This also is a temporary solution, as the one sided platform is a solid object.
-     */
-    std::vector<std::shared_ptr<SolidObj>> r_temp;
-    r_temp.reserve(r_SolidObjs.size() + r_OneSidedPlatforms.size());
-    r_temp.insert(r_temp.end(), r_SolidObjs.begin(), r_SolidObjs.end());
-    r_temp.insert(r_temp.end(), r_OneSidedPlatforms.begin(), r_OneSidedPlatforms.end());
-
-    for (const auto& Solid : r_temp){
-        other_Pos = Solid->m_WorldPos;
-        other_scale = abs(Solid->GetScaledSize());
-
-        x = !((Pos.x < other_Pos.x - other_scale.x/2 - 1) || (Pos.x > other_Pos.x + other_scale.x/2 + 1));
-        y = (Pos.y > other_Pos.y - other_scale.y/2) && (Pos.y < other_Pos.y + other_scale.y/2 + 2);
-        if (x && y) return true;
-    }
-    
-    return false;
-}
-
