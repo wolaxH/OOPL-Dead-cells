@@ -8,12 +8,11 @@ public:
     RustySword();
     ~RustySword() = default;
 
-    void Use(const glm::vec2& Pos, const glm::vec2& Dir) override;
+    void Use(std::shared_ptr<Mob>& mob) override;
 
     Rect GetHitBox(const glm::vec2& Pos, const glm::vec2& Dir) override;
 
 private:
-   Rect HitBox;
 };
 
 

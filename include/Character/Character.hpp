@@ -29,7 +29,7 @@ public:
     Character(  std::vector<std::string>& path, int Hp,
                 const std::vector<std::shared_ptr<SolidObj>>& SolidObjs, 
                 const std::vector<std::shared_ptr<OneSidedPlatform>>& OSP);
-    ~Character() noexcept = default;
+    virtual ~Character() = default;
 
     void SetPos(glm::vec2 pos){ m_WorldPos = pos;}
 

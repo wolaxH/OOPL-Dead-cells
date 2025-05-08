@@ -62,8 +62,8 @@ void AttackManager::Update(float dt) {
 
         // 小幅位移（可選擇移到 Use() 處理）
         glm::vec2 Dir = player->m_Transform.scale;
-        if (Dir.x > 0) player->VelocityX += 15;
-        else if (Dir.x < 0) player->VelocityX -= 15;
+        if (Dir.x > 0) player->VelocityX += 10;
+        else if (Dir.x < 0) player->VelocityX -= 10;
     }
     else if (!hasNextCombo || m_ComboTimer >= 1.8f) {
         ResetCombo();

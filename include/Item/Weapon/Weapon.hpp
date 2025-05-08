@@ -6,6 +6,7 @@
 
 #include "Util/Animation.hpp"
 
+class Mob;
 
 class Weapon : public Item{
 public:
@@ -17,7 +18,7 @@ public:
     }
     virtual ~Weapon() noexcept = default;
 
-    virtual void Use(const glm::vec2& Pos, const glm::vec2& Dir) = 0;
+    virtual void Use(std::shared_ptr<Mob>& mob) = 0;
     
     auto GetIcon() const {return m_Drawable;}
 

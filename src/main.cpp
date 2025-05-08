@@ -16,8 +16,7 @@ int main(int, char**) {
         auto currentTime = std::chrono::high_resolution_clock::now();
         std::chrono::duration<float> elapsed = currentTime - previousTime;
         previousTime = currentTime;
-        float deltaTime = elapsed.count() * 60.0f;
-
+        float deltaTime = std::min(elapsed.count(), 0.05f) * 60.0f;
 
         switch (app.GetCurrentState()) {
             case App::State::INIT_MENU:

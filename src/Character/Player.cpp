@@ -1,4 +1,5 @@
 #include "Character/Player.hpp"
+#include "Character/Mob.hpp"
 
 #include "Util/Input.hpp"
 
@@ -36,7 +37,20 @@ void Player::Attack(float dt){
     if (Util::Input::IsKeyDown(Util::Keycode::J)){
         //使用武器1
         if (m_Weapon1){
-            m_Weapon1->Use(m_WorldPos, m_Transform.scale);
+            Rect HitBox = m_Weapon1->GetHitBox(m_WorldPos, m_Transform.scale);
+            Rect TempRect;
+            for (auto& mob : r_Mobs->GetChildren()){
+                auto MobObj = std::dynamic_pointer_cast<Mob>(mob);
+                if (MobObj == nullptr) continue;
+                LOG_DEBUG("point");
+                TempRect.x = MobObj->m_WorldPos.x, TempRect.y = MobObj->m_WorldPos.y;
+                TempRect.height = MobObj->top + MobObj->bottom;
+                TempRect.width = MobObj->left + MobObj->right;
+                if (HitBox.Intersects(TempRect)){
+                    m_Weapon1->Use(MobObj);
+                }
+            }
+
             if (!m_AttackManager.IsAttacking()) m_AttackManager.StartAttack(0, m_Weapon1);
             
             if (IsContainState(c_state::atk)) SetState(c_state::atk);

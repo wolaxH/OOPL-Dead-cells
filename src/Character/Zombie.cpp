@@ -37,7 +37,10 @@ void Zombie::Attack(float dt){  //player
     //atk logic end
 }
 
-void Zombie::Attacked(int Damage, glm::vec2 Dir){}
+void Zombie::Attacked(int Damage, glm::vec2 Dir){
+    LOG_DEBUG("Mob Attacked");
+
+}
 
 bool Zombie::IsPlayerNearby(){
     glm::vec2 D = player->m_WorldPos - m_WorldPos;

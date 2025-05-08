@@ -13,6 +13,13 @@ struct Rect
                Pos.t >= y - height/2 && Pos.y <= y + height/2;
     }
 
+    bool Intersects(const Rect& other) const {
+        return !(x + width / 2 < other.x - other.width / 2 ||  // this is left of other
+                 x - width / 2 > other.x + other.width / 2 ||  // this is right of other
+                 y + height / 2 < other.y - other.height / 2 ||// this is above other
+                 y - height / 2 > other.y + other.height / 2); // this is below other
+    }
+
 };
 
 

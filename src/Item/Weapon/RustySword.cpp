@@ -1,4 +1,5 @@
 #include "Item/Weapon/RustySword.hpp"
+#include "Character/Mob.hpp"
 
 RustySword::RustySword() : Weapon(RESOURCE_DIR"/Item/RustySword/Icon.png", 20, 50.0f, "Knife"){
     m_AtkPoint = 20;
@@ -20,12 +21,20 @@ RustySword::RustySword() : Weapon(RESOURCE_DIR"/Item/RustySword/Icon.png", 20, 5
     m_Player_Drawables[1] = std::make_shared<Util::Animation>(path, true, 20 ,false, 0);
 }
 
-void RustySword::Use(const glm::vec2& Pos, const glm::vec2& Dir){
-    
+void RustySword::Use(std::shared_ptr<Mob>& mob){
+    mob->Attacked(123, glm::vec2(1,1));
 }
 
 Rect RustySword::GetHitBox(const glm::vec2& Pos, const glm::vec2& Dir){
-    if (Dir.x > 0) {
-        
+    Rect result;
+    result.x = Pos.x, result.y = Pos.y + 30;
+    result.width = 30;
+    result.height = 60;
+    if (Dir.x > 0){ //右
+        result.x += 20;
     }
+    else{   //左
+        result.x -= 20;
+    }
+    return result;
 }
