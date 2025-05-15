@@ -8,6 +8,7 @@
 void App::InGameInit() {
 
     Drops::m_World = &m_World;
+    // m_World = GameWorldContext(MapObjs);
 
     std::vector<std::string> Img;
     Img.reserve(46);
@@ -31,20 +32,29 @@ void App::InGameInit() {
     zombie->SetPos({0, 100});
     zombie->SetZIndex(30);
     zombie->SetVisible(true);
-    MapObjs.push_back(zombie);
+    //MapObjs.push_back(zombie);
     m_World.Mobs->AddObj(zombie);
     
 
     //test
     auto aa = std::make_shared<RustySword>();
-    auto t = aa->ToDrops();
-    t->SetZIndex(20.0f);
-    t->m_WorldPos = {0, -220.5f};
-    m_World.WorldDrops->AddObj(t);
-    MapObjs.push_back(t);
-    //test
+    auto bb = std::make_shared<RustySword>();
+    auto cc = std::make_shared<RustySword>();
 
-    
+    auto t = aa->ToDrops();
+    m_World.WorldDrops->AddObj(t);
+    // MapObjs.push_back(t);
+
+    t = bb->ToDrops();
+    t->m_WorldPos.x += 100;
+    m_World.WorldDrops->AddObj(t);
+    // MapObjs.push_back(t);
+
+    t = cc->ToDrops();
+    t->m_WorldPos.x -= 400;
+    m_World.WorldDrops->AddObj(t);
+    // MapObjs.push_back(t);
+    //test
 
 
     //bg
@@ -66,15 +76,15 @@ void App::InGameInit() {
      * To create a one sided platform object
      */
     InitColliders<OneSidedPlatform>("OSPs.json", m_World.OneSidedPlatforms);
-    
 
 
     /**
      * To create a solid object
      */
     InitColliders<SolidObj>("SolidObjs.json", m_World.SolidObjs);
-
     
+    
+
     /**
      * Add all solid objects to the root object for rendering.
      */
@@ -86,6 +96,15 @@ void App::InGameInit() {
 
     root.AddChild(m_World.WorldDrops);
     root.AddChild(m_World.Mobs);
+    for (const auto& temp : m_World.WorldDrops->GetObjs()){
+        auto drop = std::dynamic_pointer_cast<MapObj>(temp);
+        if (drop) MapObjs.push_back(drop);
+    }
+
+    for (const auto& temp : m_World.Mobs->GetObjs()){
+        auto mob = std::dynamic_pointer_cast<MapObj>(temp);
+        if (mob) MapObjs.push_back(mob);
+    }
 
     LOG_TRACE("Start");
     

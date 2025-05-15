@@ -10,9 +10,9 @@ SolidObj::SolidObj(const std::string& path){
     m_Drawable = std::make_shared<Util::Image>(path);
     m_ZIndex = 10.0f;
 
-    top = m_Drawable->GetSize().y / 2;
+    top = (m_Drawable->GetSize().y / 2);
     bottom = top;
-    left = m_Drawable->GetSize().x /2;
+    left = (m_Drawable->GetSize().x) /2;
     right = left;
 }
 

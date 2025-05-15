@@ -12,7 +12,6 @@
 
 
 
-
 class Player : public Character, public std::enable_shared_from_this<Player>{
 public:
     Player(std::vector<std::string>& path, int Hp, GameWorldContext& World);
@@ -47,16 +46,6 @@ public:
 private:
     
     void PickUp();
-
-    /**Get item logic
-     * * 1. 玩家靠近掉落物      complete
-     * * 2. 掉落物出現撿取提示
-     * * 3. 玩家按下R           complete
-     * * 4. 根據掉落物的物品觸發不同邏輯
-     * * * 4.1. 若為武器且武器slot滿了需要彈出更換視窗，且被替換的武器需要變回掉落物    complete
-     * * * 4.2. 若為卷軸則直接使用
-     * * 5. 掉落物消失     complete
-     */
     /**
      * When Press R, call this function
      */

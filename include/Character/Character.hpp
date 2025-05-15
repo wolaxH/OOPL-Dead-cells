@@ -7,6 +7,8 @@
 #include "MyUtil/GameWorldContext.hpp"
 #include "MyUtil/AccessKey.hpp"
 #include "MyUtil/Physics.hpp"
+#include "MyUtil/Collision.hpp"
+
 
 #include <unordered_map>
 #include <algorithm>
@@ -35,11 +37,7 @@ public:
 
     void SetState(c_state State, std::vector<std::string> path = {}, bool Isloop = true);
 
-    
-
     c_state GetState(){ return State;}
-
-    bool IsCollsion(std::shared_ptr<MapObj> other);
 
     void virtual Attack(float dt) = 0;
 
@@ -49,24 +47,15 @@ public:
 protected:
     bool IsContainState(c_state State){return (D_Manager.find(State) != D_Manager.end()) ? true : false;}
 
-    // bool InGround();
-
     /**
      * @param path eg:RESOURCE_DIR"Zombie/move/move_"
      */
     void InitState(c_state state, const std::vector<std::size_t>& frames = {}, const std::vector<std::string>& paths = {});
 
     void InitState(c_state State, std::shared_ptr<Core::Drawable> drawable);
-    
-
-
-    /**
-     * only for set VelocityY，不修改c_state
-     */
-    // void applyGravity(float dt);
 
     /*用來修正位置，使其不會穿牆，不修改c_state*/
-    void FixPos();
+    void FixPos(float dt);
 
     //移動
     virtual void Move(float dt) = 0;
@@ -82,7 +71,6 @@ protected:
     const float Friction = 1.5f;   //摩擦力(減速速度)
     const float Gravity = 0.8f;
     const float MaxFallSpeed = 20.0f;
-
 
     float AtkRange;
     int Hp;

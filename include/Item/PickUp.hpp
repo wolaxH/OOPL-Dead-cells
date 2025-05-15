@@ -3,10 +3,12 @@
 
 #include "Abstract/MapObj.hpp"
 #include "MyUtil/GameWorldContext.hpp"
+#include "MyUtil/Physics.hpp"
 
 #include "Util/Image.hpp"
 #include "Util/GameObject.hpp"
 #include "Util/Text.hpp"
+#include "Util/Logger.hpp"
 
 class Drops;
 class Item;
@@ -63,10 +65,43 @@ public:
     Drops(std::shared_ptr<Item> item) : 
         m_Item(item){
         m_Drawable = item->m_Drawable;
+        m_ZIndex = 20.0f;
         m_Transform.scale = {2, 2};
-        
     }
 
+    void Update(){
+
+        IsOnGround = Physics::IsOnGround(m_WorldPos, m_World->SolidObjs, m_World->OneSidedPlatforms);
+        Physics::ApplyGravity(VelocityY, IsOnGround, Gravity, MaxFallSpeed);
+
+        m_WorldPos.y += VelocityY;
+        FixPos();
+    }
+
+    void FixPos() {
+
+        std::vector<std::shared_ptr<SolidObj>> temp(m_World->SolidObjs);
+        temp.insert(temp.end(), m_World->OneSidedPlatforms.begin(), m_World->OneSidedPlatforms.end());
+        for (const auto& solid : temp) {
+            glm::vec2 solidPos = solid->m_WorldPos;
+            glm::vec2 solidSize = abs(solid->GetScaledSize());
+    
+            bool inXRange = m_WorldPos.x >= solidPos.x - solid->left * solidSize.x &&
+                            m_WorldPos.x <= solidPos.x + solid->right * solidSize.x;
+    
+            bool hittingTop = m_WorldPos.y >= solidPos.y - solid->bottom * solidSize.y &&
+                              m_WorldPos.y <= solidPos.y + solid->top * solidSize.y;
+
+    
+            if (inXRange && hittingTop && VelocityY < 0) {
+                LOG_DEBUG("point");
+                m_WorldPos.y = solidPos.y + solidSize.y / 2;
+                VelocityY = 0;
+                return;
+            }
+        }
+    }    
+    
     void PopUpDescribeBox(){ m_Item->SetDescribeVisible(true);}
 
     void HideDescribeBox(){ m_Item->SetDescribeVisible(false);}
@@ -76,6 +111,10 @@ public:
     static GameWorldContext* m_World;
 private:
     std::shared_ptr<Item> m_Item;
+    bool IsOnGround = false;
+    float VelocityY = 0;
+    const float Gravity = 0.8f;
+    const float MaxFallSpeed = 20.0f;
 };  // Drops
 
 

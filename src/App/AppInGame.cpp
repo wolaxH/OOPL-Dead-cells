@@ -4,12 +4,25 @@ void App::InGameUpdate(float dt) {
     
     player->Update(dt);
     
+    
+    //mobs
+    for (auto& temp : m_World.Mobs->GetObjs()){
+        auto mob = std::dynamic_pointer_cast<Mob>(temp);
+        mob->Update(dt);
+    }
+    //Drops
+    for (auto& temp : m_World.WorldDrops->GetObjs()){
+        auto drop = std::dynamic_pointer_cast<Drops>(temp);
+        drop->Update();
+    }
+
+    //camera    
     camera.Update(player);
     for (auto& temp : MapObjs){
         temp->m_Transform.translation = temp->m_WorldPos - camera.GetPos();
     }
-    zombie->Update(dt);
     
+    //render
     root.Update();
 
     

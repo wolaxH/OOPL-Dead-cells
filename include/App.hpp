@@ -90,7 +90,7 @@ private:    //ingame Objs
 
     std::vector<std::shared_ptr<MapObj>> MapObjs;
 
-    GameWorldContext m_World;
+    GameWorldContext m_World = GameWorldContext(MapObjs);
     
     std::vector<std::shared_ptr<BG>> BGs;
 };

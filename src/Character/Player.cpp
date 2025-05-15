@@ -16,7 +16,7 @@ Player::Player(std::vector<std::string>& path, int Hp, GameWorldContext& World):
     Character(path, Hp, World){
         m_Transform.scale = {2.0f, 2.0f};
         m_Transform.translation = {0.0f, -100.0f};
-        top = 60, bottom = 0, left = 10, right = 10;
+        top = 50, bottom = 0, left = 10, right = 10;
         
         m_PlayerINFO = std::make_shared<PlayerUI>();
 
@@ -28,33 +28,37 @@ void Player::Attack(float dt){
     if (GetState() == c_state::roll) return; //翻滾狀態不能攻擊
     if (GetState() == c_state::clinb) return; //攀爬狀態不能攻擊
     
-    
+    std::shared_ptr<Weapon> UsedWeapon;
+    //使用武器1 
     if (Util::Input::IsKeyDown(Util::Keycode::J)){
-        //使用武器1
-        if (m_Weapon1){
-            Rect HitBox = m_Weapon1->GetHitBox(m_WorldPos, m_Transform.scale);
-            Rect TempRect;
-            for (auto& mob : m_World.Mobs->GetChildren()){
-                auto MobObj = std::dynamic_pointer_cast<Mob>(mob);
-                if (MobObj == nullptr) continue;
-                LOG_DEBUG("point");
-                TempRect.x = MobObj->m_WorldPos.x, TempRect.y = MobObj->m_WorldPos.y;
-                TempRect.height = MobObj->top + MobObj->bottom;
-                TempRect.width = MobObj->left + MobObj->right;
-                if (HitBox.Intersects(TempRect)){
-                    m_Weapon1->Use(MobObj);
-                }
-            }
+        UsedWeapon = m_Weapon1;
+    }//使用武器2
+    else if(Util::Input::IsKeyDown(Util::Keycode::K)){
+        UsedWeapon = m_Weapon2;
+    }
 
-            if (!m_AttackManager.IsAttacking()) m_AttackManager.StartAttack(0, m_Weapon1);
+    if (UsedWeapon){
+        Rect HitBox = UsedWeapon->GetHitBox(m_WorldPos, m_Transform.scale);
+        Rect TempRect;
+        for (auto& mob : m_World.Mobs->GetObjs()){
+            auto MobObj = std::dynamic_pointer_cast<Mob>(mob);
+            if (MobObj == nullptr) continue;
             
-            if (IsContainState(c_state::atk)) SetState(c_state::atk);
-            else InitState(c_state::atk, nullptr);
-            
+
+            TempRect.x = MobObj->m_WorldPos.x, TempRect.y = MobObj->m_WorldPos.y;
+            TempRect.height = MobObj->top + MobObj->bottom;
+            TempRect.width = MobObj->left + MobObj->right;
+            if (HitBox.Intersects(TempRect)){
+                UsedWeapon->Use(MobObj);
+            }
         }
+        int slot = (UsedWeapon == m_Weapon1) ? 0 : 1;
+        if (!m_AttackManager.IsAttacking()) m_AttackManager.StartAttack(slot, UsedWeapon);
+        
+        if (IsContainState(c_state::atk)) SetState(c_state::atk);
+        else InitState(c_state::atk, nullptr);
     }
     m_AttackManager.Update(dt);
-    
 }
 
 void Player::Attacked(int Damage, glm::vec2 Dir){
@@ -62,31 +66,32 @@ void Player::Attacked(int Damage, glm::vec2 Dir){
 }
 
 void Player::PickUpDrops(std::shared_ptr<Drops> drops){
-    
     auto NewItem = std::dynamic_pointer_cast<Weapon>(drops->ToItem());
 
     //如果是武器
     if (NewItem){
-        if (!m_Weapon1){
+        if (m_Weapon1 == nullptr){
             m_Weapon1 = NewItem;
-            m_World.WorldDrops->RemoveChild(drops);
             m_PlayerINFO->SetSkill(m_Weapon1, 0);
         }
-        else if (!m_Weapon2) m_Weapon2 = NewItem;
+        else if (m_Weapon2 == nullptr){
+            m_Weapon2 = NewItem;
+            m_PlayerINFO->SetSkill(m_Weapon2, 1);
+        }
         else{ //WIP
             //彈出更換武器視窗
             int select = 0;
 
             //將被替換的武器變成掉落物
             auto temp = m_Weapon1->ToDrops();
-            temp->m_WorldPos = m_WorldPos + glm::vec2(0, 10);
-            m_World.WorldDrops->AddChild(temp);
+            temp->m_WorldPos = m_WorldPos + glm::vec2(10, 40);
+            m_World.WorldDrops->AddObj(temp);
             m_Weapon1 = NewItem;
-            m_World.WorldDrops->RemoveChild(drops);
-
+            
             //更換slot圖案
             m_PlayerINFO->SetSkill(m_Weapon1, select);
         }
+        m_World.WorldDrops->RemoveObj(drops);
     } //如果是卷軸
     else{ //WIP
         //卷軸效果加乘
@@ -94,15 +99,14 @@ void Player::PickUpDrops(std::shared_ptr<Drops> drops){
 }
 
 void Player::PickUp(){
-    //if (!InGround) return;
     if (GetState() == c_state::roll) return; //翻滾狀態不能撿東西
     if (GetState() == c_state::atk) return; //攻擊狀態不能撿東西
 
     if (Util::Input::IsKeyDown(Util::Keycode::R)){
-        for (auto& temp : m_World.WorldDrops->GetChildren()){
+        for (auto& temp : m_World.WorldDrops->GetObjs()){
             auto drop = std::dynamic_pointer_cast<Drops>(temp);
             if (IsNearBy(drop, 50.0f)){
-                LOG_DEBUG("Get");
+                LOG_DEBUG("Get Item");
                 PickUpDrops(drop);
                 return;
             }
@@ -476,7 +480,7 @@ void Player::Update(float dt){
     PickUp();
     Attack(dt);
 
-    FixPos();
+    FixPos(dt);
     TestP();
 
     m_WorldPos.x += VelocityX * dt;

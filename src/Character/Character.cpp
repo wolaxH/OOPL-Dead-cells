@@ -59,63 +59,36 @@ bool Character::IsNearBy(std::shared_ptr<MapObj> other, float distance){
     return glm::length(D) <= distance;
 }
 
-bool Character::IsCollsion(std::shared_ptr<MapObj> other){
-
-    glm::vec2 Pos = m_WorldPos;
-    glm::vec2 other_Pos = other->m_WorldPos;
-    
-    glm::vec2 other_scale = abs(other->GetTransform().scale);
-    glm::vec2 scale = abs(GetTransform().scale); 
-    float t_right = right * scale.x,  //temp borger
-        t_left = left * scale.x,
-        t_top = top * scale.y,
-        t_bottom = bottom * scale.y;
-
-    float other_right = other->right * other_scale.x,
-        other_left = other->left * other_scale.x,
-        other_top = other->top * other_scale.y,
-        other_bottom = other->bottom * other_scale.y;
-
-
-
-    bool x = ((Pos.x < other_Pos.x + other_right) && (Pos.x + t_right > other_Pos.x - other_left)) ||
-             ((Pos.x > other_Pos.x - other_left) && (Pos.x - t_left < other_Pos.x + other_right));
-
-    bool y = ((Pos.y < other_Pos.y + other_top) && (Pos.y + t_top > other_Pos.y - other_bottom)) ||
-             ((Pos.y > other_Pos.y - other_bottom) && (Pos.y - t_bottom < other_Pos.y + other_top));
-
-    return x && y;
-}
-
 void Character::ChangeDrawable(AccessKey , std::shared_ptr<Util::Animation> PlayerDrawable, c_state state){
     PlayerDrawable->SetCurrentFrame(0);
     m_Drawable = PlayerDrawable;
     D_Manager[state] = m_Drawable;
 }
 
-void Character::FixPos(){
+void Character::FixPos(float dt){
     int breakFlag = 0;
-    //LOG_INFO(m_World.SolidObjs.size());
+
     for (auto& Solid : m_World.SolidObjs){
 
         if (!IsNearBy(Solid, 3000.0f)) continue;
         breakFlag = 0;
         
-        m_WorldPos.x += VelocityX;
-        if (IsCollsion(Solid)){
-            m_WorldPos.x -= VelocityX;
+        m_WorldPos.x += VelocityX * dt;
+
+        if (Collision::IsIntersect(this, Solid.get())){
+            m_WorldPos.x -= VelocityX  * dt;
             VelocityX = 0;
             breakFlag++;
         }
-        m_WorldPos.x -= VelocityX;
+        m_WorldPos.x -= VelocityX  * dt;
         
-        m_WorldPos.y += VelocityY;
-        if (IsCollsion(Solid)){
-            m_WorldPos.y -= VelocityY;
+        m_WorldPos.y += VelocityY * dt;
+        if (Collision::IsIntersect(this, Solid.get())){
+            m_WorldPos.y -= VelocityY * dt;
             VelocityY = 0;
             breakFlag++;
         }
-        m_WorldPos.y -= VelocityY;
+        m_WorldPos.y -= VelocityY * dt;
 
         if (breakFlag == 2){
            m_WorldPos.y -= 1;
@@ -127,13 +100,13 @@ void Character::FixPos(){
         if (m_WorldPos.y < OSP->m_WorldPos.y) continue;
         if (!IsNearBy(OSP, 640.0f)) continue;
 
-        m_WorldPos.y += VelocityY;
+        m_WorldPos.y += VelocityY  * dt;
         if (m_WorldPos.y < OSP->m_WorldPos.y && 
             !((m_WorldPos.x < OSP->m_WorldPos.x - OSP->GetScaledSize().x/2 - 1) || (m_WorldPos.x > OSP->m_WorldPos.x + OSP->GetScaledSize().x/2 + 1))){
-            m_WorldPos.y -= VelocityY;
+            m_WorldPos.y -= VelocityY * dt;
             VelocityY = 0;
             break;
         }
-        m_WorldPos.y -= VelocityY;
+        m_WorldPos.y -= VelocityY * dt;
     }
 }

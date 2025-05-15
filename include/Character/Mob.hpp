@@ -20,7 +20,7 @@ protected:
 
     void PushPlayer(){
         auto obj = std::static_pointer_cast<MapObj>(player);
-        if (IsCollsion(obj)){
+        if (Collision::IsIntersect(this, player.get())){
             player->Pushed();            
         }    
     }

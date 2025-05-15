@@ -122,27 +122,27 @@ void Zombie::Move(float dt){
 }
 
 void Zombie::Update(float dt){
-    Move(dt);
+    // Move(dt);
     InGround = Physics::IsOnGround(m_WorldPos, m_World.SolidObjs, m_World.OneSidedPlatforms);
     Physics::ApplyGravity(VelocityY, InGround, Gravity, MaxFallSpeed);
 
     
     //atk behavior
-    if ((VelocityX > 0 && player->m_WorldPos.x > m_WorldPos.x && player->m_WorldPos.x < m_WorldPos.x + right) ||
-        (VelocityX < 0 && player->m_WorldPos.x < m_WorldPos.x && player->m_WorldPos.x > m_WorldPos.x - left)){
+    // if ((VelocityX > 0 && player->m_WorldPos.x > m_WorldPos.x && player->m_WorldPos.x < m_WorldPos.x + right) ||
+    //     (VelocityX < 0 && player->m_WorldPos.x < m_WorldPos.x && player->m_WorldPos.x > m_WorldPos.x - left)){
     
-        VelocityX = 0;
+    //     VelocityX = 0;
         
-        //set atk state
-        if (IsContainState(c_state::atk)) SetState(c_state::atk, {}, false);
-        else InitState(c_state::atk, {28}, {RESOURCE_DIR"/Zombie/atk/atk_"});
-        Attack(dt);
-    }
-    else if (GetState() == c_state::atk) Attack(dt);
+    //     //set atk state
+    //     if (IsContainState(c_state::atk)) SetState(c_state::atk, {}, false);
+    //     else InitState(c_state::atk, {28}, {RESOURCE_DIR"/Zombie/atk/atk_"});
+    //     Attack(dt);
+    // }
+    // else if (GetState() == c_state::atk) Attack(dt);
     //atk end
     
     PushPlayer();
-    FixPos();
+    FixPos(dt);
 
     m_WorldPos.x += VelocityX * dt;
     m_WorldPos.y += VelocityY * dt;
