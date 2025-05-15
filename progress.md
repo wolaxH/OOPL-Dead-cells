@@ -16,3 +16,4 @@
 
 ## NOTE
 - 可能不做暈眩條系統
+- 用laptop 的gdb try 武器連續攻擊時導致閃退的錯誤，Desktop 的 gdb kind of weird
