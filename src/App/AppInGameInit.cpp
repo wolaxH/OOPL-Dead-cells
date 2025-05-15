@@ -4,11 +4,9 @@
 
 #include <fstream>
 
-#include "Util/Logger.hpp"
 void App::InGameInit() {
 
     Drops::m_World = &m_World;
-    // m_World = GameWorldContext(MapObjs);
 
     std::vector<std::string> Img;
     Img.reserve(46);
@@ -37,11 +35,11 @@ void App::InGameInit() {
     
 
     //test
-    auto aa = std::make_shared<RustySword>();
+    auto RW = std::make_shared<RustySword>();
     auto bb = std::make_shared<RustySword>();
-    auto cc = std::make_shared<RustySword>();
+    auto TD = std::make_shared<TwinDaggers>();
 
-    auto t = aa->ToDrops();
+    auto t = RW->ToDrops();
     m_World.WorldDrops->AddObj(t);
     // MapObjs.push_back(t);
 
@@ -50,7 +48,7 @@ void App::InGameInit() {
     m_World.WorldDrops->AddObj(t);
     // MapObjs.push_back(t);
 
-    t = cc->ToDrops();
+    t = TD->ToDrops();
     t->m_WorldPos.x -= 400;
     m_World.WorldDrops->AddObj(t);
     // MapObjs.push_back(t);

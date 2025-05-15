@@ -16,6 +16,7 @@
 #include "BackGround.hpp"
 #include "OneSidedPlatform.hpp"
 #include "UI/PlayerUI.hpp"
+#include "Item/Weapon/WeaponTypes.hpp"
 
 
 #include "json.hpp"

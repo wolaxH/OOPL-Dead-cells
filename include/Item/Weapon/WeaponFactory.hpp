@@ -1,0 +1,7 @@
+#ifndef WEAPONFACTORY_HPP
+#define WEAPONFACTORY_HPP
+
+
+
+
+#endif
