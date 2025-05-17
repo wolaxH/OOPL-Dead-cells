@@ -1,6 +1,8 @@
 #ifndef WEAPON_HPP
 #define WEAPON_HPP
 
+#include <map>
+
 #include "Item/PickUp.hpp"
 #include "MyUtil/Rect.hpp"
 
@@ -18,18 +20,23 @@ public:
     }
     virtual ~Weapon() noexcept = default;
 
-    virtual void Use(std::shared_ptr<Mob>& mob, const glm::vec2& Dir = {1, 1}, int combo = 0) = 0;
-    
     auto GetIcon() const {return m_Drawable;}
+    
+    std::vector<std::shared_ptr<Util::Animation>> GetPlayerDrawable() const noexcept {return m_Player_Drawables;}
 
-    std::vector<std::shared_ptr<Util::Animation>> GetPlayerDrawable() const {return m_Player_Drawables;}
+    std::vector<size_t> GetAtkableFrames(int combo) const {
+        if (combo < m_AtkableFrames.size()) return m_AtkableFrames[combo];
+    }
 
-    Rect virtual GetHitBox(const glm::vec2& Pos, const glm::vec2& Dir) = 0;
+    virtual void Use(std::shared_ptr<Mob>& mob, const glm::vec2& Dir = {1, 1}, int combo = 0) = 0;
+
+    Rect virtual GetHitBox(const glm::vec2& Pos, const glm::vec2& Dir, int combo = 0) = 0;
 
 protected:
     std::vector<int> m_AtkPoint; //攻擊力
 
     std::vector<std::shared_ptr<Util::Animation>> m_Player_Drawables; //玩家的攻擊動畫
+    std::vector<std::vector<size_t>> m_AtkableFrames;
 };
 
 #endif

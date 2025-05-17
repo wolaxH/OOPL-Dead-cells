@@ -18,6 +18,7 @@ void AttackManager::StartAttack(int SlotNumber, std::shared_ptr<Weapon> weapon){
     m_ComboTimer = 0.0f;
     m_IsAttacking = true;
     m_Player.lock()->RequastToChangeDrawable(m_Weapon->GetPlayerDrawable()[0]);
+    m_CurrentAtkData.AttackableFrams = weapon->GetAtkableFrames(0);
     if (Util::Input::IsKeyPressed(Util::Keycode::RIGHT) || Util::Input::IsKeyPressed(Util::Keycode::D)) m_Player.lock()->VelocityX += 5;
     else if (Util::Input::IsKeyPressed(Util::Keycode::LEFT)  || Util::Input::IsKeyPressed(Util::Keycode::A)) m_Player.lock()->VelocityX -= 5;
 }
@@ -26,35 +27,39 @@ void AttackManager::Interrupt(){
 
 }
 
-void AttackManager::Update(float dt) {
-    if (!m_IsAttacking) return;
-
-    auto player = m_Player.lock();
-    if (!player) return;
-
-    auto currentAnim = std::dynamic_pointer_cast<Util::Animation>(player->m_Drawable);
-    if (!currentAnim) return;
+void AttackManager::AnimaUpdate(std::shared_ptr<Player> player, std::shared_ptr<Util::Animation> currentAnim, float dt){
 
     Util::Keycode atkKey = (m_WeaponSlotNUmber == 0) ? Util::Keycode::J : Util::Keycode::K;
 
-    if (currentAnim->GetCurrentFrameIndex() > currentAnim->GetFrameCount() - 6 && Util::Input::IsKeyDown(atkKey)) {
-        NextSegFlag = true;
+
+    auto currentFrame = currentAnim->GetCurrentFrameIndex();
+    const auto& atkableFrames = m_CurrentAtkData.AttackableFrams;
+    //如果找到
+    if (std::find(atkableFrames.begin(), atkableFrames.end(), currentFrame) != atkableFrames.end()){
+        m_CurrentAtkData.HitableFlag = true;
+    }
+    else{
+        m_CurrentAtkData.HitableFlag = false;
     }
 
+    if (currentFrame > currentAnim->GetFrameCount() - 6 && Util::Input::IsKeyDown(atkKey)) m_NextSegFlag = true;
+
     // 檢查當前動畫是否播放完
-    if (currentAnim->GetCurrentFrameIndex() < currentAnim->GetFrameCount() - 1) return;
+    if (currentFrame < currentAnim->GetFrameCount() - 1) return;
 
     m_ComboTimer += dt;
 
     // 是否還有下一段攻擊動畫
     bool hasNextCombo = (m_ComboIndex + 1 < m_Weapon->GetPlayerDrawable().size());
-
-    
+        
     // 若在攻擊動畫結束時按下按鍵 → 進入下一段
-    if (NextSegFlag && hasNextCombo) {
+    if (m_NextSegFlag && hasNextCombo) {
         m_ComboIndex++;
         m_ComboTimer = 0.f;
-        NextSegFlag = false;
+        m_NextSegFlag = false;
+
+        m_CurrentAtkData.AttackableFrams = m_Weapon->GetAtkableFrames(m_ComboIndex);
+        m_CurrentAtkData.HitableFlag = false;
 
         auto nextAnim = m_Weapon->GetPlayerDrawable()[m_ComboIndex];
         nextAnim->SetCurrentFrame(0);
@@ -68,6 +73,18 @@ void AttackManager::Update(float dt) {
     else if (!hasNextCombo || m_ComboTimer >= 1.8f) {
         ResetCombo();
     }
+}
+
+void AttackManager::Update(float dt) {
+    if (!m_IsAttacking) return;
+
+    auto player = m_Player.lock();
+    if (!player) return;
+
+    auto currentAnim = std::dynamic_pointer_cast<Util::Animation>(player->m_Drawable);
+    if (!currentAnim) return;
+
+    AnimaUpdate(player, currentAnim, dt);
 }
 
 void AttackManager::ResetCombo() {

@@ -5,6 +5,7 @@ TwinDaggers::TwinDaggers() : Weapon(RESOURCE_DIR"/Item/TwinDaggers/Icon.png", "t
 
     std::vector<std::string> path;
     m_Player_Drawables.resize(3);
+    m_AtkPoint.resize(3);
 
     for (int i = 0; i < 11; i++){
         path.push_back(RESOURCE_DIR"/Item/TwinDaggers/A/A_" + std::to_string(i) + ".png");
@@ -23,13 +24,18 @@ TwinDaggers::TwinDaggers() : Weapon(RESOURCE_DIR"/Item/TwinDaggers/Icon.png", "t
     m_Player_Drawables[1] = std::make_shared<Util::Animation>(path, true, 30, false, 0);
 
     m_AtkPoint[0] = 40, m_AtkPoint[1] = 55, m_AtkPoint[2] = 90;
+
+    m_AtkableFrames.resize(3);
+    for (int i = 4; i < 11; i++){m_AtkableFrames[0].push_back(i);}
+    for (int i = 4; i < 12; i++){m_AtkableFrames[1].push_back(i);}
+    for (int i = 4; i < 11; i++){m_AtkableFrames[2].push_back(i);}
 }
 
 void TwinDaggers::Use(std::shared_ptr<Mob>& mob, const glm::vec2& Dir, int combo){
     mob->Attacked(m_AtkPoint[combo], Dir);
 }
 
-Rect TwinDaggers::GetHitBox(const glm::vec2& Pos, const glm::vec2& Dir){
+Rect TwinDaggers::GetHitBox(const glm::vec2& Pos, const glm::vec2& Dir, int combo){
     Rect result;
     result.x = Pos.x, result.y = Pos.y + 30;
     result.width = 60;

@@ -27,8 +27,8 @@ Player::Player(std::vector<std::string>& path, int Hp, GameWorldContext& World):
 void Player::Attack(float dt){
     if (GetState() == c_state::roll) return; //翻滾狀態不能攻擊
     if (GetState() == c_state::clinb) return; //攀爬狀態不能攻擊
-    
-    std::shared_ptr<Weapon> UsedWeapon;
+
+    std::shared_ptr<Weapon> UsedWeapon = nullptr;
     //使用武器1 
     if (Util::Input::IsKeyDown(Util::Keycode::J)){
         UsedWeapon = m_Weapon1;
@@ -37,26 +37,36 @@ void Player::Attack(float dt){
         UsedWeapon = m_Weapon2;
     }
 
+    //武器動畫與 c_State 設定
     if (UsedWeapon){
-        Rect HitBox = UsedWeapon->GetHitBox(m_WorldPos, m_Transform.scale);
-        Rect TempRect;
-        for (auto& mob : m_World.Mobs->GetObjs()){
-            auto MobObj = std::dynamic_pointer_cast<Mob>(mob);
-            if (MobObj == nullptr) continue;
-            
-
-            TempRect.x = MobObj->m_WorldPos.x, TempRect.y = MobObj->m_WorldPos.y;
-            TempRect.height = MobObj->top + MobObj->bottom;
-            TempRect.width = MobObj->left + MobObj->right;
-            if (HitBox.Intersects(TempRect)){
-                UsedWeapon->Use(MobObj);
-            }
-        }
         int slot = (UsedWeapon == m_Weapon1) ? 0 : 1;
         if (!m_AttackManager.IsAttacking()) m_AttackManager.StartAttack(slot, UsedWeapon);
         
         if (IsContainState(c_state::atk)) SetState(c_state::atk);
         else InitState(c_state::atk, nullptr);
+        
+    }
+
+    //攻擊操作
+    if (GetState() == c_state::atk && m_AttackManager.GetHitable()){
+        auto currentWeapon = m_AttackManager.GetCurrentWeapon();
+        if (currentWeapon == nullptr){
+            m_AttackManager.Update(dt);
+            return;
+        }
+        Rect HitBox = currentWeapon->GetHitBox(m_WorldPos, m_Transform.scale, m_AttackManager.GetComboIndex());
+        Rect TempRect;
+        for (auto& mob : m_World.Mobs->GetObjs()){
+            auto MobObj = std::dynamic_pointer_cast<Mob>(mob);
+            if (MobObj == nullptr) continue;
+
+            TempRect.x = MobObj->m_WorldPos.x, TempRect.y = MobObj->m_WorldPos.y;
+            TempRect.height = MobObj->top + MobObj->bottom;
+            TempRect.width = MobObj->left + MobObj->right;
+            if (HitBox.Intersects(TempRect)){
+                currentWeapon->Use(MobObj, m_Transform.scale, m_AttackManager.GetComboIndex());
+            }
+        }
     }
     m_AttackManager.Update(dt);
 }

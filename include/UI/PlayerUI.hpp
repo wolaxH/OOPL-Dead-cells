@@ -19,6 +19,7 @@ public:
 
     int GetCurrentHp() const {return m_Hp->GetCurrentHp();}
 
+
 private:
     std::shared_ptr<Hp> m_Hp;
     std::shared_ptr<SkillSlot> m_WaterSlot; 

@@ -25,3 +25,4 @@ void PlayerUI::SetSkill(std::shared_ptr<Item> item, int index){
     auto Icon = std::dynamic_pointer_cast<Util::Image>(item->GetIcon());
     m_SkillSlot[index]->SetSkillIcon(Icon);
 }
+

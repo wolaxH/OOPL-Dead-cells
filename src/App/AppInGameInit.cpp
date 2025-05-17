@@ -30,28 +30,27 @@ void App::InGameInit() {
     zombie->SetPos({0, 100});
     zombie->SetZIndex(30);
     zombie->SetVisible(true);
-    //MapObjs.push_back(zombie);
     m_World.Mobs->AddObj(zombie);
     
 
     //test
     auto RW = std::make_shared<RustySword>();
-    auto bb = std::make_shared<RustySword>();
+    auto B = std::make_shared<Bone>();
     auto TD = std::make_shared<TwinDaggers>();
 
     auto t = RW->ToDrops();
     m_World.WorldDrops->AddObj(t);
-    // MapObjs.push_back(t);
+    LOG_DEBUG("Rw init");
 
-    t = bb->ToDrops();
+    t = B->ToDrops();
     t->m_WorldPos.x += 100;
     m_World.WorldDrops->AddObj(t);
-    // MapObjs.push_back(t);
+    LOG_DEBUG("B init");
 
     t = TD->ToDrops();
     t->m_WorldPos.x -= 400;
     m_World.WorldDrops->AddObj(t);
-    // MapObjs.push_back(t);
+    LOG_DEBUG("TD init");
     //test
 
 
