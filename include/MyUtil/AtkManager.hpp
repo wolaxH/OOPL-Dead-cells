@@ -1,13 +1,11 @@
 #ifndef ATKMANAGER_HPP
 #define ATKMANAGER_HPP
 
-
 #include "Item/Weapon/Weapon.hpp"
 
 #include "Util/Animation.hpp"
 
 class Player;
-
 
 enum class AttackPhase {
     None,
@@ -61,9 +59,6 @@ private:
     AttackData m_CurrentAtkData;
 
     void ResetCombo();
-
-    void AnimaUpdate(std::shared_ptr<Player> player, std::shared_ptr<Util::Animation> currentAnim, float dt);
-
 };
 
 #endif // ATKMANAGER_HPP

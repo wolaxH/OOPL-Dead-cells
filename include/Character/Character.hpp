@@ -23,7 +23,8 @@ enum class c_state{ //Character state
     clinb,
     clinbOSP,
     crouch,
-    roll
+    roll,
+    atked
 };
 
 class Character : public MapObj{
@@ -42,7 +43,6 @@ public:
     void virtual Attack(float dt) = 0;
 
     void virtual Attacked(int Damage, glm::vec2 Dir) = 0;
-
 
 protected:
     bool IsContainState(c_state State){return (D_Manager.find(State) != D_Manager.end()) ? true : false;}
@@ -72,7 +72,6 @@ protected:
     const float Gravity = 0.8f;
     const float MaxFallSpeed = 20.0f;
 
-    float AtkRange;
     int Hp;
     bool InGround;
     GameWorldContext& m_World;   //reference of World resource
@@ -80,6 +79,7 @@ protected:
 private:
     std::unordered_map<c_state, std::shared_ptr<Core::Drawable>> D_Manager;  //Drawable Manager
     c_state State;      //current state
+
 };
 
 #endif

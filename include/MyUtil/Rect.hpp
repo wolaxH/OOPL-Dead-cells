@@ -20,6 +20,10 @@ struct Rect
                  y - height / 2 > other.y + other.height / 2); // this is below other
     }
 
+    static Rect CreateRect(glm::vec2 center, float width, float height){
+        return Rect{center.x, center.y, width, height};
+    }
+
 };
 
 

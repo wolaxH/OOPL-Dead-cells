@@ -27,7 +27,14 @@ void AttackManager::Interrupt(){
 
 }
 
-void AttackManager::AnimaUpdate(std::shared_ptr<Player> player, std::shared_ptr<Util::Animation> currentAnim, float dt){
+void AttackManager::Update(float dt) {
+    if (!m_IsAttacking) return;
+
+    auto player = m_Player.lock();
+    if (!player) return;
+
+    auto currentAnim = std::dynamic_pointer_cast<Util::Animation>(player->m_Drawable);
+    if (!currentAnim) return;
 
     Util::Keycode atkKey = (m_WeaponSlotNUmber == 0) ? Util::Keycode::J : Util::Keycode::K;
 
@@ -50,7 +57,7 @@ void AttackManager::AnimaUpdate(std::shared_ptr<Player> player, std::shared_ptr<
     m_ComboTimer += dt;
 
     // 是否還有下一段攻擊動畫
-    bool hasNextCombo = (m_ComboIndex + 1 < m_Weapon->GetPlayerDrawable().size());
+    bool hasNextCombo = (m_ComboIndex + 1 < m_Weapon->GetSegCount());
         
     // 若在攻擊動畫結束時按下按鍵 → 進入下一段
     if (m_NextSegFlag && hasNextCombo) {
@@ -73,18 +80,6 @@ void AttackManager::AnimaUpdate(std::shared_ptr<Player> player, std::shared_ptr<
     else if (!hasNextCombo || m_ComboTimer >= 1.8f) {
         ResetCombo();
     }
-}
-
-void AttackManager::Update(float dt) {
-    if (!m_IsAttacking) return;
-
-    auto player = m_Player.lock();
-    if (!player) return;
-
-    auto currentAnim = std::dynamic_pointer_cast<Util::Animation>(player->m_Drawable);
-    if (!currentAnim) return;
-
-    AnimaUpdate(player, currentAnim, dt);
 }
 
 void AttackManager::ResetCombo() {

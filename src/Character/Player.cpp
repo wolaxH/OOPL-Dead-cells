@@ -44,7 +44,6 @@ void Player::Attack(float dt){
         
         if (IsContainState(c_state::atk)) SetState(c_state::atk);
         else InitState(c_state::atk, nullptr);
-        
     }
 
     //攻擊操作
@@ -54,16 +53,15 @@ void Player::Attack(float dt){
             m_AttackManager.Update(dt);
             return;
         }
+        //player 攻擊產生的碰撞箱
         Rect HitBox = currentWeapon->GetHitBox(m_WorldPos, m_Transform.scale, m_AttackManager.GetComboIndex());
-        Rect TempRect;
+        Rect MobRect;
         for (auto& mob : m_World.Mobs->GetObjs()){
             auto MobObj = std::dynamic_pointer_cast<Mob>(mob);
             if (MobObj == nullptr) continue;
 
-            TempRect.x = MobObj->m_WorldPos.x, TempRect.y = MobObj->m_WorldPos.y;
-            TempRect.height = MobObj->top + MobObj->bottom;
-            TempRect.width = MobObj->left + MobObj->right;
-            if (HitBox.Intersects(TempRect)){
+            MobRect = Rect::CreateRect(MobObj->m_WorldPos, MobObj->top + MobObj->bottom, MobObj->left + MobObj->right);
+            if (HitBox.Intersects(MobRect)){
                 currentWeapon->Use(MobObj, m_Transform.scale, m_AttackManager.GetComboIndex());
             }
         }

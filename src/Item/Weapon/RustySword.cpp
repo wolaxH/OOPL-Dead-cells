@@ -2,10 +2,10 @@
 #include "Character/Mob.hpp"
 
 RustySword::RustySword() : Weapon(RESOURCE_DIR"/Item/RustySword/Icon.png", "this is a Weapon"){
-    
+    m_SegCount = 3;
     std::vector<std::string> path;
-    m_Player_Drawables.resize(3);
-    m_AtkPoint.resize(3);
+    m_Player_Drawables.resize(m_SegCount);
+    m_AtkPoint.resize(m_SegCount);
 
     for (int i = 0; i < 8; i++){
         path.push_back(RESOURCE_DIR"/Item/RustySword/A/A_" + std::to_string(i) + ".png");
@@ -24,11 +24,10 @@ RustySword::RustySword() : Weapon(RESOURCE_DIR"/Item/RustySword/Icon.png", "this
 
     m_AtkPoint[0] = 25, m_AtkPoint[1] = 30, m_AtkPoint[2] = 40;
 
-    m_AtkableFrames.resize(3);
+    m_AtkableFrames.resize(m_SegCount);
     for (int i = 4; i < 10; i++){m_AtkableFrames[0].push_back(i);}
     for (int i = 4; i < 10; i++){m_AtkableFrames[1].push_back(i);}
     for (int i = 6; i < 14; i++){m_AtkableFrames[2].push_back(i);}
-
 }
 
 void RustySword::Use(std::shared_ptr<Mob>& mob, const glm::vec2& Dir, int combo){

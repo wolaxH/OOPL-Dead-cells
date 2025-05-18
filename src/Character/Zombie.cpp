@@ -4,33 +4,42 @@
 
 #include "Util/Logger.hpp"
 
+Zombie::Zombie(std::vector<std::string>& path, int Hp, std::shared_ptr<Player> player, GameWorldContext& World) 
+    : Mob(path, Hp, player, World){
+    top = 50, bottom = 52, left = 13, right = 13;
+    m_DetectRange = 300.0f;
+    m_Transform.translation = {1.0f, 1.0f};
+    m_AtkRange = 20.0f;
+    m_Hp = 200;
+}
 
 void Zombie::Attack(float dt){  //player
+    if (GetState() == c_state::atked) return;
 
     //rendering 
     auto temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
     if (temp->GetState() != Util::Animation::State::PLAY){  // init atk behavior
         SetState(c_state::idle);
-        AtkFlag = false;
+        m_AtkFlag = false;
         return;
     }
     //rendering end
 
-    if (AtkFlag) return;    //already attacked
+    if (m_AtkFlag) return;    //already attacked
     if (temp->GetCurrentFrameIndex() >= temp->GetFrameCount()-4 ||  //atkable frame only 18 ~ 24
         temp->GetCurrentFrameIndex() < 17 ) return; 
 
     //the real atk logic
     if (m_Transform.scale.x > 0){   //atk forward right
-        if (player->m_WorldPos.x > m_WorldPos.x && player->m_WorldPos.x < m_WorldPos.x + AtkRange){
-            player->Attacked(AtkPoint);
-            AtkFlag = true;
+        if (m_player->m_WorldPos.x > m_WorldPos.x && m_player->m_WorldPos.x < m_WorldPos.x + m_AtkRange){
+            m_player->Attacked(AtkPoint);
+            m_AtkFlag = true;
         }
     }
     else{
-        if (player->m_WorldPos.x < m_WorldPos.x && player->m_WorldPos.x > m_WorldPos.x - AtkRange){
-            player->Attacked(AtkPoint);
-            AtkFlag = true;
+        if (m_player->m_WorldPos.x < m_WorldPos.x && m_player->m_WorldPos.x > m_WorldPos.x - m_AtkRange){
+            m_player->Attacked(AtkPoint);
+            m_AtkFlag = true;
             
         }
     }
@@ -38,29 +47,41 @@ void Zombie::Attack(float dt){  //player
 }
 
 void Zombie::Attacked(int Damage, glm::vec2 Dir){
-    LOG_DEBUG("Mob Attacked");
+    LOG_DEBUG("Attacked");
+    if (GetState() == c_state::atk){
+        m_Hp -= Damage;
+        return;
+    }
 
-}
-
-bool Zombie::IsPlayerNearby(){
-    glm::vec2 D = player->m_WorldPos - m_WorldPos;
-    return glm::length(D) <= DetectRange;
+    if (GetState() == c_state::atked){
+        auto temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
+        if (temp == nullptr) return;
+        if (temp->GetCurrentFrameIndex() >= temp->GetFrameCount()-1){
+            SetState(c_state::idle);
+        }
+    }
+    
+    if (IsContainState(c_state::atked)) SetState(c_state::atked);
+    else InitState(c_state::atked, {3}, {RESOURCE_DIR"/Zombie/Atked/Atked_"});
+    m_Hp -= Damage;
+    m_WorldPos.x += (Dir.x > 0) ? 5 : -5;
 }
 
 void Zombie::Move(float dt){
     if (GetState() == c_state::atk) return; //atk cannot move
+    if (GetState() == c_state::atked) return;   //atked cannot move
 
     //trace player
-    if (IsPlayerNearby()){  
+    if (IsNearBy(m_player,m_DetectRange)){  
         //c_state = move
         m_state = mob_state::trace;
-        if (player->m_WorldPos.x > m_WorldPos.x + 10){   
+        if (m_player->m_WorldPos.x > m_WorldPos.x + 10){   
             m_Transform.scale.x = 1.0f;
             //Add state
             if (!IsContainState(c_state::R_move)) InitState(c_state::R_move, {22}, {RESOURCE_DIR"/Zombie/move/move_"});
             else SetState(c_state::R_move);
         }
-        else if (player->m_WorldPos.x < m_WorldPos.x - 10){
+        else if (m_player->m_WorldPos.x < m_WorldPos.x - 10){
             m_Transform.scale.x = -1.0f;
             //Add state
             if (!IsContainState(c_state::L_move)) InitState(c_state::L_move, {22}, {RESOURCE_DIR"/Zombie/move/move_"});
@@ -140,6 +161,8 @@ void Zombie::Update(float dt){
     // }
     // else if (GetState() == c_state::atk) Attack(dt);
     //atk end
+
+    if (GetState() == c_state::atked) Attacked(0, glm::vec2(0, 0));
     
     PushPlayer();
     FixPos(dt);

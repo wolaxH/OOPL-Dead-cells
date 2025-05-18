@@ -2,10 +2,10 @@
 #include "Character/Mob.hpp"
 
 TwinDaggers::TwinDaggers() : Weapon(RESOURCE_DIR"/Item/TwinDaggers/Icon.png", "this is a Weapon"){
-
+    m_SegCount = 3;
     std::vector<std::string> path;
-    m_Player_Drawables.resize(3);
-    m_AtkPoint.resize(3);
+    m_Player_Drawables.resize(m_SegCount);
+    m_AtkPoint.resize(m_SegCount);
 
     for (int i = 0; i < 11; i++){
         path.push_back(RESOURCE_DIR"/Item/TwinDaggers/A/A_" + std::to_string(i) + ".png");
@@ -25,7 +25,7 @@ TwinDaggers::TwinDaggers() : Weapon(RESOURCE_DIR"/Item/TwinDaggers/Icon.png", "t
 
     m_AtkPoint[0] = 40, m_AtkPoint[1] = 55, m_AtkPoint[2] = 90;
 
-    m_AtkableFrames.resize(3);
+    m_AtkableFrames.resize(m_SegCount);
     for (int i = 4; i < 11; i++){m_AtkableFrames[0].push_back(i);}
     for (int i = 4; i < 12; i++){m_AtkableFrames[1].push_back(i);}
     for (int i = 4; i < 11; i++){m_AtkableFrames[2].push_back(i);}

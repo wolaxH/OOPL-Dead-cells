@@ -21,6 +21,8 @@ public:
     virtual ~Weapon() noexcept = default;
 
     auto GetIcon() const {return m_Drawable;}
+
+    int GetSegCount() const noexcept { return m_SegCount;}
     
     std::vector<std::shared_ptr<Util::Animation>> GetPlayerDrawable() const noexcept {return m_Player_Drawables;}
 
@@ -34,9 +36,9 @@ public:
 
 protected:
     std::vector<int> m_AtkPoint; //攻擊力
-
     std::vector<std::shared_ptr<Util::Animation>> m_Player_Drawables; //玩家的攻擊動畫
-    std::vector<std::vector<size_t>> m_AtkableFrames;
+    std::vector<std::vector<size_t>> m_AtkableFrames;   //玩家攻擊有效的frames
+    int m_SegCount;
 };
 
 #endif
