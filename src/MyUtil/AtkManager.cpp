@@ -18,7 +18,10 @@ void AttackManager::StartAttack(int SlotNumber, std::shared_ptr<Weapon> weapon){
     m_ComboTimer = 0.0f;
     m_IsAttacking = true;
     m_Player.lock()->RequastToChangeDrawable(m_Weapon->GetPlayerDrawable()[0]);
+
     m_CurrentAtkData.AttackableFrams = weapon->GetAtkableFrames(0);
+    m_CurrentAtkData.AtkTimes = weapon->GetAtkTimes()[0];
+    m_CurrentAtkData.HasAtkTimes = 0;
     if (Util::Input::IsKeyPressed(Util::Keycode::RIGHT) || Util::Input::IsKeyPressed(Util::Keycode::D)) m_Player.lock()->VelocityX += 5;
     else if (Util::Input::IsKeyPressed(Util::Keycode::LEFT)  || Util::Input::IsKeyPressed(Util::Keycode::A)) m_Player.lock()->VelocityX -= 5;
 }
@@ -67,6 +70,8 @@ void AttackManager::Update(float dt) {
 
         m_CurrentAtkData.AttackableFrams = m_Weapon->GetAtkableFrames(m_ComboIndex);
         m_CurrentAtkData.HitableFlag = false;
+        m_CurrentAtkData.AtkTimes = m_Weapon->GetAtkTimes()[m_ComboIndex];
+        m_CurrentAtkData.HasAtkTimes = 0;
 
         auto nextAnim = m_Weapon->GetPlayerDrawable()[m_ComboIndex];
         nextAnim->SetCurrentFrame(0);

@@ -20,6 +20,8 @@ enum class AttackPhase {
 struct AttackData {
     std::vector<size_t> AttackableFrams;
     bool HitableFlag = false;
+    unsigned int AtkTimes;
+    unsigned int HasAtkTimes;
 };
 
 
@@ -38,13 +40,20 @@ public:
     bool IsAttacking() const {return m_IsAttacking;}
 
     void Update(float dt);
+
     void StartAttack(int SlotNumber, std::shared_ptr<Weapon> weapon);
+
     void Interrupt();
+
     int GetComboIndex() noexcept { return m_ComboIndex;}
 
     bool GetHitable() const noexcept { return m_CurrentAtkData.HitableFlag;}
 
     std::shared_ptr<Weapon> GetCurrentWeapon() const {return m_Weapon;}
+
+    bool IsAtkAble() { return m_CurrentAtkData.AtkTimes > m_CurrentAtkData.HasAtkTimes && m_CurrentAtkData.HitableFlag;}
+
+    void UpdateAtkTimes() {m_CurrentAtkData.HasAtkTimes++;}
 
 private:
     int m_ComboIndex = 0;

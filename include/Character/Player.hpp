@@ -103,12 +103,6 @@ private:
      */
     bool IsUnderOSP();
 
-
-    /**
-     * To make player slowdown
-     */
-    void SlowDown();
-
     void RequastToChangeDrawable(std::shared_ptr<Util::Animation> PD){
         ChangeDrawable(AccessKey(), PD, c_state::atk);
     }

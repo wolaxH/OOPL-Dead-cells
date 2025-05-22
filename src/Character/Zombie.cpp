@@ -47,7 +47,6 @@ void Zombie::Attack(float dt){  //player
 }
 
 void Zombie::Attacked(int Damage, glm::vec2 Dir){
-    LOG_DEBUG("Attacked");
     if (GetState() == c_state::atk){
         m_Hp -= Damage;
         return;
@@ -57,14 +56,20 @@ void Zombie::Attacked(int Damage, glm::vec2 Dir){
         auto temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
         if (temp == nullptr) return;
         if (temp->GetCurrentFrameIndex() >= temp->GetFrameCount()-1){
+            temp->SetCurrentFrame(0);
             SetState(c_state::idle);
         }
+        return;
     }
     
     if (IsContainState(c_state::atked)) SetState(c_state::atked);
-    else InitState(c_state::atked, {3}, {RESOURCE_DIR"/Zombie/Atked/Atked_"});
+    else InitState(c_state::atked, {6}, {RESOURCE_DIR"/Zombie/Atked/Atked_"});
+    auto temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
+    temp->Play();
     m_Hp -= Damage;
-    m_WorldPos.x += (Dir.x > 0) ? 5 : -5;
+    VelocityX += (Dir.x > 0) ? 5 : -5;
+    LOG_DEBUG("Attacked");
+
 }
 
 void Zombie::Move(float dt){
@@ -146,6 +151,7 @@ void Zombie::Update(float dt){
     // Move(dt);
     InGround = Physics::IsOnGround(m_WorldPos, m_World.SolidObjs, m_World.OneSidedPlatforms);
     Physics::ApplyGravity(VelocityY, InGround, Gravity, MaxFallSpeed);
+    if (InGround) Physics::SlowDown(VelocityX, Friction);
 
     
     //atk behavior

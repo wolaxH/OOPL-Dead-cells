@@ -47,7 +47,7 @@ void Player::Attack(float dt){
     }
 
     //攻擊操作
-    if (GetState() == c_state::atk && m_AttackManager.GetHitable()){
+    if (GetState() == c_state::atk && m_AttackManager.IsAtkAble()){
         auto currentWeapon = m_AttackManager.GetCurrentWeapon();
         if (currentWeapon == nullptr){
             m_AttackManager.Update(dt);
@@ -56,6 +56,7 @@ void Player::Attack(float dt){
         //player 攻擊產生的碰撞箱
         Rect HitBox = currentWeapon->GetHitBox(m_WorldPos, m_Transform.scale, m_AttackManager.GetComboIndex());
         Rect MobRect;
+        bool IsWeaponUsed = false;
         for (auto& mob : m_World.Mobs->GetObjs()){
             auto MobObj = std::dynamic_pointer_cast<Mob>(mob);
             if (MobObj == nullptr) continue;
@@ -63,8 +64,10 @@ void Player::Attack(float dt){
             MobRect = Rect::CreateRect(MobObj->m_WorldPos, MobObj->top + MobObj->bottom, MobObj->left + MobObj->right);
             if (HitBox.Intersects(MobRect)){
                 currentWeapon->Use(MobObj, m_Transform.scale, m_AttackManager.GetComboIndex());
+                IsWeaponUsed = true;
             }
         }
+        if (IsWeaponUsed) m_AttackManager.UpdateAtkTimes();
     }
     m_AttackManager.Update(dt);
 }
@@ -135,20 +138,6 @@ void Player::TestP(){
 
 }
 
-void Player::SlowDown(){
-
-    //slow down
-    if (VelocityX > 0){
-
-        VelocityX -= Friction;
-        if (VelocityX < 0) VelocityX = 0;
-    }
-    else if(VelocityX < 0){
-        VelocityX += Friction;
-        if (VelocityX > 0) VelocityX = 0;
-    } 
-}
-
 bool Player::IsOnOSP(){
     if (!InGround) return false;
 
@@ -196,13 +185,13 @@ void Player::Move(float dt){
      */
     if (GetState() == c_state::clinb) return; //攀爬時不能移動
     if (GetState() == c_state::atk){
-        SlowDown();
+        Physics::SlowDown(VelocityX, Friction);
         return;
     }
 
 
     if ((IS_DOWN_PRESSED()) && (GetState() == c_state::crouch)) {
-        SlowDown();
+        Physics::SlowDown(VelocityX, Friction);
         if ((IS_UP_DOWN()) && IsOnOSP()){
 
             m_WorldPos.y -= 10;
@@ -270,7 +259,7 @@ void Player::Move(float dt){
             // idle
             if (GetState() != c_state::idle && GetState() != c_state::crouch) SetState(c_state::idle);//  set state
             
-            SlowDown();  
+            Physics::SlowDown(VelocityX, Friction);
         }
     }while (false);
     
@@ -284,7 +273,6 @@ void Player::Move(float dt){
     else if (IS_DOWN_PRESSED()){
         //crouch
         if (InGround){
-
             if (IsContainState(c_state::crouch)) SetState(c_state::crouch);
             else InitState(c_state::crouch, {6}, {RESOURCE_DIR"/Beheaded/crouch/crouch_"});
 

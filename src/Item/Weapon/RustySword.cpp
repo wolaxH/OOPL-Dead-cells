@@ -3,10 +3,12 @@
 
 RustySword::RustySword() : Weapon(RESOURCE_DIR"/Item/RustySword/Icon.png", "this is a Weapon"){
     m_SegCount = 3;
-    std::vector<std::string> path;
     m_Player_Drawables.resize(m_SegCount);
     m_AtkPoint.resize(m_SegCount);
-
+    m_AtkTimes.resize(m_SegCount);
+    m_AtkableFrames.resize(m_SegCount);
+    
+    std::vector<std::string> path;
     for (int i = 0; i < 8; i++){
         path.push_back(RESOURCE_DIR"/Item/RustySword/A/A_" + std::to_string(i) + ".png");
     }
@@ -24,7 +26,8 @@ RustySword::RustySword() : Weapon(RESOURCE_DIR"/Item/RustySword/Icon.png", "this
 
     m_AtkPoint[0] = 25, m_AtkPoint[1] = 30, m_AtkPoint[2] = 40;
 
-    m_AtkableFrames.resize(m_SegCount);
+    for(auto& temp : m_AtkTimes){temp = 1;}
+
     for (int i = 4; i < 10; i++){m_AtkableFrames[0].push_back(i);}
     for (int i = 4; i < 10; i++){m_AtkableFrames[1].push_back(i);}
     for (int i = 6; i < 14; i++){m_AtkableFrames[2].push_back(i);}

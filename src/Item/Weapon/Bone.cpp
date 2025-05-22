@@ -3,9 +3,12 @@
 
 Bone::Bone() : Weapon(RESOURCE_DIR"/Item/Bone/icon.png", "a Bone"){
     m_SegCount = 3;
-    std::vector<std::string> paths;
     m_Player_Drawables.resize(m_SegCount);
     m_AtkPoint.resize(m_SegCount);
+    m_AtkTimes.resize(3);
+    m_AtkableFrames.resize(m_SegCount);
+
+    std::vector<std::string> paths;
     for (int i = 0; i < 14; i++){
         paths.push_back(RESOURCE_DIR"/Item/Bone/A/A_" + std::to_string(i) + ".png");
     }
@@ -29,7 +32,8 @@ Bone::Bone() : Weapon(RESOURCE_DIR"/Item/Bone/icon.png", "a Bone"){
 
     m_AtkPoint[0] = 50, m_AtkPoint[1] = 60, m_AtkPoint[2] = 40;
 
-    m_AtkableFrames.resize(m_SegCount);
+    m_AtkTimes[0] = 1, m_AtkTimes[1] = 1, m_AtkTimes[2] = 3;
+
     for (int i = 3; i < 10; i++){m_AtkableFrames[0].push_back(i);}
     for (int i = 7; i < 13; i++){m_AtkableFrames[1].push_back(i);}
     m_AtkableFrames[2] = {3, 7, 11, 15, 19, 23};

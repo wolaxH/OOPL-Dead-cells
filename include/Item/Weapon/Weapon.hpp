@@ -30,6 +30,9 @@ public:
         if (combo < m_AtkableFrames.size()) return m_AtkableFrames[combo];
     }
 
+    std::vector<int> GetAtkTimes() const noexcept{return m_AtkTimes;}
+    
+
     virtual void Use(std::shared_ptr<Mob>& mob, const glm::vec2& Dir = {1, 1}, int combo = 0) = 0;
 
     Rect virtual GetHitBox(const glm::vec2& Pos, const glm::vec2& Dir, int combo = 0) = 0;
@@ -38,6 +41,7 @@ protected:
     std::vector<int> m_AtkPoint; //攻擊力
     std::vector<std::shared_ptr<Util::Animation>> m_Player_Drawables; //玩家的攻擊動畫
     std::vector<std::vector<size_t>> m_AtkableFrames;   //玩家攻擊有效的frames
+    std::vector<int> m_AtkTimes;
     int m_SegCount;
 };
 
