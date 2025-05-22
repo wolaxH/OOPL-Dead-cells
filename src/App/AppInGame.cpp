@@ -10,7 +10,7 @@ void App::InGameUpdate(float dt) {
                        m_World.Mobs->GetObjs().end(), 
                        [](const std::shared_ptr<Util::GameObject>& temp){
                             auto mob = std::dynamic_pointer_cast<Mob>(temp);
-                            if (mob) return false;
+                            if (mob == nullptr) return false;
                             return !mob->IsAlive();
         }),
         m_World.Mobs->GetObjs().end()
