@@ -30,7 +30,7 @@ protected:
     float m_DetectRange;
     mob_state m_state = mob_state::wander;
     std::shared_ptr<Player> m_player;
-    int m_Hp;
+
 };
 
 

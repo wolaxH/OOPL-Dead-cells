@@ -13,7 +13,7 @@ void App::InGameInit() {
     for (int i = 0; i < 46; i++){
         Img.push_back(RESOURCE_DIR"/Beheaded/idle/idle_" + std::to_string(i) + ".png");
     }
-    player = std::make_shared<Player>(Img, 100, m_World);
+    player = std::make_shared<Player>(Img, 200, m_World);
     player->Init();
     player->SetPos({0, 100});
     player->SetZIndex(30);
@@ -26,7 +26,7 @@ void App::InGameInit() {
     for (int i = 0; i < 24; i++){
         Img.push_back(RESOURCE_DIR"/Zombie/idle/idle_" + std::to_string(i) + ".png");
     }
-    zombie = std::make_shared<Zombie>(Img, 100, player, m_World);
+    zombie = std::make_shared<Zombie>(Img, 200, player, m_World);
     zombie->SetPos({0, 100});
     zombie->SetZIndex(30);
     zombie->SetVisible(true);

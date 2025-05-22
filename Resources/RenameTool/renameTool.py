@@ -9,10 +9,10 @@ from natsort import natsorted
 """
 
 Source_Path = os.getcwd().replace("\\", "/") + "/source"   #The folder path that you will replac
-Target_Path = os.getcwd().replace("\\", "/") + "/../Item/ThrowingKnife/Behavior"   #The folder path that you will save
+Target_Path = os.getcwd().replace("\\", "/") + "/target"   #The folder path that you will save
 
 
-prefix = "Throw_"    #The new name prefix eg: runB_{index}.png
+prefix = "Atked_"    #The new name prefix eg: runB_{index}.png
 errorItem = []
 temp = input("Please input the prefix or press enter to use source files prefix:")
 if (temp != ""):

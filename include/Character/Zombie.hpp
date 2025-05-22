@@ -21,7 +21,7 @@ private:
     void Move(float dt) override;
 
 private:
-    int AtkPoint;
+    int m_AtkPoint;
     Timer timer;
 };
 

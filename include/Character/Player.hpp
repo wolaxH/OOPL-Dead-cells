@@ -23,8 +23,6 @@ public:
     
     void Update(float dt) override;
     
-    void Attacked(int damage){Hp -= damage;}
-    
     //for mob push
     void Pushed(){ 
         if (GetState() == c_state::roll) return;    //翻滾狀態不回被怪物推動減少速度
@@ -40,8 +38,6 @@ public:
     }
 
     void Attacked(int Damage, glm::vec2 Dir) override;
-        
-        
         
 private:
     

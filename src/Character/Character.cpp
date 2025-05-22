@@ -3,7 +3,7 @@
 #include "Util/Logger.hpp"
 
 Character::Character(std::vector<std::string>& path, int Hp, GameWorldContext& World) 
-    : Hp(Hp), m_World(World) {
+    : m_Hp(Hp), m_World(World) {
     m_Drawable = std::make_shared<Util::Animation>(path, true, 20, true, 0);
     State = c_state::idle;
     D_Manager[State] = m_Drawable;

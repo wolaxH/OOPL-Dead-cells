@@ -73,7 +73,12 @@ void Player::Attack(float dt){
 }
 
 void Player::Attacked(int Damage, glm::vec2 Dir){
+    VelocityX += Dir.x > 0 ? 5.f : -5.f;
+    Jump();
+    VelocityY = 5.f;
 
+    m_Hp -= Damage;
+    m_PlayerINFO->SetHp(m_Hp);
 }
 
 void Player::PickUpDrops(std::shared_ptr<Drops> drops){
@@ -129,11 +134,13 @@ void Player::PickUp(){
 
 void Player::TestP(){
     if (Util::Input::IsKeyDown(Util::Keycode::P)){
-        // m_PlayerINFO->SetHp(m_PlayerINFO->GetCurrentHp() - 5);
-        // if (m_PlayerINFO->GetCurrentHp() <= 0){
-        //     m_PlayerINFO->SetHp(100);
-        // }
-        LOG_DEBUG(m_WorldPos);
+        m_Hp -= 5;
+        m_PlayerINFO->SetHp(m_Hp);
+        if (m_PlayerINFO->GetCurrentHp() <= 0){
+            m_PlayerINFO->SetHp(200);
+            m_Hp = 200;
+        }
+        // LOG_DEBUG(m_WorldPos);
     }
 
 }
@@ -193,8 +200,8 @@ void Player::Move(float dt){
     if ((IS_DOWN_PRESSED()) && (GetState() == c_state::crouch)) {
         Physics::SlowDown(VelocityX, Friction);
         if ((IS_UP_DOWN()) && IsOnOSP()){
-
             m_WorldPos.y -= 10;
+            VelocityY = -5.f;
             fall();
         }
         return;
@@ -219,7 +226,6 @@ void Player::Move(float dt){
      * for jump 打斷roll
      */
     do{
-
         //press right
         if (IS_LEFT_PRESSED()){
             //與翻滾不同方向才會打斷翻滾狀態
@@ -306,7 +312,7 @@ void Player::fall(){
     if(IsContainState(c_state::fall)) SetState(c_state::fall, {}, false);
     else{
         std::vector<std::string> Img =  {RESOURCE_DIR"/Beheaded/jump/jumpTrans_",
-                                            RESOURCE_DIR"/Beheaded/jump/jumpDown_"};
+                                         RESOURCE_DIR"/Beheaded/jump/jumpDown_"};
         InitState(c_state::fall, {5, 5}, Img);
     }
 }
@@ -462,9 +468,9 @@ void Player::roll(){
 
 /*-----------------------------------update-----------------------------------*/
 void Player::Update(float dt){
-    Move(dt);
     InGround = Physics::IsOnGround(m_WorldPos, m_World.SolidObjs, m_World.OneSidedPlatforms);
     Physics::ApplyGravity(VelocityY, InGround, Gravity, MaxFallSpeed);
+    Move(dt);
 
     if (IS_ROLL_DOWN() || GetState() == c_state::roll){
         roll();

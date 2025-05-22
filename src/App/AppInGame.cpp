@@ -3,11 +3,21 @@
 void App::InGameUpdate(float dt) {
     
     player->Update(dt);
-    
-    
+        
     //mobs
+    m_World.Mobs->GetObjs().erase(
+        std::remove_if(m_World.Mobs->GetObjs().begin(), 
+                       m_World.Mobs->GetObjs().end(), 
+                       [](const std::shared_ptr<Util::GameObject>& temp){
+                            auto mob = std::dynamic_pointer_cast<Mob>(temp);
+                            if (mob) return false;
+                            return !mob->IsAlive();
+        }),
+        m_World.Mobs->GetObjs().end()
+    );
     for (auto& temp : m_World.Mobs->GetObjs()){
         auto mob = std::dynamic_pointer_cast<Mob>(temp);
+        if (!mob->IsAlive()) {}
         mob->Update(dt);
     }
     //Drops
@@ -47,6 +57,7 @@ void App::InGameUpdate(float dt) {
         Util::Input::IfExit()) {
         m_CurrentState = State::END;
     }
+    if (!player->IsAlive()){m_CurrentState = State::END;}
 }
 
 void App::End() { // NOLINT(this method will mutate members in the future)

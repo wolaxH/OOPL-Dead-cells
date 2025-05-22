@@ -11,6 +11,7 @@ Zombie::Zombie(std::vector<std::string>& path, int Hp, std::shared_ptr<Player> p
     m_Transform.translation = {1.0f, 1.0f};
     m_AtkRange = 20.0f;
     m_Hp = 200;
+    m_AtkPoint = 30;
 }
 
 void Zombie::Attack(float dt){  //player
@@ -32,15 +33,14 @@ void Zombie::Attack(float dt){  //player
     //the real atk logic
     if (m_Transform.scale.x > 0){   //atk forward right
         if (m_player->m_WorldPos.x > m_WorldPos.x && m_player->m_WorldPos.x < m_WorldPos.x + m_AtkRange){
-            m_player->Attacked(AtkPoint);
+            m_player->Attacked(m_AtkPoint, m_Transform.scale);
             m_AtkFlag = true;
         }
     }
     else{
         if (m_player->m_WorldPos.x < m_WorldPos.x && m_player->m_WorldPos.x > m_WorldPos.x - m_AtkRange){
-            m_player->Attacked(AtkPoint);
+            m_player->Attacked(m_AtkPoint, m_Transform.scale);
             m_AtkFlag = true;
-            
         }
     }
     //atk logic end
@@ -61,14 +61,15 @@ void Zombie::Attacked(int Damage, glm::vec2 Dir){
         }
         return;
     }
-    
+    LOG_DEBUG(m_Hp);
+
     if (IsContainState(c_state::atked)) SetState(c_state::atked);
     else InitState(c_state::atked, {6}, {RESOURCE_DIR"/Zombie/Atked/Atked_"});
     auto temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
     temp->Play();
     m_Hp -= Damage;
     VelocityX += (Dir.x > 0) ? 5 : -5;
-    LOG_DEBUG("Attacked");
+    
 
 }
 
@@ -148,25 +149,25 @@ void Zombie::Move(float dt){
 }
 
 void Zombie::Update(float dt){
-    // Move(dt);
+    Move(dt);
     InGround = Physics::IsOnGround(m_WorldPos, m_World.SolidObjs, m_World.OneSidedPlatforms);
     Physics::ApplyGravity(VelocityY, InGround, Gravity, MaxFallSpeed);
     if (InGround) Physics::SlowDown(VelocityX, Friction);
 
     
-    //atk behavior
-    // if ((VelocityX > 0 && player->m_WorldPos.x > m_WorldPos.x && player->m_WorldPos.x < m_WorldPos.x + right) ||
-    //     (VelocityX < 0 && player->m_WorldPos.x < m_WorldPos.x && player->m_WorldPos.x > m_WorldPos.x - left)){
+    // atk behavior
+    if ((VelocityX > 0 && m_player->m_WorldPos.x > m_WorldPos.x && m_player->m_WorldPos.x < m_WorldPos.x + right) ||
+        (VelocityX < 0 && m_player->m_WorldPos.x < m_WorldPos.x && m_player->m_WorldPos.x > m_WorldPos.x - left)){
     
-    //     VelocityX = 0;
+        VelocityX = 0;
         
-    //     //set atk state
-    //     if (IsContainState(c_state::atk)) SetState(c_state::atk, {}, false);
-    //     else InitState(c_state::atk, {28}, {RESOURCE_DIR"/Zombie/atk/atk_"});
-    //     Attack(dt);
-    // }
-    // else if (GetState() == c_state::atk) Attack(dt);
-    //atk end
+        //set atk state
+        if (IsContainState(c_state::atk)) SetState(c_state::atk, {}, false);
+        else InitState(c_state::atk, {28}, {RESOURCE_DIR"/Zombie/atk/atk_"});
+        Attack(dt);
+    }
+    else if (GetState() == c_state::atk) Attack(dt);
+    // atk end
 
     if (GetState() == c_state::atked) Attacked(0, glm::vec2(0, 0));
     

@@ -44,6 +44,8 @@ public:
 
     void virtual Attacked(int Damage, glm::vec2 Dir) = 0;
 
+    bool IsAlive() const noexcept{ return m_Hp > 0;}
+
 protected:
     bool IsContainState(c_state State){return (D_Manager.find(State) != D_Manager.end()) ? true : false;}
 
@@ -72,7 +74,7 @@ protected:
     const float Gravity = 0.8f;
     const float MaxFallSpeed = 20.0f;
 
-    int Hp;
+    int m_Hp;
     bool InGround;
     GameWorldContext& m_World;   //reference of World resource
 

@@ -41,7 +41,6 @@ void AttackManager::Update(float dt) {
 
     Util::Keycode atkKey = (m_WeaponSlotNUmber == 0) ? Util::Keycode::J : Util::Keycode::K;
 
-
     auto currentFrame = currentAnim->GetCurrentFrameIndex();
     const auto& atkableFrames = m_CurrentAtkData.AttackableFrams;
     //如果找到
