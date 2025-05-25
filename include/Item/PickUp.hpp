@@ -31,6 +31,7 @@ public:
         AddChild(m_DescribeBox);
         AddChild(m_Describe);
     }
+    Item() = default;
     virtual ~Item() = default;
     
     std::shared_ptr<Drops> ToDrops() {return std::make_shared<Drops>(shared_from_this());}

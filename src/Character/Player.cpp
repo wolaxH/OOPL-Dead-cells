@@ -29,22 +29,24 @@ void Player::Attack(float dt){
     if (GetState() == c_state::clinb) return; //攀爬狀態不能攻擊
 
     std::shared_ptr<Weapon> UsedWeapon = nullptr;
+    int slot = -1;
     //使用武器1 
     if (Util::Input::IsKeyDown(Util::Keycode::J)){
-        UsedWeapon = m_Weapon1;
+        UsedWeapon = std::dynamic_pointer_cast<Weapon>(m_Skill1);
     }//使用武器2
     else if(Util::Input::IsKeyDown(Util::Keycode::K)){
-        UsedWeapon = m_Weapon2;
+        UsedWeapon = std::dynamic_pointer_cast<Weapon>(m_skill2);
     }
 
     //武器動畫與 c_State 設定
     if (UsedWeapon){
-        int slot = (UsedWeapon == m_Weapon1) ? 0 : 1;
+        int slot = UsedWeapon == m_Skill1 ? 0 : 1;
         if (!m_AttackManager.IsAttacking()) m_AttackManager.StartAttack(slot, UsedWeapon);
         
         if (IsContainState(c_state::atk)) SetState(c_state::atk);
         else InitState(c_state::atk, nullptr);
     }
+    else return;
 
     //攻擊操作
     if (GetState() == c_state::atk && m_AttackManager.IsAtkAble()){
@@ -72,40 +74,92 @@ void Player::Attack(float dt){
     m_AttackManager.Update(dt);
 }
 
+void Player::Block(float dt){
+    if (GetState() == c_state::roll) return; //翻滾狀態不能攻擊
+    if (GetState() == c_state::clinb) return; //攀爬狀態不能攻擊
+
+    std::shared_ptr<Shield> UsedShield = nullptr;
+    bool JPressed =  Util::Input::IsKeyPressed(Util::Keycode::J);
+    bool KPressed =  Util::Input::IsKeyPressed(Util::Keycode::K);
+    if (JPressed) UsedShield = std::dynamic_pointer_cast<Shield>(m_Skill1);
+    else if (KPressed) UsedShield = std::dynamic_pointer_cast<Shield>(m_skill2);
+
+
+    if (GetState() == c_state::block) {
+        // 按鍵放開 → 播放 block end → block end 動畫結束 → 回 idle
+        bool JUp = Util::Input::IsKeyUp(Util::Keycode::J);
+        bool KUp = Util::Input::IsKeyUp(Util::Keycode::K);
+        auto currAnim = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
+
+        // blockend to idle( if Animation is ended)
+        if (m_CurrentShield->GetState() == Shield::State::BlockEnd){
+            if (currAnim->GetCurrentFrameIndex() == currAnim->GetFrameCount() -1){
+                SetState(c_state::idle);
+                m_CurrentShield = nullptr;
+            }
+            return;
+        }   //Shield frome block to blocckend
+        else if ((m_CurrentShield == m_Skill1 && JUp) || (m_CurrentShield == m_skill2 && KUp)) {
+            ChangeDrawable(AccessKey(), m_CurrentShield->GetBlockEndDrawable(), c_state::block);
+            m_CurrentShield->BlockEnd();
+            m_Defense = 0;
+        }
+        return;
+    }   //from other c_state to block
+    else{
+        if (UsedShield == nullptr) return;
+        if (IsContainState(c_state::block)){
+            ChangeDrawable(AccessKey(), UsedShield->GetBlockDrawable(), c_state::block);
+            SetState(c_state::block);
+        }
+        else InitState(c_state::block, UsedShield->GetBlockDrawable());
+        m_Defense = UsedShield->GetDefense();
+        m_CurrentShield = UsedShield;
+        UsedShield->Block();
+    }
+}
+
 void Player::Attacked(int Damage, glm::vec2 Dir){
     VelocityX += Dir.x > 0 ? 5.f : -5.f;
-    Jump();
-    VelocityY = 5.f;
-
+    
+    if (m_Defense > 0){
+        if ((Dir.x > 0 && m_Transform.scale.x < 0) || (Dir.x < 0 && m_Transform.scale.x > 0)){
+            Damage *= (1-m_Defense);
+        }
+        else{
+            Jump();
+            VelocityY = 5.f;
+        }
+    }
     m_Hp -= Damage;
     m_PlayerINFO->SetHp(m_Hp);
 }
 
 void Player::PickUpDrops(std::shared_ptr<Drops> drops){
-    auto NewItem = std::dynamic_pointer_cast<Weapon>(drops->ToItem());
+    auto NewItem = drops->ToItem();
 
     //如果是武器
     if (NewItem){
-        if (m_Weapon1 == nullptr){
-            m_Weapon1 = NewItem;
-            m_PlayerINFO->SetSkill(m_Weapon1, 0);
+        if (m_Skill1 == nullptr){
+            m_Skill1 = NewItem;
+            m_PlayerINFO->SetSkill(m_Skill1, 0);
         }
-        else if (m_Weapon2 == nullptr){
-            m_Weapon2 = NewItem;
-            m_PlayerINFO->SetSkill(m_Weapon2, 1);
+        else if (m_skill2 == nullptr){
+            m_skill2 = NewItem;
+            m_PlayerINFO->SetSkill(m_skill2, 1);
         }
         else{ //WIP
             //彈出更換武器視窗
             int select = 0;
 
             //將被替換的武器變成掉落物
-            auto temp = m_Weapon1->ToDrops();
+            auto temp = m_Skill1->ToDrops();
             temp->m_WorldPos = m_WorldPos + glm::vec2(10, 40);
             m_World.WorldDrops->AddObj(temp);
-            m_Weapon1 = NewItem;
+            m_Skill1 = NewItem;
             
             //更換slot圖案
-            m_PlayerINFO->SetSkill(m_Weapon1, select);
+            m_PlayerINFO->SetSkill(m_Skill1, select);
         }
         m_World.WorldDrops->RemoveObj(drops);
     } //如果是卷軸

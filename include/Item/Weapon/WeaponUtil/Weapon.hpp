@@ -20,8 +20,6 @@ public:
     }
     virtual ~Weapon() noexcept = default;
 
-    auto GetIcon() const {return m_Drawable;}
-
     int GetSegCount() const noexcept { return m_SegCount;}
     
     std::vector<std::shared_ptr<Util::Animation>> GetPlayerDrawable() const noexcept {return m_Player_Drawables;}

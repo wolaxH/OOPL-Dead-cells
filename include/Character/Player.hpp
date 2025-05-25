@@ -3,8 +3,8 @@
 
 #include "Character/Character.hpp"
 #include "Item/PickUp.hpp"
-#include "Item/Weapon/Weapon.hpp"
-#include "Item/Weapon/RustySword.hpp"
+#include "Item/Weapon/WeaponUtil/Weapon.hpp"
+#include "Item/Weapon//WeaponTypes.hpp"
 #include "MyUtil/Timer.hpp"
 #include "MyUtil/AtkManager.hpp"
 #include "MyUtil/GameWorldContext.hpp"
@@ -20,6 +20,8 @@ public:
     void Init(){m_AttackManager = AttackManager(std::weak_ptr<Player>(shared_from_this()));}
     
     void Attack(float dt) override;
+
+    void Block(float dt);
     
     void Update(float dt) override;
     
@@ -110,9 +112,11 @@ private:
 private:
     friend class AttackManager;
 
-    std::shared_ptr<Weapon> m_Weapon1 = nullptr, m_Weapon2 = nullptr; //武器槽
+    std::shared_ptr<Item> m_Skill1 = nullptr, m_skill2 = nullptr; //武器槽
     std::shared_ptr<PlayerUI> m_PlayerINFO; //玩家UI
     AttackManager m_AttackManager; //攻擊管理器
+    int m_Defense = 0; //防禦力
+    std::shared_ptr<Shield> m_CurrentShield = nullptr; //當前使用的shield 如果沒有就nullptr
     
     int jumpStep = 0;   //double jump counter
     Timer timer;   //for count the roll cooling time

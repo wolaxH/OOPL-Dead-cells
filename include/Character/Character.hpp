@@ -24,7 +24,8 @@ enum class c_state{ //Character state
     clinbOSP,
     crouch,
     roll,
-    atked
+    atked,
+    block
 };
 
 class Character : public MapObj{
@@ -64,7 +65,7 @@ protected:
 
     bool IsNearBy(std::shared_ptr<MapObj> other, float distance = 1000.0f);
 
-    void ChangeDrawable(AccessKey key, std::shared_ptr<Util::Animation> PlayerDrawable, c_state state = c_state::atk);
+    void ChangeDrawable(AccessKey key, std::shared_ptr<Core::Drawable> PlayerDrawable, c_state state = c_state::atk);
 
 protected:
     float VelocityX = 0, VelocityY = 0; //speed

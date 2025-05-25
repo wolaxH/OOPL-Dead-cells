@@ -1,7 +1,7 @@
 #ifndef TWINDAGGERS_HPP
 #define TWINDAGGERS_HPP
 
-#include "Item/Weapon/Weapon.hpp"
+#include "Item/Weapon/WeaponUtil/Weapon.hpp"
 
 
 class TwinDaggers : public Weapon{

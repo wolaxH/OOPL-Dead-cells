@@ -1,7 +1,7 @@
 #ifndef ATKMANAGER_HPP
 #define ATKMANAGER_HPP
 
-#include "Item/Weapon/Weapon.hpp"
+#include "Item/Weapon/WeaponUtil/Weapon.hpp"
 
 #include "Util/Animation.hpp"
 
