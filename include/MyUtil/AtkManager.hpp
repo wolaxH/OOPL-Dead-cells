@@ -22,6 +22,13 @@ struct AttackData {
     bool HitableFlag = false;
     unsigned int AtkTimes;
     unsigned int HasAtkTimes;
+
+    void reset(){
+        AttackableFrams.clear();
+        HitableFlag = false;
+        AtkTimes = 0;
+        HasAtkTimes = 0;
+    }
 };
 
 

@@ -41,24 +41,24 @@ public:
 
     c_state GetState(){ return State;}
 
-    void virtual Attack(float dt) = 0;
-
     void virtual Attacked(int Damage, glm::vec2 Dir) = 0;
-
+    
     bool IsAlive() const noexcept{ return m_Hp > 0;}
-
-protected:
+    
+    protected:
     bool IsContainState(c_state State){return (D_Manager.find(State) != D_Manager.end()) ? true : false;}
-
+    
     /**
      * @param path eg:RESOURCE_DIR"Zombie/move/move_"
      */
     void InitState(c_state state, const std::vector<std::size_t>& frames = {}, const std::vector<std::string>& paths = {});
-
+    
     void InitState(c_state State, std::shared_ptr<Core::Drawable> drawable);
-
+    
     /*用來修正位置，使其不會穿牆，不修改c_state*/
     void FixPos(float dt);
+
+    void virtual Attack(float dt) = 0;
 
     //移動
     virtual void Move(float dt) = 0;

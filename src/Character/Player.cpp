@@ -27,9 +27,9 @@ Player::Player(std::vector<std::string>& path, int Hp, GameWorldContext& World):
 void Player::Attack(float dt){
     if (GetState() == c_state::roll) return; //翻滾狀態不能攻擊
     if (GetState() == c_state::clinb) return; //攀爬狀態不能攻擊
+    if (GetState() == c_state::block) return; //擋格狀態不能攻擊
 
     std::shared_ptr<Weapon> UsedWeapon = nullptr;
-    int slot = -1;
     //使用武器1 
     if (Util::Input::IsKeyDown(Util::Keycode::J)){
         UsedWeapon = std::dynamic_pointer_cast<Weapon>(m_Skill1);
@@ -46,7 +46,6 @@ void Player::Attack(float dt){
         if (IsContainState(c_state::atk)) SetState(c_state::atk);
         else InitState(c_state::atk, nullptr);
     }
-    else return;
 
     //攻擊操作
     if (GetState() == c_state::atk && m_AttackManager.IsAtkAble()){
@@ -74,9 +73,10 @@ void Player::Attack(float dt){
     m_AttackManager.Update(dt);
 }
 
-void Player::Block(float dt){
-    if (GetState() == c_state::roll) return; //翻滾狀態不能攻擊
-    if (GetState() == c_state::clinb) return; //攀爬狀態不能攻擊
+void Player::Block(){
+    if (GetState() == c_state::roll) return; //翻滾狀態不能擋格
+    if (GetState() == c_state::clinb) return; //攀爬狀態不能擋格
+    if (GetState() == c_state::atk) return; //攻擊狀態不能擋格
 
     std::shared_ptr<Shield> UsedShield = nullptr;
     bool JPressed =  Util::Input::IsKeyPressed(Util::Keycode::J);
@@ -98,7 +98,7 @@ void Player::Block(float dt){
                 m_CurrentShield = nullptr;
             }
             return;
-        }   //Shield frome block to blocckend
+        }   //Shield from block to blocckend
         else if ((m_CurrentShield == m_Skill1 && JUp) || (m_CurrentShield == m_skill2 && KUp)) {
             ChangeDrawable(AccessKey(), m_CurrentShield->GetBlockEndDrawable(), c_state::block);
             m_CurrentShield->BlockEnd();
@@ -121,17 +121,17 @@ void Player::Block(float dt){
 
 void Player::Attacked(int Damage, glm::vec2 Dir){
     VelocityX += Dir.x > 0 ? 5.f : -5.f;
-    
-    if (m_Defense > 0){
-        if ((Dir.x > 0 && m_Transform.scale.x < 0) || (Dir.x < 0 && m_Transform.scale.x > 0)){
-            Damage *= (1-m_Defense);
-        }
-        else{
-            Jump();
-            VelocityY = 5.f;
-        }
+    float hurt = 0;
+    if (((Dir.x > 0 && m_Transform.scale.x < 0) || (Dir.x < 0 && m_Transform.scale.x > 0)) && m_Defense > 0){
+        hurt = abs((float)Damage * (1-m_Defense));
+        LOG_DEBUG("def success");
     }
-    m_Hp -= Damage;
+    else{
+        SetState(c_state::idle);
+        Jump();
+        VelocityY = 5.f;
+    }
+    m_Hp -= hurt;
     m_PlayerINFO->SetHp(m_Hp);
 }
 
@@ -171,6 +171,7 @@ void Player::PickUpDrops(std::shared_ptr<Drops> drops){
 void Player::PickUp(){
     if (GetState() == c_state::roll) return; //翻滾狀態不能撿東西
     if (GetState() == c_state::atk) return; //攻擊狀態不能撿東西
+    if (GetState() == c_state::block) return;
 
     if (Util::Input::IsKeyDown(Util::Keycode::R)){
         for (auto& temp : m_World.WorldDrops->GetObjs()){
@@ -244,6 +245,7 @@ void Player::Move(float dt){
     /**
      * 特定狀態不能移動
      */
+    if (GetState() == c_state::block) return; //擋格狀態不能移動
     if (GetState() == c_state::clinb) return; //攀爬時不能移動
     if (GetState() == c_state::atk){
         Physics::SlowDown(VelocityX, Friction);
@@ -535,6 +537,7 @@ void Player::Update(float dt){
     
     PickUp();
     Attack(dt);
+    Block();
 
     FixPos(dt);
     TestP();

@@ -19,10 +19,6 @@ public:
 
     void Init(){m_AttackManager = AttackManager(std::weak_ptr<Player>(shared_from_this()));}
     
-    void Attack(float dt) override;
-
-    void Block(float dt);
-    
     void Update(float dt) override;
     
     //for mob push
@@ -38,9 +34,8 @@ public:
             if (VelocityX > -5) VelocityX = -5.0f;
         }
     }
-
+    
     void Attacked(int Damage, glm::vec2 Dir) override;
-        
 private:
     
     void PickUp();
@@ -48,7 +43,7 @@ private:
      * When Press R, call this function
      */
     void PickUpDrops(std::shared_ptr<Drops> drops);
-
+    
     /**
      * 設置c_state 跟 Rednering
      * 向所面相的方向移動一段距離 (set VelocityX)
@@ -56,66 +51,76 @@ private:
      * 可被打斷
      */
     void roll();
-
+    
     /**
      * setPos
      * 當動畫撥放完之前不能move
      * 動畫播完後c_state = idle
      */
     void Clinb();
-
+    
     /**
      * 
      */
     void ClinbOSP();
-
+    
     /**
      * set Velocity
      * also set c_state
      * clinb and roll 等特殊狀態期間無法move
      */
     void Move(float dt) override;
-
+    
     /**
      * 這沒什麼好寫的同move, 且只有在 move 中call
      * 我現在眼睛好痛
      * by Etho 2025/04/17
      */
     void Jump();
-
+    
     /**
-     * 這沒什麼好寫的同move, 且只有在 move 中call
+     * 同move, 且只有在 move 中call
      * only set or init state
      * 往下的功能由applyGravity完成
      */
     void fall();
-
+    
     //Util function ; OSP mean OneSidedPlatform
     /**
      * return ture if player stand on any OSP
      */
     bool IsOnOSP();
-  
+    
     /**
      * return true if player under any OSP, and the padding of OSP is 5px
      */
     bool IsUnderOSP();
-
+    
     void RequastToChangeDrawable(std::shared_ptr<Util::Animation> PD){
         ChangeDrawable(AccessKey(), PD, c_state::atk);
     }
-
-
+    
+    
     //a special function for test, development function, to Log player current position
     void TestP();
+    
+    /**
+     * attack event for weapon
+     */
+    void Attack(float dt) override;
 
+    /**
+     * Block event for shield
+     */
+    void Block();
+    
 private:
     friend class AttackManager;
-
+    
     std::shared_ptr<Item> m_Skill1 = nullptr, m_skill2 = nullptr; //武器槽
     std::shared_ptr<PlayerUI> m_PlayerINFO; //玩家UI
     AttackManager m_AttackManager; //攻擊管理器
-    int m_Defense = 0; //防禦力
+    float m_Defense = 0; //防禦力
     std::shared_ptr<Shield> m_CurrentShield = nullptr; //當前使用的shield 如果沒有就nullptr
     
     int jumpStep = 0;   //double jump counter

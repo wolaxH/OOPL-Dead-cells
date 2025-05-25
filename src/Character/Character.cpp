@@ -61,7 +61,10 @@ bool Character::IsNearBy(std::shared_ptr<MapObj> other, float distance){
 
 void Character::ChangeDrawable(AccessKey , std::shared_ptr<Core::Drawable> PlayerDrawable, c_state state){
     auto PlayerAnim = std::dynamic_pointer_cast<Util::Animation>(PlayerDrawable);
-    PlayerAnim->SetCurrentFrame(0);
+    if (PlayerAnim){
+        PlayerAnim->SetCurrentFrame(0);
+        PlayerAnim->Play();
+    }
     m_Drawable = PlayerDrawable;
     D_Manager[state] = m_Drawable;
 }

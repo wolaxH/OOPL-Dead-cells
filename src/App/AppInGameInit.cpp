@@ -33,25 +33,27 @@ void App::InGameInit() {
     m_World.Mobs->AddObj(zombie);
     
 
-    //test
+    //Item test
     auto RW = std::make_shared<RustySword>();
     auto B = std::make_shared<Bone>();
     auto TD = std::make_shared<TwinDaggers>();
+    auto WS = std::make_shared<WoodenShield>();
 
     auto t = RW->ToDrops();
     m_World.WorldDrops->AddObj(t);
-    LOG_DEBUG("Rw init");
 
     t = B->ToDrops();
     t->m_WorldPos.x += 100;
     m_World.WorldDrops->AddObj(t);
-    LOG_DEBUG("B init");
 
     t = TD->ToDrops();
     t->m_WorldPos.x -= 400;
     m_World.WorldDrops->AddObj(t);
-    LOG_DEBUG("TD init");
-    //test
+
+    t = WS->ToDrops();
+    t->m_WorldPos.x -= 200;
+    m_World.WorldDrops->AddObj(t);
+    //Item test end
 
 
     //bg

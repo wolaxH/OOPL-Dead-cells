@@ -90,6 +90,8 @@ void AttackManager::ResetCombo() {
     m_ComboIndex = 0;
     m_ComboTimer = 0.f;
     m_IsAttacking = false;
+    m_NextSegFlag = false;
+    m_CurrentAtkData.reset();
     if (auto p = m_Player.lock()) {
         p->SetState(c_state::idle);
     }

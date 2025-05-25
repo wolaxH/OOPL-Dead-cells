@@ -7,9 +7,9 @@ WoodenShield::WoodenShield() : Shield(RESOURCE_DIR"/Item/WoodenShield/Icon.png",
     for (int i = 0; i < 9; i++){
         paths.push_back(RESOURCE_DIR"/Item/WoodenShield/Behavior/BlockEnd_" + std::to_string(i) + ".png");
     }
-    m_BlockEndDrawable = std::make_shared<Util::Animation>(paths, true, 0, false);
+    m_BlockEndDrawable = std::make_shared<Util::Animation>(paths, true, 20, false);
 
-    m_defense = 20;
+    m_defense = 0.75f;
 }
 
 void WoodenShield::Parry(std::shared_ptr<Mob>& mob, const glm::vec2& Dir, int combo){
