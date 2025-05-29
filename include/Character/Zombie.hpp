@@ -11,7 +11,7 @@ public:
     Zombie(std::vector<std::string>& path, int Hp, std::shared_ptr<Player> player, GameWorldContext& World) ;
     ~Zombie() = default;
 
-    void Attacked(int Damage, glm::vec2 Dir) override;
+    void Attacked(int Damage, glm::vec2 Dir, float Velocity = 0.0f) override;
     
     void Update(float dt) override;
 private:

@@ -20,13 +20,14 @@ void App::InGameInit() {
     player->SetVisible(true);
     root.AddChild(player);
     camera.SetPos(player->m_WorldPos);
+    m_World.m_Player = player;
     
 
     Img.clear();
     for (int i = 0; i < 24; i++){
         Img.push_back(RESOURCE_DIR"/Zombie/idle/idle_" + std::to_string(i) + ".png");
     }
-    zombie = std::make_shared<Zombie>(Img, 200, player, m_World);
+    std::shared_ptr<Zombie> zombie = std::make_shared<Zombie>(Img, 200, player, m_World);
     zombie->SetPos({0, 100});
     zombie->SetZIndex(30);
     zombie->SetVisible(true);
@@ -95,6 +96,7 @@ void App::InGameInit() {
 
     root.AddChild(m_World.WorldDrops);
     root.AddChild(m_World.Mobs);
+    root.AddChild(m_World.Projectiles);
     for (const auto& temp : m_World.WorldDrops->GetObjs()){
         auto drop = std::dynamic_pointer_cast<MapObj>(temp);
         if (drop) MapObjs.push_back(drop);
@@ -104,6 +106,7 @@ void App::InGameInit() {
         auto mob = std::dynamic_pointer_cast<MapObj>(temp);
         if (mob) MapObjs.push_back(mob);
     }
+
 
     LOG_TRACE("Start");
     

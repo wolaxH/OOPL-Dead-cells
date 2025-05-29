@@ -119,8 +119,8 @@ void Player::Block(){
     }
 }
 
-void Player::Attacked(int Damage, glm::vec2 Dir){
-    VelocityX += Dir.x > 0 ? 5.f : -5.f;
+void Player::Attacked(int Damage, glm::vec2 Dir, float Velocity){
+    VelocityX += Dir.x > 0 ? Velocity : -1*Velocity;
     float hurt = 0;
     if (((Dir.x > 0 && m_Transform.scale.x < 0) || (Dir.x < 0 && m_Transform.scale.x > 0)) && m_Defense > 0){
         hurt = abs((float)Damage * (1-m_Defense));
@@ -129,7 +129,8 @@ void Player::Attacked(int Damage, glm::vec2 Dir){
     else{
         SetState(c_state::idle);
         Jump();
-        VelocityY = 5.f;
+        VelocityY = 10.f;
+        hurt = Damage;
     }
     m_Hp -= hurt;
     m_PlayerINFO->SetHp(m_Hp);
@@ -245,9 +246,8 @@ void Player::Move(float dt){
     /**
      * 特定狀態不能移動
      */
-    if (GetState() == c_state::block) return; //擋格狀態不能移動
     if (GetState() == c_state::clinb) return; //攀爬時不能移動
-    if (GetState() == c_state::atk){
+    if (GetState() == c_state::atk || GetState() == c_state::block){
         Physics::SlowDown(VelocityX, Friction);
         return;
     }

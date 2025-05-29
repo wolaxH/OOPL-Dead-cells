@@ -2,8 +2,9 @@
 #define SHIELD_HPP
 
 #include "Item/PickUp.hpp"
+#include "Util/Animation.hpp"
 
-class mob;
+class Mob;
 
 class Shield : public Item{
 public:
@@ -29,7 +30,7 @@ public:
 
     int GetParryDamage() const noexcept {return ParryDamage;}
 
-    virtual void Parry(std::shared_ptr<Mob>& mob, const glm::vec2& Dir = {1, 1}, int combo = 0) = 0;
+    virtual void Parry(std::shared_ptr<Mob>& mob, const glm::vec2& Dir = {1, 1}) = 0;
 
     State GetState() const noexcept {return m_State;}
 

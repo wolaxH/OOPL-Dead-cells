@@ -16,14 +16,12 @@ public:
     virtual ~Mob() = default;
 
 protected:
-
     void PushPlayer(){
         auto obj = std::static_pointer_cast<MapObj>(m_player);
         if (Collision::IsIntersect(this, m_player.get())){
             m_player->Pushed();            
         }    
     }
-
 protected:
     float m_AtkRange;
     bool m_AtkFlag = false;
@@ -32,6 +30,4 @@ protected:
     std::shared_ptr<Player> m_player;
 
 };
-
-
 #endif

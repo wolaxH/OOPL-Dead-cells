@@ -41,7 +41,7 @@ public:
 
     c_state GetState(){ return State;}
 
-    void virtual Attacked(int Damage, glm::vec2 Dir) = 0;
+    void virtual Attacked(int Damage, glm::vec2 Dir, float Velocity = 0.0f) = 0;
     
     bool IsAlive() const noexcept{ return m_Hp > 0;}
     

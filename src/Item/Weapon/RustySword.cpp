@@ -34,7 +34,7 @@ RustySword::RustySword() : Weapon(RESOURCE_DIR"/Item/RustySword/Icon.png", "this
 }
 
 void RustySword::Use(std::shared_ptr<Mob>& mob, const glm::vec2& Dir, int combo){
-    mob->Attacked(m_AtkPoint[combo], Dir);
+    mob->Attacked(m_AtkPoint[combo], Dir, 1.f);
 }
 
 Rect RustySword::GetHitBox(const glm::vec2& Pos, const glm::vec2& Dir, int combo){

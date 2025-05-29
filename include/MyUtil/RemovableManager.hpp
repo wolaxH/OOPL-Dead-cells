@@ -3,6 +3,7 @@
 
 #include "Util/GameObject.hpp"
 #include "Abstract/MapObj.hpp"
+#include <functional>
 
 class RemovableManager : public Util::GameObject{
 public:
@@ -26,6 +27,18 @@ public:
                 auto it = std::find(m_MapObjs.begin(), m_MapObjs.end(), temp);
                 if (it != m_MapObjs.end()) m_MapObjs.erase(it);
             }
+        }
+    }
+
+    void RemoveObjs(const std::function<bool(const std::shared_ptr<Util::GameObject>&)>& predicate){
+        std::vector<std::shared_ptr<Util::GameObject>> toRemove;
+        for (auto& obj : m_Children) {
+            if (predicate(obj)) {
+                toRemove.push_back(obj);
+            }
+        }
+        for (auto& obj : toRemove) {
+            RemoveObj(obj);
         }
     }
 

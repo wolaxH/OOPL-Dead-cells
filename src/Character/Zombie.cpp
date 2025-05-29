@@ -33,20 +33,20 @@ void Zombie::Attack(float dt){  //player
     //the real atk logic
     if (m_Transform.scale.x > 0){   //atk forward right
         if (m_player->m_WorldPos.x > m_WorldPos.x && m_player->m_WorldPos.x < m_WorldPos.x + m_AtkRange){
-            m_player->Attacked(m_AtkPoint, m_Transform.scale);
+            m_player->Attacked(m_AtkPoint, m_Transform.scale, 15.0f);
             m_AtkFlag = true;
         }
     }
     else{
         if (m_player->m_WorldPos.x < m_WorldPos.x && m_player->m_WorldPos.x > m_WorldPos.x - m_AtkRange){
-            m_player->Attacked(m_AtkPoint, m_Transform.scale);
+            m_player->Attacked(m_AtkPoint, m_Transform.scale, 15.0f);
             m_AtkFlag = true;
         }
     }
     //atk logic end
 }
 
-void Zombie::Attacked(int Damage, glm::vec2 Dir){
+void Zombie::Attacked(int Damage, glm::vec2 Dir, float Velocity){
     if (GetState() == c_state::atk){
         m_Hp -= Damage;
         return;
@@ -169,7 +169,7 @@ void Zombie::Update(float dt){
     else if (GetState() == c_state::atk) Attack(dt);
     // atk end
 
-    if (GetState() == c_state::atked) Attacked(0, glm::vec2(0, 0));
+    if (GetState() == c_state::atked) Attacked(0, glm::vec2(0, 0), 0.0f);
     
     PushPlayer();
     FixPos(dt);

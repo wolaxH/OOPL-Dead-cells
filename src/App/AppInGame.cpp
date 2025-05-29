@@ -3,23 +3,36 @@
 void App::InGameUpdate(float dt) {
     
     player->Update(dt);
+
+    //for test Projectile
+    if (m_World.Projectiles->GetObjs().size() == 0){
+        std::shared_ptr<Projectile> p = std::make_shared<Projectile>(
+                        glm::vec2(-500, 0), glm::vec2(-1, 1), 10.0f, 1, 
+                        Projectile::Faction::Enemy, m_World, 50.0f, RESOURCE_DIR"/shooter/arrow.png");
+        m_World.Projectiles->AddObj(p);
+    }
+
+    for (auto& temp : m_World.Projectiles->GetObjs()){
+        auto projectile = std::dynamic_pointer_cast<Projectile>(temp);
+        if (projectile) projectile->Update(dt);
+    }
+
+    m_World.Projectiles->RemoveObjs([](const std::shared_ptr<Util::GameObject>& temp){
+        auto projectile = std::dynamic_pointer_cast<Projectile>(temp);
+        return projectile && projectile->IsDestroyed();
+    });
+    //end test
         
     //mobs
-    m_World.Mobs->GetObjs().erase(
-        std::remove_if(m_World.Mobs->GetObjs().begin(), 
-                       m_World.Mobs->GetObjs().end(), 
-                       [](const std::shared_ptr<Util::GameObject>& temp){
-                            auto mob = std::dynamic_pointer_cast<Mob>(temp);
-                            if (mob == nullptr) return false;
-                            return !mob->IsAlive();
-        }),
-        m_World.Mobs->GetObjs().end()
-    );
     for (auto& temp : m_World.Mobs->GetObjs()){
         auto mob = std::dynamic_pointer_cast<Mob>(temp);
-        if (!mob->IsAlive()) {}
         mob->Update(dt);
     }
+    m_World.Mobs->RemoveObjs([](const std::shared_ptr<Util::GameObject>& temp){
+        auto mob = std::dynamic_pointer_cast<Mob>(temp);
+        return mob && !mob->IsAlive();
+    });    
+
     //Drops
     for (auto& temp : m_World.WorldDrops->GetObjs()){
         auto drop = std::dynamic_pointer_cast<Drops>(temp);

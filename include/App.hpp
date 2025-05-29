@@ -10,6 +10,7 @@
 #include "SolidObj.hpp"
 #include "MyUtil/Camera.hpp"
 #include "MyUtil/GameWorldContext.hpp"
+#include "MyUtil/Projectile.hpp"
 #include "Character/Zombie.hpp"
 #include "Menu/Button.hpp"
 #include "Menu/Menu.hpp"
@@ -87,7 +88,6 @@ private:    //ingame Objs
     Camera camera;
 
     std::shared_ptr<Player> player;
-    std::shared_ptr<Zombie> zombie;
 
     std::vector<std::shared_ptr<MapObj>> MapObjs;
 
