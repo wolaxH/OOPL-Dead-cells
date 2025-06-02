@@ -36,16 +36,16 @@ public:
     void SetPos(glm::vec2 pos){ m_WorldPos = pos;}
 
     void virtual Update(float dt) = 0;
-
-    void SetState(c_state State, std::vector<std::string> path = {}, bool Isloop = true);
-
+    
     c_state GetState(){ return State;}
-
+    
     void virtual Attacked(int Damage, glm::vec2 Dir, float Velocity = 0.0f) = 0;
     
     bool IsAlive() const noexcept{ return m_Hp > 0;}
     
-    protected:
+protected:
+    void SetState(c_state State, std::vector<std::string> path = {}, bool Isloop = true);
+
     bool IsContainState(c_state State){return (D_Manager.find(State) != D_Manager.end()) ? true : false;}
     
     /**

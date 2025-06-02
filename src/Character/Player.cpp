@@ -518,8 +518,8 @@ void Player::roll(){
     if (m_Transform.scale.x > 0) VelocityX = 15.0f;
     else VelocityX = -15.0f;
     //set Velocity end
-    timer.SetChangeTime(700, 700);
-    timer.ResetCheckTime();
+    timer.SetTime(700, 700);
+    timer.ResetTime();
 }
 
 /*-----------------------------------update-----------------------------------*/

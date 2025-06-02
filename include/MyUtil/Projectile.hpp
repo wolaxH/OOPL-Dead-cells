@@ -4,7 +4,7 @@
 #include "Abstract/MapObj.hpp"
 #include "MyUtil/Collision.hpp"
 #include "MyUtil/GameWorldContext.hpp"
-
+#include "MyUtil/Timer.hpp"
 #include "Util/Image.hpp"
 
 class Projectile : public MapObj{
@@ -31,6 +31,7 @@ private:
     bool m_IsDestroyed = false;
     Faction m_Faction;
     GameWorldContext& m_World;
+    Timer m_Timer;
 };
 
 #endif

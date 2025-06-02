@@ -21,7 +21,7 @@ void Projectile::Update(float dt){
     if (m_IsDestroyed) return;
 
     m_WorldPos.x += m_Velocity * m_Dir * dt;
-    m_LifeTime -= dt;
+    m_LifeTime -= dt / 60.0f;
 
     if (m_LifeTime <= 0.f){
         m_IsDestroyed = true;

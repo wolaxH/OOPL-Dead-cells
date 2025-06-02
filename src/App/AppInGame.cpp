@@ -7,8 +7,8 @@ void App::InGameUpdate(float dt) {
     //for test Projectile
     if (m_World.Projectiles->GetObjs().size() == 0){
         std::shared_ptr<Projectile> p = std::make_shared<Projectile>(
-                        glm::vec2(-500, 0), glm::vec2(-1, 1), 10.0f, 1, 
-                        Projectile::Faction::Enemy, m_World, 50.0f, RESOURCE_DIR"/shooter/arrow.png");
+                        glm::vec2(500, 0), glm::vec2(-1, 1), 10.0f, 1, 
+                        Projectile::Faction::Enemy, m_World, 1.0f, RESOURCE_DIR"/shooter/arrow.png");
         m_World.Projectiles->AddObj(p);
     }
 

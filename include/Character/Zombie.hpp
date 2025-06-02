@@ -2,9 +2,7 @@
 #define ZOMBIE_HPP
 
 #include "Character/Mob.hpp"
-#include "MyUtil/Timer.hpp"
 
-#include <ctime>
 
 class Zombie : public Mob{
 public:
@@ -20,8 +18,6 @@ private:
     void Move(float dt) override;
 
 private:
-    int m_AtkPoint;
-    Timer timer;
 };
 
 

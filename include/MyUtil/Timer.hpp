@@ -9,12 +9,12 @@
 */
 class Timer{
 public:
-    Timer() {ResetCheckTime();}
+    Timer() {ResetTime();}
     ~Timer() = default;
 
     bool IsTimeout(){return std::chrono::steady_clock::now() > checkTime + changeTime;}
 
-    void ResetCheckTime(){
+    void ResetTime(){
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution<int> dist(min, max);
@@ -23,7 +23,7 @@ public:
         checkTime = std::chrono::steady_clock::now();
     }
 
-    void SetChangeTime(int min = 1000, int max = 2000){
+    void SetTime(int min = 1000, int max = 2000){
         this->min = min;
         this->max = max;
     }

@@ -7,7 +7,7 @@
 Zombie::Zombie(std::vector<std::string>& path, int Hp, std::shared_ptr<Player> player, GameWorldContext& World) 
     : Mob(path, Hp, player, World){
     top = 50, bottom = 52, left = 13, right = 13;
-    m_DetectRange = 300.0f;
+    m_DetectRange = 500.0f;
     m_Transform.translation = {1.0f, 1.0f};
     m_AtkRange = 20.0f;
     m_Hp = 200;
@@ -69,8 +69,6 @@ void Zombie::Attacked(int Damage, glm::vec2 Dir, float Velocity){
     temp->Play();
     m_Hp -= Damage;
     VelocityX += (Dir.x > 0) ? 5 : -5;
-    
-
 }
 
 void Zombie::Move(float dt){
@@ -95,40 +93,7 @@ void Zombie::Move(float dt){
         }
     }
     else{   //遊蕩狀態
-        if (m_state == mob_state::trace){
-            m_state = mob_state::wander;
-            SetState(c_state::idle);
-            timer.SetChangeTime(500, 1000);
-            timer.ResetCheckTime();
-        }
-        if (timer.IsTimeout()){ //update state
-            c_state nextstate;
-            switch (GetState()){
-            case c_state::idle :
-                nextstate = (std::rand() % 2 == 0) ? c_state::L_move : c_state::R_move;
-                timer.SetChangeTime(500, 1000);
-                break;
-            case c_state::L_move :
-                nextstate = c_state::idle;
-                timer.SetChangeTime(2000, 5000);
-                break;
-            case c_state::R_move :
-                nextstate = c_state::idle;
-                timer.SetChangeTime(2000, 5000);
-                break;
-            default:
-                nextstate = c_state::idle;
-                break;
-            }
-            //set state
-            if (IsContainState(nextstate))SetState(nextstate);
-            else InitState(nextstate, {22}, {RESOURCE_DIR"/Zombie/move/move_"});
-            //turn
-            if (GetState() == c_state::L_move) m_Transform.scale.x = -1;
-            else if (GetState() == c_state::R_move) m_Transform.scale.x = 1;
-
-            timer.ResetCheckTime();
-        }
+        Wander(RESOURCE_DIR"/Zombie/move/move_");
     }
     //move
     switch (GetState()){
