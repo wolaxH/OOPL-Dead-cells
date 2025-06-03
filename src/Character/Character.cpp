@@ -7,6 +7,7 @@ Character::Character(std::vector<std::string>& path, int Hp, GameWorldContext& W
     m_Drawable = std::make_shared<Util::Animation>(path, true, 20, true, 0);
     State = c_state::idle;
     D_Manager[State] = m_Drawable;
+    m_ZIndex = 30;
 }
 
 

@@ -125,6 +125,7 @@ private:
     
     int jumpStep = 0;   //double jump counter
     Timer timer;   //for count the roll cooling time
+    bool m_Atkedable = false;
     
 };
 #endif

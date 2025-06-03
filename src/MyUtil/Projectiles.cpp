@@ -13,7 +13,8 @@ Projectile::Projectile(glm::vec2 Pos, glm::vec2 dir, float velocity,
     m_Visible = true;
     m_WorldPos = Pos;
     m_Transform.scale = {1.0f * dir.x, 1.0f};
-    left = right = 10;
+    left = m_Dir > 0 ? 0 : 10;
+    right = m_Dir < 0 ? 0 : 10;
     top = bottom = 5;
 }
 

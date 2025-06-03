@@ -10,8 +10,8 @@ Zombie::Zombie(std::vector<std::string>& path, int Hp, std::shared_ptr<Player> p
     m_DetectRange = 500.0f;
     m_Transform.translation = {1.0f, 1.0f};
     m_AtkRange = 20.0f;
-    m_Hp = 200;
     m_AtkPoint = 30;
+    m_AtkCoolDownTimer.SetTime(1000, 1500);
 }
 
 void Zombie::Attack(float dt){  //player
@@ -19,7 +19,8 @@ void Zombie::Attack(float dt){  //player
 
     //rendering 
     auto temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
-    if (temp->GetState() != Util::Animation::State::PLAY){  // init atk behavior
+    if (temp->GetState() != Util::Animation::State::PLAY){
+        m_AtkCoolDownTimer.ResetTime();
         SetState(c_state::idle);
         m_AtkFlag = false;
         return;
@@ -68,7 +69,7 @@ void Zombie::Attacked(int Damage, glm::vec2 Dir, float Velocity){
     auto temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
     temp->Play();
     m_Hp -= Damage;
-    VelocityX += (Dir.x > 0) ? 5 : -5;
+    VelocityX += Velocity * ((Dir.x > 0) ? 1 : -1);
 }
 
 void Zombie::Move(float dt){
@@ -76,7 +77,7 @@ void Zombie::Move(float dt){
     if (GetState() == c_state::atked) return;   //atked cannot move
 
     //trace player
-    if (IsNearBy(m_player,m_DetectRange)){  
+    if (IsSameLevelNearBy(m_player,m_DetectRange)){  
         //c_state = move
         m_state = mob_state::trace;
         if (m_player->m_WorldPos.x > m_WorldPos.x + 10){   
@@ -93,7 +94,7 @@ void Zombie::Move(float dt){
         }
     }
     else{   //遊蕩狀態
-        Wander(RESOURCE_DIR"/Zombie/move/move_");
+        Wander(RESOURCE_DIR"/Zombie/move/move_", 22);
     }
     //move
     switch (GetState()){
@@ -114,11 +115,22 @@ void Zombie::Move(float dt){
 }
 
 void Zombie::Update(float dt){
-    Move(dt);
     InGround = Physics::IsOnGround(m_WorldPos, m_World.SolidObjs, m_World.OneSidedPlatforms);
     Physics::ApplyGravity(VelocityY, InGround, Gravity, MaxFallSpeed);
     if (InGround) Physics::SlowDown(VelocityX, Friction);
 
+    if (!m_AtkCoolDownTimer.IsTimeout()){
+        if (GetState() == c_state::atked) Attacked(0, glm::vec2(0, 0), 0.0f);
+        else SetState(c_state::idle);  // 在 cooldown 時完全 idle
+        m_AtkFlag = false;        // 允許 cooldown 結束後重新攻擊
+        PushPlayer();
+        FixPos(dt);
+        m_WorldPos.x += VelocityX * dt;
+        m_WorldPos.y += VelocityY * dt;
+        return;
+    }
+
+    Move(dt);
     
     // atk behavior
     if ((VelocityX > 0 && m_player->m_WorldPos.x > m_WorldPos.x && m_player->m_WorldPos.x < m_WorldPos.x + right) ||

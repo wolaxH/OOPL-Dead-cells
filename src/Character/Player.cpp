@@ -120,6 +120,7 @@ void Player::Block(){
 }
 
 void Player::Attacked(int Damage, glm::vec2 Dir, float Velocity){
+    if (!m_Atkedable) return;
     VelocityX += Dir.x > 0 ? Velocity : -1*Velocity;
     float hurt = 0;
     if (((Dir.x > 0 && m_Transform.scale.x < 0) || (Dir.x < 0 && m_Transform.scale.x > 0)) && m_Defense > 0){

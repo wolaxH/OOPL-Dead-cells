@@ -16,8 +16,7 @@ void App::InGameInit() {
     player = std::make_shared<Player>(Img, 200, m_World);
     player->Init();
     player->SetPos({0, 100});
-    player->SetZIndex(30);
-    player->SetVisible(true);
+    player->SetZIndex(30.1);
     root.AddChild(player);
     camera.SetPos(player->m_WorldPos);
     m_World.m_Player = player;
@@ -29,9 +28,15 @@ void App::InGameInit() {
     }
     std::shared_ptr<Zombie> zombie = std::make_shared<Zombie>(Img, 200, player, m_World);
     zombie->SetPos({0, 100});
-    zombie->SetZIndex(30);
-    zombie->SetVisible(true);
     m_World.Mobs->AddObj(zombie);
+
+    Img.clear();
+    for (int i = 0; i < 6; i++){
+        Img.push_back(RESOURCE_DIR"/shooter/idle/idle_" + std::to_string(i) + ".png");
+    }
+    std::shared_ptr<Shooter> shooter = std::make_shared<Shooter>(Img, 200, player, m_World);
+    shooter->SetPos({1200, 500});
+    m_World.Mobs->AddObj(shooter);
     
 
     //Item test
@@ -89,8 +94,11 @@ void App::InGameInit() {
      * Add all solid objects to the root object for rendering.
      */
     std::vector<std::shared_ptr<Util::GameObject>> temps;
-    for (auto& temp : m_World.SolidObjs){ temps.push_back(temp);}
-    for (auto& temp : m_World.OneSidedPlatforms){ temps.push_back(temp);}
+
+    temps.insert(temps.end(), m_World.OneSidedPlatforms.begin(), m_World.OneSidedPlatforms.end());
+    temps.insert(temps.end(), m_World.SolidObjs.begin(), m_World.SolidObjs.end());
+    // for (auto& temp : m_World.SolidObjs){ temps.push_back(temp);}
+    // for (auto& temp : m_World.OneSidedPlatforms){ temps.push_back(temp);}
     root.AddChildren(temps);
 
 

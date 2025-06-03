@@ -4,14 +4,7 @@ void App::InGameUpdate(float dt) {
     
     player->Update(dt);
 
-    //for test Projectile
-    if (m_World.Projectiles->GetObjs().size() == 0){
-        std::shared_ptr<Projectile> p = std::make_shared<Projectile>(
-                        glm::vec2(500, 0), glm::vec2(-1, 1), 10.0f, 1, 
-                        Projectile::Faction::Enemy, m_World, 1.0f, RESOURCE_DIR"/shooter/arrow.png");
-        m_World.Projectiles->AddObj(p);
-    }
-
+    //projectiles
     for (auto& temp : m_World.Projectiles->GetObjs()){
         auto projectile = std::dynamic_pointer_cast<Projectile>(temp);
         if (projectile) projectile->Update(dt);
@@ -21,7 +14,7 @@ void App::InGameUpdate(float dt) {
         auto projectile = std::dynamic_pointer_cast<Projectile>(temp);
         return projectile && projectile->IsDestroyed();
     });
-    //end test
+    
         
     //mobs
     for (auto& temp : m_World.Mobs->GetObjs()){

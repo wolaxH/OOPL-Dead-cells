@@ -1,6 +1,6 @@
 #include "Character/Mob.hpp"
 
-void Mob::Wander(const std::string& path){
+void Mob::Wander(const std::string& path, const size_t frames){
     if (m_state == mob_state::trace){
         m_state = mob_state::wander;
         SetState(c_state::idle);
@@ -28,7 +28,7 @@ void Mob::Wander(const std::string& path){
         }
         //set state
         if (IsContainState(nextstate))SetState(nextstate);
-        else InitState(nextstate, {22}, {path});
+        else InitState(nextstate, {frames}, {path});
         //turn
         if (GetState() == c_state::L_move) m_Transform.scale.x = -1;
         else if (GetState() == c_state::R_move) m_Transform.scale.x = 1;

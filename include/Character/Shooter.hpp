@@ -14,7 +14,7 @@ public:
 
     void Attacked(int Damage, glm::vec2 Dir, float Velocity = 0.0f) override;
 
-    
+    void FireProjectile();
 
 private:
     void LookAtPlayer();
@@ -23,7 +23,7 @@ private:
 
     void Move(float dt) override;
 private:
-    Timer m_Timer;
+    static constexpr int FIRE_FRAME = 21;
 };
 
 #endif

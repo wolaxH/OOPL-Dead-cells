@@ -12,6 +12,7 @@
 #include "MyUtil/GameWorldContext.hpp"
 #include "MyUtil/Projectile.hpp"
 #include "Character/Zombie.hpp"
+#include "Character/Shooter.hpp"
 #include "Menu/Button.hpp"
 #include "Menu/Menu.hpp"
 #include "BackGround.hpp"
