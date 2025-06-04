@@ -27,7 +27,7 @@ void App::InGameInit() {
         Img.push_back(RESOURCE_DIR"/Zombie/idle/idle_" + std::to_string(i) + ".png");
     }
     std::shared_ptr<Zombie> zombie = std::make_shared<Zombie>(Img, 200, player, m_World);
-    zombie->SetPos({0, 100});
+    zombie->SetPos({1200, 500});
     m_World.Mobs->AddObj(zombie);
 
     Img.clear();

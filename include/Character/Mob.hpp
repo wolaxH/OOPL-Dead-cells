@@ -20,7 +20,7 @@ public:
 protected:
     bool IsSameLevelNearBy(std::shared_ptr<MapObj> other, float distance = 1000.0f){
         glm::vec2 D = m_WorldPos - other->m_WorldPos;
-        return (std::abs(D.y) < 60.0f && glm::length(D) <= distance);
+        return (std::abs(D.y) < 100.0f && glm::length(D) <= distance);
     }
 
     void PushPlayer();

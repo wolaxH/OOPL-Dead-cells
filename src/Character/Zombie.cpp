@@ -6,12 +6,15 @@
 
 Zombie::Zombie(std::vector<std::string>& path, int Hp, std::shared_ptr<Player> player, GameWorldContext& World) 
     : Mob(path, Hp, player, World){
-    top = 50, bottom = 52, left = 13, right = 13;
-    m_DetectRange = 500.0f;
-    m_Transform.translation = {1.0f, 1.0f};
-    m_AtkRange = 20.0f;
-    m_AtkPoint = 30;
-    m_AtkCoolDownTimer.SetTime(1000, 1500);
+        m_DetectRange = 500.0f;
+        m_Transform.scale = {1.0f, 1.0f};
+        m_AtkRange = 20.0f;
+        m_AtkPoint = 30;
+        m_AtkCoolDownTimer.SetTime(1000, 1500);
+        top = 50 * m_Transform.scale.y;
+        bottom = 52 * m_Transform.scale.y;
+        left = 13 * m_Transform.scale.x;
+        right = 13 * m_Transform.scale.x;
 }
 
 void Zombie::Attack(float dt){  //player

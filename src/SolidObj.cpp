@@ -10,9 +10,9 @@ SolidObj::SolidObj(const std::string& path){
     m_Drawable = std::make_shared<Util::Image>(path);
     m_ZIndex = 10.0f;
 
-    top = (m_Drawable->GetSize().y / 2);
+    top = m_Drawable->GetSize().y / 2;
     bottom = top;
-    left = (m_Drawable->GetSize().x) /2;
+    left = m_Drawable->GetSize().x /2;
     right = left;
 }
 
@@ -33,6 +33,7 @@ void SolidObj::get_data_from_json(std::string JsonFileName, int index){
 
    from_json(j[index]["scale"], this->m_Transform.scale);
    from_json(j[index]["pos"], this->m_WorldPos);
-   
+   top = bottom = GetScaledSize().y / 2;
+   right = left = GetScaledSize().x / 2;
 }
 

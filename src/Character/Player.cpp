@@ -16,7 +16,10 @@ Player::Player(std::vector<std::string>& path, int Hp, GameWorldContext& World):
     Character(path, Hp, World){
         m_Transform.scale = {2.0f, 2.0f};
         m_Transform.translation = {0.0f, -100.0f};
-        top = 50, bottom = 0, left = 10, right = 10;
+        top = 50 * m_Transform.scale.y;
+        bottom = 0 * m_Transform.scale.y;
+        left = 10 * m_Transform.scale.x;
+        right = 10 * m_Transform.scale.x;
         
         m_PlayerINFO = std::make_shared<PlayerUI>();
 
@@ -125,7 +128,6 @@ void Player::Attacked(int Damage, glm::vec2 Dir, float Velocity){
     float hurt = 0;
     if (((Dir.x > 0 && m_Transform.scale.x < 0) || (Dir.x < 0 && m_Transform.scale.x > 0)) && m_Defense > 0){
         hurt = abs((float)Damage * (1-m_Defense));
-        LOG_DEBUG("def success");
     }
     else{
         SetState(c_state::idle);
@@ -406,21 +408,20 @@ void Player::Clinb(){
 
     for (auto& Solid : temps) {
         if (!IsNearBy(Solid, 3000.0f)) continue; //如果不在附近就跳過
-        solidTop = Solid->top * Solid->m_Transform.scale.y;
-        solidLeft = Solid->left * Solid->m_Transform.scale.x;
-        solidRight = Solid->right * Solid->m_Transform.scale.x;
-
-        playerTop = m_WorldPos.y + top * m_Transform.scale.y;
+        solidTop = Solid->top;
+        solidLeft = Solid->left;
+        solidRight = Solid->right;
+        playerTop = m_WorldPos.y + top;
 
         inYRange = playerTop > Solid->m_WorldPos.y + solidTop &&
                         m_WorldPos.y < Solid->m_WorldPos.y + solidTop;
         //玩家朝左
-        leftCheck = m_WorldPos.x - std::abs(left * m_Transform.scale.x) <
+        leftCheck = m_WorldPos.x - left <
                          Solid->m_WorldPos.x + std::abs(solidRight) + 3 &&
                          m_WorldPos.x > Solid->m_WorldPos.x + std::abs(solidRight) - 1 &&    //m_WorldPos.x > Solid->m_WorldPos.x - std::abs(solidLeft)
                          m_Transform.scale.x < 0;
         //玩家朝右
-        rightCheck = m_WorldPos.x + std::abs(right * m_Transform.scale.x) >
+        rightCheck = m_WorldPos.x + right >
                           Solid->m_WorldPos.x - solidLeft - 3 &&
                           m_WorldPos.x < Solid->m_WorldPos.x - solidLeft + 1 && //m_WorldPos.x < Solid->m_WorldPos.x + solidRight
                           m_Transform.scale.x > 0;
@@ -457,7 +458,7 @@ void Player::ClinbOSP(){
         SetState(c_state::idle);
     }
 
-    float P_Head = m_WorldPos.y + top * m_Transform.scale.y;
+    float P_Head = m_WorldPos.y + top;
     float P_Bottom = m_WorldPos.y;
 
     bool IsHeadOver, IsbottomUnder, IsXInRange;

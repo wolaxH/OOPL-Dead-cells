@@ -24,3 +24,23 @@ bool Collision::IsIntersect(const MapObj* a, const MapObj* b) {
 
     return x && y;    
 }
+
+bool Collision::IsIntersectAABB(const AABB& a, const AABB& b) {
+    bool x = a.left < b.right && a.right > b.left;
+
+    bool y = a.top > b.bottom && a.bottom < b.top;
+
+    return x && y;
+
+    // return !(a.right < b.left || a.left > b.right ||
+    //          a.bottom < b.top || a.top > b.bottom);
+}
+
+Collision::AABB Collision::GetAABB(const MapObj* obj){
+    return{
+        obj->m_WorldPos.x - obj->left,
+        obj->m_WorldPos.y + obj->top,
+        obj->m_WorldPos.x + obj->right,
+        obj->m_WorldPos.y - obj->bottom
+    };
+}
