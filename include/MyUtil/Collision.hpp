@@ -11,6 +11,8 @@ namespace Collision{
     };
     bool IsIntersectAABB(const AABB& a, const AABB& b);
 
+    bool IsIntersectAABB(const MapObj* a, const MapObj* b);
+
     AABB GetAABB(const MapObj* obj);
     
 } // namespace Collision

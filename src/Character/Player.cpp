@@ -30,7 +30,7 @@ Player::Player(std::vector<std::string>& path, int Hp, GameWorldContext& World):
 void Player::Attack(float dt){
     if (GetState() == c_state::roll) return; //翻滾狀態不能攻擊
     if (GetState() == c_state::clinb) return; //攀爬狀態不能攻擊
-    if (GetState() == c_state::block) return; //擋格狀態不能攻擊
+
 
     std::shared_ptr<Weapon> UsedWeapon = nullptr;
     //使用武器1 
@@ -58,6 +58,7 @@ void Player::Attack(float dt){
             return;
         }
         //player 攻擊產生的碰撞箱
+        
         Rect HitBox = currentWeapon->GetHitBox(m_WorldPos, m_Transform.scale, m_AttackManager.GetComboIndex());
         Rect MobRect;
         bool IsWeaponUsed = false;
@@ -123,18 +124,42 @@ void Player::Block(){
 }
 
 void Player::Attacked(int Damage, glm::vec2 Dir, float Velocity){
-    if (!m_Atkedable) return;
     VelocityX += Dir.x > 0 ? Velocity : -1*Velocity;
     float hurt = 0;
-    if (((Dir.x > 0 && m_Transform.scale.x < 0) || (Dir.x < 0 && m_Transform.scale.x > 0)) && m_Defense > 0){
-        hurt = abs((float)Damage * (1-m_Defense));
+
+    if (m_CurrentShield &&
+    ((Dir.x > 0 && m_Transform.scale.x < 0) || (Dir.x < 0 && m_Transform.scale.x > 0))){    //Shield is used and Dir is correct
+        Rect HitBox;
+        Rect MobRect;
+        switch (m_CurrentShield->GetState()){
+        case Shield::State::Block:
+            hurt = abs((float)Damage * (1-m_Defense));
+            break;        
+        case Shield::State::BlockEnd:
+            VelocityX = 0;
+
+            HitBox = m_CurrentShield->GetParryHitBox(m_WorldPos, m_Transform.scale);
+            for (auto& mob : m_World.Mobs->GetObjs()){
+                auto MobObj = std::dynamic_pointer_cast<Mob>(mob);
+                if (MobObj == nullptr) continue;
+
+                MobRect = Rect::CreateRect(MobObj->m_WorldPos, MobObj->top + MobObj->bottom, MobObj->left + MobObj->right);
+                if (HitBox.Intersects(MobRect)){
+                    m_CurrentShield->Parry(MobObj, m_Transform.scale);
+                }
+            }
+            return; //blockend狀態不會受到傷害
+        default:
+            return;
+        }
     }
-    else{
+    else{   //一般被攻擊行為
         SetState(c_state::idle);
         Jump();
         VelocityY = 10.f;
         hurt = Damage;
     }
+
     m_Hp -= hurt;
     m_PlayerINFO->SetHp(m_Hp);
 }
@@ -496,6 +521,7 @@ void Player::roll(){
             
             if (InGround) SetState(c_state::idle);
             else SetState(c_state::fall, {}, false);
+            m_Atkedable = true;
         }
         return;
     }
@@ -519,6 +545,7 @@ void Player::roll(){
     //set Velocity 
     if (m_Transform.scale.x > 0) VelocityX = 15.0f;
     else VelocityX = -15.0f;
+    m_Atkedable = false;
     //set Velocity end
     timer.SetTime(700, 700);
     timer.ResetTime();
@@ -533,6 +560,7 @@ void Player::Update(float dt){
     if (IS_ROLL_DOWN() || GetState() == c_state::roll){
         roll();
     }
+    if (GetState() != c_state::roll) m_Atkedable = true;
     
     Clinb();
     ClinbOSP();

@@ -36,6 +36,8 @@ public:
     }
     
     void Attacked(int Damage, glm::vec2 Dir, float Velocity = 0.0f) override;
+
+    bool IsAtkedable() const noexcept { return m_Atkedable; }
 private:
     
     void PickUp();
@@ -125,7 +127,7 @@ private:
     
     int jumpStep = 0;   //double jump counter
     Timer timer;   //for count the roll cooling time
-    bool m_Atkedable = false;
+    bool m_Atkedable = true;
     
 };
 #endif

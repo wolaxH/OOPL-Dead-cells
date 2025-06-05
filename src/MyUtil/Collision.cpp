@@ -27,13 +27,15 @@ bool Collision::IsIntersect(const MapObj* a, const MapObj* b) {
 
 bool Collision::IsIntersectAABB(const AABB& a, const AABB& b) {
     bool x = a.left < b.right && a.right > b.left;
-
     bool y = a.top > b.bottom && a.bottom < b.top;
-
     return x && y;
+}
 
-    // return !(a.right < b.left || a.left > b.right ||
-    //          a.bottom < b.top || a.top > b.bottom);
+bool Collision::IsIntersectAABB(const MapObj* a, const MapObj* b){
+    AABB a_AABB = GetAABB(a);
+    AABB b_AABB = GetAABB(b);
+
+    return IsIntersectAABB(a_AABB, b_AABB);
 }
 
 Collision::AABB Collision::GetAABB(const MapObj* obj){

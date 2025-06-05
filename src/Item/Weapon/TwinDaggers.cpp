@@ -36,7 +36,7 @@ TwinDaggers::TwinDaggers() : Weapon(RESOURCE_DIR"/Item/TwinDaggers/Icon.png", "t
 }
 
 void TwinDaggers::Use(std::shared_ptr<Mob>& mob, const glm::vec2& Dir, int combo){
-    mob->Attacked(m_AtkPoint[combo], Dir, 1.0f);
+    mob->Attacked(m_AtkPoint[combo], Dir, 5.0f);
 }
 
 Rect TwinDaggers::GetHitBox(const glm::vec2& Pos, const glm::vec2& Dir, int combo){

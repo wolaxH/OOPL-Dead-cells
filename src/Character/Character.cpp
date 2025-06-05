@@ -125,7 +125,7 @@ void Character::FixPos(float dt){
 
         // X 方向測試
         m_WorldPos.x += VelocityX * dt;
-        if (Collision::IsIntersectAABB(Collision::GetAABB(this), Collision::GetAABB(Solid.get()))) {
+        if (Collision::IsIntersectAABB(this, Solid.get())) {
             m_WorldPos.x -= VelocityX * dt;
             VelocityX = 0;
             breakFlag++;
@@ -134,7 +134,7 @@ void Character::FixPos(float dt){
 
         // Y 方向測試
         m_WorldPos.y += VelocityY * dt;
-        if (Collision::IsIntersectAABB(Collision::GetAABB(this), Collision::GetAABB(Solid.get()))) {
+        if (Collision::IsIntersectAABB(this, Solid.get())) {
             m_WorldPos.y -= VelocityY * dt;
             VelocityY = 0;
             breakFlag++;

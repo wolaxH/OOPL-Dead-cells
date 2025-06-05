@@ -2,6 +2,8 @@
 #define SHIELD_HPP
 
 #include "Item/PickUp.hpp"
+#include "MyUtil/Rect.hpp"
+
 #include "Util/Animation.hpp"
 
 class Mob;
@@ -28,8 +30,6 @@ public:
 
     float GetDefense() const noexcept {return m_defense;}
 
-    int GetParryDamage() const noexcept {return ParryDamage;}
-
     virtual void Parry(std::shared_ptr<Mob>& mob, const glm::vec2& Dir = {1, 1}) = 0;
 
     State GetState() const noexcept {return m_State;}
@@ -37,6 +37,16 @@ public:
     void Block() noexcept {m_State = State::Block;}
 
     void BlockEnd() noexcept {m_State = State::BlockEnd;}
+
+    Rect GetParryHitBox(const glm::vec2& Pos, const glm::vec2& Dir){
+        Rect result;
+        result.x = Pos.x, result.y = Pos.y + 30;
+        result.width = 60;
+        result.height = 60;
+        result.x += Dir.x > 0 ? 30 : -30;
+        result.width *= 2, result.height *= 2;
+        return result;
+    };
 
 protected:
     int ParryDamage;

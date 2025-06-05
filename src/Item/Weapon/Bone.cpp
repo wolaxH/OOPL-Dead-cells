@@ -41,7 +41,7 @@ Bone::Bone() : Weapon(RESOURCE_DIR"/Item/Bone/icon.png", "a Bone"){
 
 
 void Bone::Use(std::shared_ptr<Mob>& mob, const glm::vec2& Dir, int combo){
-    mob->Attacked(m_AtkPoint[combo], Dir, 1.f);
+    mob->Attacked(m_AtkPoint[combo], Dir, 5.f);
 }
 
 Rect Bone::GetHitBox(const glm::vec2& Pos, const glm::vec2& Dir, int combo){

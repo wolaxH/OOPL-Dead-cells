@@ -24,14 +24,14 @@ public:
     bool IsDestroyed() const noexcept { return m_IsDestroyed; }
 
 private:
-    float m_LifeTime;
+    const float m_LifeTime; // in seconds
     int m_Dir;  // 1 for right, -1 for left
     float m_Velocity;
     int m_Damage;
     bool m_IsDestroyed = false;
     Faction m_Faction;
     GameWorldContext& m_World;
-    Timer m_Timer;
+    Timer m_LifeTimer;
 };
 
 #endif

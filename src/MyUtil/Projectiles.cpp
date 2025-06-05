@@ -16,15 +16,15 @@ Projectile::Projectile(glm::vec2 Pos, glm::vec2 dir, float velocity,
     left = m_Dir > 0 ? 0 : 10;
     right = m_Dir < 0 ? 0 : 10;
     top = bottom = 5;
+    m_LifeTimer.SetTime(m_LifeTime * 1000, m_LifeTime * 1000);
 }
 
 void Projectile::Update(float dt){
     if (m_IsDestroyed) return;
 
     m_WorldPos.x += m_Velocity * m_Dir * dt;
-    m_LifeTime -= dt / 60.0f;
 
-    if (m_LifeTime <= 0.f){
+    if (m_LifeTimer.IsTimeout()){
         m_IsDestroyed = true;
         return;
     }
@@ -32,7 +32,7 @@ void Projectile::Update(float dt){
     if (m_Faction == Faction::Enemy){
         std::shared_ptr<Player> player = m_World.m_Player.lock();
         if (player == nullptr) return;
-        if (Collision::IsIntersect(this, player.get())){
+        if (Collision::IsIntersectAABB(this, player.get()) && player->IsAtkedable()){
             player->Attacked(m_Damage, glm::vec2(m_Dir, 0.f), 5.0f);
             m_IsDestroyed = true;
         }
@@ -43,7 +43,7 @@ void Projectile::Update(float dt){
     for (auto& temp : objs){
         glm::vec2 D = m_WorldPos - temp->m_WorldPos;
         if (glm::length(D) >= 1000.0f) continue;
-        if (Collision::IsIntersect(this, temp.get())){
+        if (Collision::IsIntersectAABB(this, temp.get())){
             m_IsDestroyed = true;
             break;
         }

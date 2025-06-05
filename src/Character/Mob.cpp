@@ -39,7 +39,7 @@ void Mob::Wander(const std::string& path, const size_t frames){
 
 void Mob::PushPlayer(){
     auto obj = std::static_pointer_cast<MapObj>(m_player);
-    if (Collision::IsIntersectAABB(Collision::GetAABB(this), Collision::GetAABB(m_player.get())) ){
+    if (Collision::IsIntersectAABB(this, m_player.get())){
         m_player->Pushed();            
     }    
 }
