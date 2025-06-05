@@ -21,10 +21,16 @@ public:
     void Update();
     
 private:
+    void PopUpText();
+
+    void Close();
+
+private:
     Type m_Type;
     std::weak_ptr<Player> m_player;
     std::weak_ptr<Portal> m_PairPortal;
     std::shared_ptr<MapObj> m_Text;
+    int m_Light;    
 };
 
 #endif
