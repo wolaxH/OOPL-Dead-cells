@@ -65,6 +65,8 @@ protected:
 
     bool IsNearBy(std::shared_ptr<MapObj> other, float distance = 1000.0f);
 
+    bool IsNearBy(glm::vec2 Point, float distance = 1000.0f);
+
     void ChangeDrawable(AccessKey key, std::shared_ptr<Core::Drawable> PlayerDrawable, c_state state = c_state::atk);
 
 protected:

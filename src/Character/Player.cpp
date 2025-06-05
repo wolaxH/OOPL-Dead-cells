@@ -260,8 +260,8 @@ bool Player::IsUnderOSP(){
         if (!IsNearBy(OSP, 640.0f)) continue;
         OSP_scale = abs(OSP->GetScaledSize());
 
-        x = !((Pos.x < OSP->m_WorldPos.x - OSP_scale.x/2 - 1) || (Pos.x > OSP->m_WorldPos.x + OSP_scale.x/2 + 1));
-        y = (Pos.y < OSP->m_WorldPos.y - OSP_scale.y/2.0f) && (Pos.y + top*m_Transform.scale.x > OSP->m_WorldPos.y - 20.0f);
+        x = !((Pos.x < OSP->m_WorldPos.x - OSP->left - 1) || (Pos.x > OSP->m_WorldPos.x + OSP->right + 1));
+        y = (Pos.y - bottom < OSP->m_WorldPos.y - OSP->bottom) && (Pos.y + top > OSP->m_WorldPos.y - 10.0f);
 
         if (x && y) return true;
     }
@@ -484,26 +484,21 @@ void Player::ClinbOSP(){
     }
 
     float P_Head = m_WorldPos.y + top;
-    float P_Bottom = m_WorldPos.y;
+    float P_Bottom = m_WorldPos.y - bottom;
 
     bool IsHeadOver, IsbottomUnder, IsXInRange;
 
     for (auto& OSP : m_World.OneSidedPlatforms){
-        IsHeadOver = P_Head > OSP->m_WorldPos.y;
+        IsHeadOver = P_Head > OSP->m_WorldPos.y - OSP->bottom - 10.0f;
         IsbottomUnder = P_Bottom < OSP->m_WorldPos.y-3;
-        IsXInRange = !((m_WorldPos.x < OSP->m_WorldPos.x - OSP->GetScaledSize().x/2 - 1) || (m_WorldPos.x > OSP->m_WorldPos.x + OSP->GetScaledSize().x/2 + 1));
-        if ((IsbottomUnder &&  IsHeadOver && IsXInRange) ||
-            (!InGround && IsUnderOSP())){
-
-                if (GetState() != c_state::clinbOSP) m_WorldPos.y += 50;
-
+        IsXInRange = !((m_WorldPos.x < OSP->m_WorldPos.x - OSP->left - 1) || (m_WorldPos.x > OSP->m_WorldPos.x + OSP->right + 1));
+        if (IsbottomUnder &&  IsHeadOver && IsXInRange){
                 //rendering, c_state
                 if (IsContainState(c_state::clinbOSP)) SetState(c_state::clinbOSP);
                 else InitState(c_state::clinbOSP, {2}, {RESOURCE_DIR"/Beheaded/land/land_"});
 
-                //Move logic
-                
-                VelocityY = 10.0f;
+                //Move logic                
+                VelocityY = 7.5f;
                 return;
             }
     }

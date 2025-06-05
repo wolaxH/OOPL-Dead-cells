@@ -60,6 +60,11 @@ bool Character::IsNearBy(std::shared_ptr<MapObj> other, float distance){
     return glm::length(D) <= distance;
 }
 
+bool Character::IsNearBy(glm::vec2 Point, float distance){
+    glm::vec2 D = m_WorldPos - Point;
+    return glm::length(D) <= distance;
+}
+
 void Character::ChangeDrawable(AccessKey , std::shared_ptr<Core::Drawable> PlayerDrawable, c_state state){
     auto PlayerAnim = std::dynamic_pointer_cast<Util::Animation>(PlayerDrawable);
     if (PlayerAnim){
@@ -71,52 +76,6 @@ void Character::ChangeDrawable(AccessKey , std::shared_ptr<Core::Drawable> Playe
 }
 
 void Character::FixPos(float dt){
-    // int breakFlag = 0;
-
-    // for (auto& Solid : m_World.SolidObjs){
-
-    //     if (!IsNearBy(Solid, 3000.0f)) continue;
-    //     breakFlag = 0;
-        
-    //     m_WorldPos.x += VelocityX * dt;
-
-    //     if (Collision::IsIntersect(this, Solid.get())){
-    //         m_WorldPos.x -= VelocityX  * dt;
-    //         VelocityX = 0;
-    //         breakFlag++;
-    //     }
-    //     m_WorldPos.x -= VelocityX  * dt;
-        
-    //     m_WorldPos.y += VelocityY * dt;
-    //     if (Collision::IsIntersect(this, Solid.get())){
-    //         m_WorldPos.y -= VelocityY * dt;
-    //         VelocityY = 0;
-    //         breakFlag++;
-    //     }
-    //     m_WorldPos.y -= VelocityY * dt;
-
-    //     if (breakFlag == 2){
-    //        m_WorldPos.y -= 1;
-    //         return;
-    //     }
-    // }
-    
-    // for (auto& OSP : m_World.OneSidedPlatforms){
-    //     if (m_WorldPos.y < OSP->m_WorldPos.y) continue;
-    //     if (!IsNearBy(OSP, 640.0f)) continue;
-
-    //     m_WorldPos.y += VelocityY  * dt;
-    //     float characterCenter = m_WorldPos.x - left + std::abs(left + right)/2;
-    //     if (m_WorldPos.y + bottom < OSP->m_WorldPos.y && 
-    //         !((characterCenter < OSP->m_WorldPos.x - OSP->GetScaledSize().x/2 - 1) || 
-    //           (characterCenter > OSP->m_WorldPos.x + OSP->GetScaledSize().x/2 + 1))){
-    //         m_WorldPos.y -= VelocityY * dt;
-    //         VelocityY = 0;
-    //         break;
-    //     }
-    //     m_WorldPos.y -= VelocityY * dt;
-    // }
-
     int breakFlag = 0;
 
     for (auto& Solid : m_World.SolidObjs) {
