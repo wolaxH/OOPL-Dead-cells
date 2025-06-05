@@ -3,13 +3,42 @@
 void App::InGameUpdate(float dt) {
     
     player->Update(dt);
+
+    //projectiles
+    for (auto& temp : m_World.Projectiles->GetObjs()){
+        auto projectile = std::dynamic_pointer_cast<Projectile>(temp);
+        if (projectile) projectile->Update(dt);
+    }
+
+    m_World.Projectiles->RemoveObjs([](const std::shared_ptr<Util::GameObject>& temp){
+        auto projectile = std::dynamic_pointer_cast<Projectile>(temp);
+        return projectile && projectile->IsDestroyed();
+    });
     
+        
+    //mobs
+    for (auto& temp : m_World.Mobs->GetObjs()){
+        auto mob = std::dynamic_pointer_cast<Mob>(temp);
+        mob->Update(dt);
+    }
+    m_World.Mobs->RemoveObjs([](const std::shared_ptr<Util::GameObject>& temp){
+        auto mob = std::dynamic_pointer_cast<Mob>(temp);
+        return mob && !mob->IsAlive();
+    });    
+
+    //Drops
+    for (auto& temp : m_World.WorldDrops->GetObjs()){
+        auto drop = std::dynamic_pointer_cast<Drops>(temp);
+        drop->Update();
+    }
+
+    //camera    
     camera.Update(player);
     for (auto& temp : MapObjs){
         temp->m_Transform.translation = temp->m_WorldPos - camera.GetPos();
     }
-    zombie->Update(dt);
     
+    //render
     root.Update();
 
     
@@ -34,6 +63,7 @@ void App::InGameUpdate(float dt) {
         Util::Input::IfExit()) {
         m_CurrentState = State::END;
     }
+    if (!player->IsAlive()){m_CurrentState = State::END;}
 }
 
 void App::End() { // NOLINT(this method will mutate members in the future)

@@ -33,6 +33,7 @@ void SolidObj::get_data_from_json(std::string JsonFileName, int index){
 
    from_json(j[index]["scale"], this->m_Transform.scale);
    from_json(j[index]["pos"], this->m_WorldPos);
-   
+   top = bottom = GetScaledSize().y / 2;
+   right = left = GetScaledSize().x / 2;
 }
 

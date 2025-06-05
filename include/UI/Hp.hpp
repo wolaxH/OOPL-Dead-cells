@@ -20,7 +20,7 @@ private:
     std::shared_ptr<Util::GameObject> HpBar;    // the green bar
     std::shared_ptr<Util::GameObject> Point;   //text eg: 100/170
     std::shared_ptr<Util::Text> text;
-    int MaxHp = 100, CurrentHp = 100;
+    int MaxHp = 200, CurrentHp = 200;
 };
 
 

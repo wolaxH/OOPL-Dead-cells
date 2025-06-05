@@ -6,17 +6,23 @@
 #include "OneSidedPlatform.hpp"
 #include "MyUtil/RemovableManager.hpp"
 
-
+class Player;
 
 class GameWorldContext{
 public:
-    GameWorldContext() = default;
+    GameWorldContext(std::vector<std::shared_ptr<MapObj>>& MapObjs){
+        Mobs = std::make_shared<RemovableManager>(MapObjs);
+        WorldDrops = std::make_shared<RemovableManager>(MapObjs);
+        Projectiles = std::make_shared<RemovableManager>(MapObjs);
+    }
     ~GameWorldContext() = default;
 
+    std::weak_ptr<Player> m_Player;
     std::vector<std::shared_ptr<SolidObj>> SolidObjs = {};
     std::vector<std::shared_ptr<OneSidedPlatform>> OneSidedPlatforms = {};
-    std::shared_ptr<RemovableManager> Mobs = std::make_shared<RemovableManager>();
-    std::shared_ptr<RemovableManager> WorldDrops = std::make_shared<RemovableManager>();
+    std::shared_ptr<RemovableManager> Mobs;
+    std::shared_ptr<RemovableManager> WorldDrops;
+    std::shared_ptr<RemovableManager> Projectiles;
 };
 
 #endif

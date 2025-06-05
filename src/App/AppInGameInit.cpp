@@ -4,7 +4,6 @@
 
 #include <fstream>
 
-#include "Util/Logger.hpp"
 void App::InGameInit() {
 
     Drops::m_World = &m_World;
@@ -14,37 +13,54 @@ void App::InGameInit() {
     for (int i = 0; i < 46; i++){
         Img.push_back(RESOURCE_DIR"/Beheaded/idle/idle_" + std::to_string(i) + ".png");
     }
-    player = std::make_shared<Player>(Img, 100, m_World);
+    player = std::make_shared<Player>(Img, 200, m_World);
     player->Init();
-    player->SetPos({5503.059082,  -2774.568848});
-    player->SetZIndex(30);
-    player->SetVisible(true);
+    player->SetPos({0, 100});
+    player->SetZIndex(30.1);
+
     root.AddChild(player);
     camera.SetPos(player->m_WorldPos);
+    m_World.m_Player = player;
     
 
     Img.clear();
     for (int i = 0; i < 24; i++){
         Img.push_back(RESOURCE_DIR"/Zombie/idle/idle_" + std::to_string(i) + ".png");
     }
-    zombie = std::make_shared<Zombie>(Img, 100, player, m_World);
-    zombie->SetPos({0, 100});
-    zombie->SetZIndex(30);
-    zombie->SetVisible(true);
-    MapObjs.push_back(zombie);
+    std::shared_ptr<Zombie> zombie = std::make_shared<Zombie>(Img, 200, player, m_World);
+    zombie->SetPos({1200, 500});
     m_World.Mobs->AddObj(zombie);
+
+    Img.clear();
+    for (int i = 0; i < 6; i++){
+        Img.push_back(RESOURCE_DIR"/shooter/idle/idle_" + std::to_string(i) + ".png");
+    }
+    std::shared_ptr<Shooter> shooter = std::make_shared<Shooter>(Img, 200, player, m_World);
+    shooter->SetPos({1200, 500});
+    m_World.Mobs->AddObj(shooter);
     
 
-    //test
-    auto aa = std::make_shared<RustySword>();
-    auto t = aa->ToDrops();
-    t->SetZIndex(20.0f);
-    t->m_WorldPos = {0, -220.5f};
+    //Item test
+    auto RW = std::make_shared<RustySword>();
+    auto B = std::make_shared<Bone>();
+    auto TD = std::make_shared<TwinDaggers>();
+    auto WS = std::make_shared<WoodenShield>();
+
+    auto t = RW->ToDrops();
     m_World.WorldDrops->AddObj(t);
-    MapObjs.push_back(t);
-    //test
 
-    
+    t = B->ToDrops();
+    t->m_WorldPos.x += 100;
+    m_World.WorldDrops->AddObj(t);
+
+    t = TD->ToDrops();
+    t->m_WorldPos.x -= 400;
+    m_World.WorldDrops->AddObj(t);
+
+    t = WS->ToDrops();
+    t->m_WorldPos.x -= 200;
+    m_World.WorldDrops->AddObj(t);
+    //Item test end
 
 
     //bg
@@ -69,26 +85,40 @@ void App::InGameInit() {
      * To create a one sided platform object
      */
     InitColliders<OneSidedPlatform>("OSPs.json", m_World.OneSidedPlatforms);
-    
 
 
     /**
      * To create a solid object
      */
     InitColliders<SolidObj>("SolidObjs.json", m_World.SolidObjs);
-
     
+    
+
     /**
      * Add all solid objects to the root object for rendering.
      */
     std::vector<std::shared_ptr<Util::GameObject>> temps;
-    for (auto& temp : m_World.SolidObjs){ temps.push_back(temp);}
-    for (auto& temp : m_World.OneSidedPlatforms){ temps.push_back(temp);}
+
+    temps.insert(temps.end(), m_World.OneSidedPlatforms.begin(), m_World.OneSidedPlatforms.end());
+    temps.insert(temps.end(), m_World.SolidObjs.begin(), m_World.SolidObjs.end());
+    // for (auto& temp : m_World.SolidObjs){ temps.push_back(temp);}
+    // for (auto& temp : m_World.OneSidedPlatforms){ temps.push_back(temp);}
     root.AddChildren(temps);
 
 
     root.AddChild(m_World.WorldDrops);
     root.AddChild(m_World.Mobs);
+    root.AddChild(m_World.Projectiles);
+    for (const auto& temp : m_World.WorldDrops->GetObjs()){
+        auto drop = std::dynamic_pointer_cast<MapObj>(temp);
+        if (drop) MapObjs.push_back(drop);
+    }
+
+    for (const auto& temp : m_World.Mobs->GetObjs()){
+        auto mob = std::dynamic_pointer_cast<MapObj>(temp);
+        if (mob) MapObjs.push_back(mob);
+    }
+
 
     LOG_TRACE("Start");
     

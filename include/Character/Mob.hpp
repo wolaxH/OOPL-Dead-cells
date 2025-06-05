@@ -3,35 +3,40 @@
 
 #include "Character/Character.hpp"
 #include "Character/Player.hpp"
+#include "MyUtil/Timer.hpp"
 
-enum class mob_state{
-    trace,
-    wander
-};
 
 class Mob : public Character{
 public:
+    enum class mob_state{
+        trace,
+        wander
+    };
+
     Mob(std::vector<std::string>& path, int Hp, std::shared_ptr<Player> player, GameWorldContext& World)
-    : Character(path, Hp, World), player(player){MaxSpeed = 5.0f, AccelerationX = 1.5f;}
+    : Character(path, Hp, World), m_player(player){MaxSpeed = 5.0f, AccelerationX = 1.5f;}
     virtual ~Mob() = default;
 
 protected:
-    virtual bool IsPlayerNearby() = 0;
-
-    void PushPlayer(){
-        auto obj = std::static_pointer_cast<MapObj>(player);
-        if (IsCollsion(obj)){
-            player->Pushed();            
-        }    
+    bool IsSameLevelNearBy(std::shared_ptr<MapObj> other, float distance = 1000.0f){
+        glm::vec2 D = m_WorldPos - other->m_WorldPos;
+        return (std::abs(D.y) < 100.0f && glm::length(D) <= distance);
     }
 
+    void PushPlayer();
+
+    void Wander(const std::string& path, const size_t frames);
 protected:
-    bool AtkFlag = false;
-    float DetectRange;
+    float m_AtkRange;
+    bool m_AtkFlag = false;
+    float m_DetectRange;
+    int m_AtkPoint;
+    
+    Timer m_AtkCoolDownTimer;
+
     mob_state m_state = mob_state::wander;
-    std::shared_ptr<Player> player;
-
+    std::shared_ptr<Player> m_player;
+private:
+    Timer m_WanderTimer;
 };
-
-
 #endif
