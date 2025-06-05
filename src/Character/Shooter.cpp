@@ -43,17 +43,18 @@ void Shooter::Attack(float dt) {
     if (GetState() != c_state::atk) {
         if (IsContainState(c_state::atk)) SetState(c_state::atk);
         else InitState(c_state::atk, {33}, {RESOURCE_DIR"/shooter/shoot/shoot_"});
-        if (anim){
-            anim->SetCurrentFrame(0);
-            anim->Play();
-        }
+
+        anim = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
+        if (anim) anim->Play();
         m_AtkFlag = false; // 準備等待開火幀
+        LOG_DEBUG("Attack animation started");
         return;
     }
 
     // 進入這邊表示正在播放 atk 動畫
     if (anim) {
         // 在指定幀開火
+        LOG_DEBUG("Attack animation frame: {}", anim->GetCurrentFrameIndex());
         if (anim->GetCurrentFrameIndex() == FIRE_FRAME && !m_AtkFlag) {
             FireProjectile();
             m_AtkFlag = true;
@@ -74,7 +75,7 @@ void Shooter::FireProjectile(){
     int Dir = m_Transform.scale.x > 0 ? 1 : -1; //1 for right, -1 for left
     glm::vec2 bulletPos = m_WorldPos + glm::vec2(Dir * 50.0f, 0.f); //projectile spawn position
 
-    auto projectile = std::make_shared<Projectile>(bulletPos, m_Transform.scale, 2.0f, 50,
+    auto projectile = std::make_shared<Projectile>(bulletPos, m_Transform.scale, 20.0f, 50,
         Projectile::Faction::Enemy, m_World, 50.0f, RESOURCE_DIR"/shooter/arrow.png");
     m_World.Projectiles->AddObj(projectile);
 }
@@ -106,7 +107,7 @@ void Shooter::Update(float dt) {
     InGround = Physics::IsOnGround(m_WorldPos, m_World.SolidObjs, m_World.OneSidedPlatforms);
     Physics::ApplyGravity(VelocityY, InGround, Gravity, MaxFallSpeed);
     if (InGround) Physics::SlowDown(VelocityX, Friction);
-    LOG_DEBUG(m_state == mob_state::trace ? "trace" : "wander");
+    //LOG_DEBUG(m_state == mob_state::trace ? "trace" : "wander");
 
     // 當前正在播放攻擊動畫
     if (GetState() == c_state::atk) {
