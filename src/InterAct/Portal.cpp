@@ -1,8 +1,8 @@
 #include "InterAct/Portal.hpp"
 
-Portal::Portal(std::shared_ptr<Player> player, glm::vec2 Pos, Type type) : m_Type(type), m_player(player){
+Portal::Portal(std::shared_ptr<Player> player, glm::vec2 Pos, Type type, std::string path) : m_Type(type), m_player(player){
     m_WorldPos = Pos;
-    m_Drawable = std::make_shared<Util::Image>(RESOURCE_DIR"/InterAct/Portal.png");
+    m_Drawable = std::make_shared<Util::Image>(path);
     m_Light = 127;
     m_ZIndex = 25.0;
 

@@ -14,7 +14,7 @@ public:
         exit
     };
 
-    Portal(std::shared_ptr<Player> player, glm::vec2 Pos, Type type);
+    Portal(std::shared_ptr<Player> player, glm::vec2 Pos, Type type, std::string paths = RESOURCE_DIR"/InterAct/Portal_opened.png");
     ~Portal() = default;
 
     void InterAct() override;

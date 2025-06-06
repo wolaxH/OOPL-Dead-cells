@@ -65,7 +65,7 @@ void App::InGameInit() {
 
     //bg
     glm::vec2 temp_pos(1, 1);
-    BGs.resize(9);
+    BGs.resize(12);
     BGs[0] = std::make_shared<BG>(RESOURCE_DIR"/bg/bg1.png", temp_pos, glm::vec2{0.8f, 0.8f});
     BGs[1] = std::make_shared<BG>(RESOURCE_DIR"/bg/bg2.png", glm::vec2{1616.0f, 174.0f}, glm::vec2{0.9f, 0.9f});
     BGs[2] = std::make_shared<BG>(RESOURCE_DIR"/bg/bg3.png", glm::vec2{3817.0f, 318.5f}, glm::vec2{1.4f, 1.4f});
@@ -75,6 +75,10 @@ void App::InGameInit() {
     BGs[6] = std::make_shared<BG>(RESOURCE_DIR"/bg/bg6.png", glm::vec2{6309.5f, -970.0f}, glm::vec2{1.2f, 1.2f});
     BGs[7] = std::make_shared<BG>(RESOURCE_DIR"/bg/bg9.png", glm::vec2{8605.5f, -2250.5f}, glm::vec2{1.2f, 1.2f});
     BGs[8] = std::make_shared<BG>(RESOURCE_DIR"/bg/bg4.png", glm::vec2{1616.0f, -673.0f}, glm::vec2{0.9f, 0.9f});
+    BGs[9] = std::make_shared<BG>(RESOURCE_DIR"/bg/BlackBridge.jpg", glm::vec2(15000, 20), glm::vec2(1.5, 1.5));
+    BGs[10]= std::make_shared<BG>(RESOURCE_DIR"/bg/bridge.png", glm::vec2(16735, 255), glm::vec2(1.3, 1.5));
+    BGs[11]= std::make_shared<BG>(RESOURCE_DIR"/bg/bridge.png", glm::vec2(13810, 255), glm::vec2(-1.3, 1.5));
+
     for (auto& temp : BGs){
         MapObjs.push_back(temp);
         root.AddChild(temp);
@@ -82,7 +86,7 @@ void App::InGameInit() {
 
     //Portal
     auto portalI = std::make_shared<Portal>(player, glm::vec2(9525, -2693), Portal::Type::entrance);
-    auto portalO = std::make_shared<Portal>(player, glm::vec2(800, 0), Portal::Type::exit);
+    auto portalO = std::make_shared<Portal>(player, glm::vec2(14255, 0), Portal::Type::exit, RESOURCE_DIR"/InterAct/Portal_close.png");
     portalI->SetPair(portalO);
     portalO->SetPair(portalI);
     m_World.InterActAbles.push_back(portalI);
