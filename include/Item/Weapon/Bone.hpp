@@ -1,7 +1,7 @@
 #ifndef BONE_HPP
 #define BONE_HPP
 
-#include "Item/Weapon/WeaponUtil/Weapon.hpp"
+#include "Item/Weapon/Abstract/Weapon.hpp"
 
 class Bone : public Weapon{
 public:

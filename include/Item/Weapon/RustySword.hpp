@@ -1,7 +1,7 @@
 #ifndef RUSTYSWORD_HPP
 #define RUSTYSWORD_HPP
 
-#include "Item/Weapon/WeaponUtil/Weapon.hpp"
+#include "Item/Weapon/Abstract/Weapon.hpp"
 
 class RustySword : public Weapon{
 public:
