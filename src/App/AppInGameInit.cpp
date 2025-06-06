@@ -15,7 +15,7 @@ void App::InGameInit() {
     }
     player = std::make_shared<Player>(Img, 200, m_World);
     player->Init();
-    player->SetPos({9425, -2772});
+    player->SetPos({0, 0});
     player->SetZIndex(30.1);
 
     root.AddChild(player);
@@ -87,10 +87,18 @@ void App::InGameInit() {
     //Portal
     auto portalI = std::make_shared<Portal>(player, glm::vec2(9525, -2693), Portal::Type::entrance);
     auto portalO = std::make_shared<Portal>(player, glm::vec2(14255, 0), Portal::Type::exit, RESOURCE_DIR"/InterAct/Portal_close.png");
-    portalI->SetPair(portalO);
-    portalO->SetPair(portalI);
+    portalI->Pair(portalO);
+    portalO->Pair(portalI);
     m_World.InterActAbles.push_back(portalI);
     m_World.InterActAbles.push_back(portalO);
+    
+    
+    //TreasureChest
+    auto treasure = std::make_shared<RustySword>();
+    auto Tchest = std::make_shared<TreasureChest>(treasure, m_World);
+    Tchest->m_WorldPos = glm::vec2(6369, 620);
+    m_World.InterActAbles.push_back(Tchest);
+    
     
     std::vector<std::shared_ptr<Util::GameObject>> temps;
     for (auto& temp : m_World.InterActAbles){
@@ -102,6 +110,8 @@ void App::InGameInit() {
             MapObjs.push_back(child);
         }
     }
+
+
 
     /**
      * To create a one sided platform object

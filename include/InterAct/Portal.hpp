@@ -21,9 +21,8 @@ public:
 
     void Update() override;
     
-    static void PairingPortal();
 
-    void SetPair(std::shared_ptr<Portal> other){
+    void Pair(std::shared_ptr<Portal> other){
         if (other->GetType() == m_Type) return;
         m_PairPortal = other;
     }

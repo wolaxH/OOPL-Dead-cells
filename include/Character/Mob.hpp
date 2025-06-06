@@ -14,7 +14,7 @@ public:
     };
 
     Mob(std::vector<std::string>& path, int Hp, std::shared_ptr<Player> player, GameWorldContext& World)
-    : Character(path, Hp, World), m_player(player){MaxSpeed = 5.0f, AccelerationX = 1.5f;}
+    : Character(path, Hp, World), m_player(player){MaxSpeed = 5.0f, AccelerationX = 2.0f;}
     virtual ~Mob() = default;
 
 protected:

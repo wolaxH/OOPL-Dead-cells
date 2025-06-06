@@ -179,16 +179,18 @@ void Player::PickUpDrops(std::shared_ptr<Drops> drops){
         }
         else{ //WIP
             //彈出更換武器視窗
-            int select = 0;
+            static int select = 0;
+            select = 1 - select;
 
             //將被替換的武器變成掉落物
-            auto temp = m_Skill1->ToDrops();
+            std::shared_ptr<Item>& selectSkill = select == 0 ? m_Skill1 : m_skill2;
+            auto temp = selectSkill->ToDrops();
             temp->m_WorldPos = m_WorldPos + glm::vec2(10, 40);
             m_World.WorldDrops->AddObj(temp);
-            m_Skill1 = NewItem;
+            selectSkill = NewItem;
             
             //更換slot圖案
-            m_PlayerINFO->SetSkill(m_Skill1, select);
+            m_PlayerINFO->SetSkill(selectSkill, select);
         }
         m_World.WorldDrops->RemoveObj(drops);
     } //如果是卷軸
@@ -557,7 +559,7 @@ void Player::roll(){
 
 /*-----------------------------------update-----------------------------------*/
 void Player::Update(float dt){
-    InGround = Physics::IsOnGround(m_WorldPos, m_World.SolidObjs, m_World.OneSidedPlatforms);
+    InGround = Physics::IsOnGround(this, m_World.SolidObjs, m_World.OneSidedPlatforms);
     Physics::ApplyGravity(VelocityY, InGround, Gravity, MaxFallSpeed);
     Move(dt);
 

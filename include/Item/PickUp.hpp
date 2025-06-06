@@ -68,11 +68,12 @@ public:
         m_Drawable = item->m_Drawable;
         m_ZIndex = 20.0f;
         m_Transform.scale = {2, 2};
+        top = bottom = left = right = 10;
     }
 
     void Update(){
 
-        IsOnGround = Physics::IsOnGround(m_WorldPos, m_World->SolidObjs, m_World->OneSidedPlatforms);
+        IsOnGround = Physics::IsOnGround(this, m_World->SolidObjs, m_World->OneSidedPlatforms);
         Physics::ApplyGravity(VelocityY, IsOnGround, Gravity, MaxFallSpeed);
 
         m_WorldPos.y += VelocityY;
@@ -85,18 +86,18 @@ public:
         temp.insert(temp.end(), m_World->OneSidedPlatforms.begin(), m_World->OneSidedPlatforms.end());
         for (const auto& solid : temp) {
             glm::vec2 solidPos = solid->m_WorldPos;
-            glm::vec2 solidSize = abs(solid->GetScaledSize());
+            // glm::vec2 solidSize = abs(solid->GetScaledSize());
     
-            bool inXRange = m_WorldPos.x >= solidPos.x - solid->left * solidSize.x &&
-                            m_WorldPos.x <= solidPos.x + solid->right * solidSize.x;
+            bool inXRange = m_WorldPos.x >= solidPos.x - solid->left &&
+                            m_WorldPos.x <= solidPos.x + solid->right;
     
-            bool hittingTop = m_WorldPos.y >= solidPos.y - solid->bottom * solidSize.y &&
-                              m_WorldPos.y <= solidPos.y + solid->top * solidSize.y;
+            bool hittingTop = m_WorldPos.y + top >= solidPos.y - solid->bottom &&
+                              m_WorldPos.y - bottom <= solidPos.y + solid->top ;
 
     
             if (inXRange && hittingTop && VelocityY < 0) {
                 LOG_DEBUG("point");
-                m_WorldPos.y = solidPos.y + solidSize.y / 2;
+                m_WorldPos.y = solidPos.y + solid->top;
                 VelocityY = 0;
                 return;
             }

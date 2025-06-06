@@ -1,9 +1,9 @@
 #include "MyUtil/Physics.hpp"
 
-bool Physics::IsOnGround(glm::vec2 pos, 
+bool Physics::IsOnGround(const MapObj* Obj, 
         const std::vector<std::shared_ptr<SolidObj>>& solids, 
         const std::vector<std::shared_ptr<OneSidedPlatform>>& platforms) {
-        glm::vec2 other_Pos, other_scale;
+        glm::vec2 other_Pos;
         float x, y;
 
         std::vector<std::shared_ptr<SolidObj>> temp(solids);
@@ -11,12 +11,11 @@ bool Physics::IsOnGround(glm::vec2 pos,
 
         for (const auto& Solid : temp) {
             other_Pos = Solid->m_WorldPos;
-            other_scale = abs(Solid->GetScaledSize());
 
-            x = !((pos.x < other_Pos.x - other_scale.x / 2 - 1) ||
-                    (pos.x > other_Pos.x + other_scale.x / 2 + 1));
-            y = (pos.y > other_Pos.y - other_scale.y / 2) &&
-                (pos.y < other_Pos.y + other_scale.y / 2 + 2);
+            x = !(Obj->m_WorldPos.x < other_Pos.x - Solid->left - 1 ||
+                    Obj->m_WorldPos.x > other_Pos.x + Solid->right + 1);
+            y = (Obj->m_WorldPos.y + Obj->top > other_Pos.y + Solid->top) &&
+                (Obj->m_WorldPos.y - Obj->bottom < other_Pos.y + Solid->top + 2);
             if (x && y) return true;
         }
 

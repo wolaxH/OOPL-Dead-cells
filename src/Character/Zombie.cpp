@@ -118,9 +118,11 @@ void Zombie::Move(float dt){
 }
 
 void Zombie::Update(float dt){
-    InGround = Physics::IsOnGround(m_WorldPos, m_World.SolidObjs, m_World.OneSidedPlatforms);
+    InGround = Physics::IsOnGround(this, m_World.SolidObjs, m_World.OneSidedPlatforms);
     Physics::ApplyGravity(VelocityY, InGround, Gravity, MaxFallSpeed);
-    if (InGround) Physics::SlowDown(VelocityX, Friction);
+    if (InGround){
+        Physics::SlowDown(VelocityX, Friction);
+    }
 
     if (!m_AtkCoolDownTimer.IsTimeout()){
         if (GetState() == c_state::atked) Attacked(0, glm::vec2(0, 0), 0.0f);

@@ -4,7 +4,7 @@ Portal::Portal(std::shared_ptr<Player> player, glm::vec2 Pos, Type type, std::st
     m_WorldPos = Pos;
     m_Drawable = std::make_shared<Util::Image>(path);
     m_Light = 127;
-    m_ZIndex = 25.0;
+    m_ZIndex = 15.0;
 
     m_Text = std::make_shared<MapObj>();
     m_Text->m_WorldPos = m_WorldPos + glm::vec2(0, 100);

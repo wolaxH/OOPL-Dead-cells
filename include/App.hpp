@@ -20,6 +20,7 @@
 #include "UI/PlayerUI.hpp"
 #include "Item/Weapon/WeaponTypes.hpp"
 #include "InterAct/Portal.hpp"
+#include "InterAct/TreasureChest.hpp"
 
 #include "json.hpp"
 

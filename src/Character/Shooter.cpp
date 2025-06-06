@@ -102,7 +102,7 @@ void Shooter::LookAtPlayer(){
 
 void Shooter::Update(float dt) {
     // 地面與物理處理
-    InGround = Physics::IsOnGround(m_WorldPos, m_World.SolidObjs, m_World.OneSidedPlatforms);
+    InGround = Physics::IsOnGround(this, m_World.SolidObjs, m_World.OneSidedPlatforms);
     Physics::ApplyGravity(VelocityY, InGround, Gravity, MaxFallSpeed);
     if (InGround) Physics::SlowDown(VelocityX, Friction);
 
