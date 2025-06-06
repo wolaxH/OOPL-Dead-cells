@@ -15,7 +15,7 @@ void App::InGameInit() {
     }
     player = std::make_shared<Player>(Img, 200, m_World);
     player->Init();
-    player->SetPos({0, 100});
+    player->SetPos({9425, -2772});
     player->SetZIndex(30.1);
 
     root.AddChild(player);
@@ -80,6 +80,24 @@ void App::InGameInit() {
         root.AddChild(temp);
     }
 
+    //Portal
+    auto portalI = std::make_shared<Portal>(player, glm::vec2(9525, -2693), Portal::Type::entrance);
+    auto portalO = std::make_shared<Portal>(player, glm::vec2(800, 0), Portal::Type::exit);
+    portalI->SetPair(portalO);
+    portalO->SetPair(portalI);
+    m_World.InterActAbles.push_back(portalI);
+    m_World.InterActAbles.push_back(portalO);
+    
+    std::vector<std::shared_ptr<Util::GameObject>> temps;
+    for (auto& temp : m_World.InterActAbles){
+        auto mapObj = std::dynamic_pointer_cast<MapObj>(temp);
+        root.AddChild(mapObj);
+        MapObjs.push_back(mapObj);
+        for (auto& child_temp : mapObj->GetChildren()){
+            auto child = std::dynamic_pointer_cast<MapObj>(child_temp);
+            MapObjs.push_back(child);
+        }
+    }
 
     /**
      * To create a one sided platform object
@@ -97,12 +115,10 @@ void App::InGameInit() {
     /**
      * Add all solid objects to the root object for rendering.
      */
-    std::vector<std::shared_ptr<Util::GameObject>> temps;
+    temps.clear();
 
     temps.insert(temps.end(), m_World.OneSidedPlatforms.begin(), m_World.OneSidedPlatforms.end());
     temps.insert(temps.end(), m_World.SolidObjs.begin(), m_World.SolidObjs.end());
-    // for (auto& temp : m_World.SolidObjs){ temps.push_back(temp);}
-    // for (auto& temp : m_World.OneSidedPlatforms){ temps.push_back(temp);}
     root.AddChildren(temps);
 
 

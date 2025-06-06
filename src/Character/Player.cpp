@@ -26,7 +26,7 @@ Player::Player(std::vector<std::string>& path, int Hp, GameWorldContext& World):
         AddChild(m_PlayerINFO);
 }
 
-//WIP
+
 void Player::Attack(float dt){
     if (GetState() == c_state::roll) return; //翻滾狀態不能攻擊
     if (GetState() == c_state::clinb) return; //攀爬狀態不能攻擊
@@ -214,17 +214,26 @@ void Player::PickUp(){
     }
 }
 
+void Player::InterAct(){
+    for (auto& InterActAble : m_World.InterActAbles){
+        auto Obj = std::dynamic_pointer_cast<MapObj>(InterActAble);
+        if (Obj && IsNearBy(Obj, 100.0)){
+            InterActAble->InterAct();
+        }
+    }
+}
+
 /*-----------------------------------util-----------------------------------*/
 
 void Player::TestP(){
     if (Util::Input::IsKeyDown(Util::Keycode::P)){
-        m_Hp -= 5;
-        m_PlayerINFO->SetHp(m_Hp);
-        if (m_PlayerINFO->GetCurrentHp() <= 0){
-            m_PlayerINFO->SetHp(200);
-            m_Hp = 200;
-        }
-        // LOG_DEBUG(m_WorldPos);
+        // m_Hp -= 5;
+        // m_PlayerINFO->SetHp(m_Hp);
+        // if (m_PlayerINFO->GetCurrentHp() <= 0){
+        //     m_PlayerINFO->SetHp(200);
+        //     m_Hp = 200;
+        // }
+        LOG_DEBUG(m_WorldPos);
     }
 
 }
@@ -556,6 +565,10 @@ void Player::Update(float dt){
         roll();
     }
     if (GetState() != c_state::roll) m_Atkedable = true;
+
+    if (Util::Input::IsKeyDown(Util::Keycode::R)){
+        InterAct();
+    }
     
     Clinb();
     ClinbOSP();

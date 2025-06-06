@@ -115,6 +115,8 @@ private:
      * Block event for shield
      */
     void Block();
+
+    void InterAct();
     
 private:
     friend class AttackManager;

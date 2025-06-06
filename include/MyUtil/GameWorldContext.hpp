@@ -4,6 +4,7 @@
 #include "pch.hpp"
 #include "SolidObj.hpp"
 #include "OneSidedPlatform.hpp"
+#include "InterAct/IInterAct.hpp"
 #include "MyUtil/RemovableManager.hpp"
 
 class Player;
@@ -20,6 +21,7 @@ public:
     std::weak_ptr<Player> m_Player;
     std::vector<std::shared_ptr<SolidObj>> SolidObjs = {};
     std::vector<std::shared_ptr<OneSidedPlatform>> OneSidedPlatforms = {};
+    std::vector<std::shared_ptr<IInterAct>> InterActAbles = {};
     std::shared_ptr<RemovableManager> Mobs;
     std::shared_ptr<RemovableManager> WorldDrops;
     std::shared_ptr<RemovableManager> Projectiles;
