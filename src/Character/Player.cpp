@@ -28,9 +28,10 @@ Player::Player(std::vector<std::string>& path, int Hp, GameWorldContext& World):
 
 
 void Player::Attack(float dt){
-    if (GetState() == c_state::roll) return; //翻滾狀態不能攻擊
-    if (GetState() == c_state::clinb) return; //攀爬狀態不能攻擊
-
+    if (GetState() == c_state::roll     || //翻滾狀態不能攻擊
+        GetState() == c_state::clinb    || //攀爬狀態不能攻擊
+        GetState() == c_state::block    ) return; 
+    
 
     std::shared_ptr<Weapon> UsedWeapon = nullptr;
     //使用武器1 
@@ -59,19 +60,10 @@ void Player::Attack(float dt){
         }
         //player 攻擊產生的碰撞箱
         
-        Rect HitBox = currentWeapon->GetHitBox(m_WorldPos, m_Transform.scale, m_AttackManager.GetComboIndex());
-        Rect MobRect;
         bool IsWeaponUsed = false;
-        for (auto& mob : m_World.Mobs->GetObjs()){
-            auto MobObj = std::dynamic_pointer_cast<Mob>(mob);
-            if (MobObj == nullptr) continue;
+        currentWeapon->Use( m_World.Mobs->GetObjs(), m_WorldPos, IsWeaponUsed, 
+                            m_Transform.scale, m_AttackManager.GetComboIndex());
 
-            MobRect = Rect::CreateRect(MobObj->m_WorldPos, MobObj->top + MobObj->bottom, MobObj->left + MobObj->right);
-            if (HitBox.Intersects(MobRect)){
-                currentWeapon->Use(MobObj, m_Transform.scale, m_AttackManager.GetComboIndex());
-                IsWeaponUsed = true;
-            }
-        }
         if (IsWeaponUsed) m_AttackManager.UpdateAtkTimes();
     }
     m_AttackManager.Update(dt);

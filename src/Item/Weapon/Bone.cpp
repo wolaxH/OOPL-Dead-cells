@@ -40,8 +40,19 @@ Bone::Bone() : Weapon(RESOURCE_DIR"/Item/Bone/icon.png", "a Bone"){
 }
 
 
-void Bone::Use(std::shared_ptr<Mob>& mob, const glm::vec2& Dir, int combo){
-    mob->Attacked(m_AtkPoint[combo], Dir, 5.f);
+void Bone::Use(std::vector<std::shared_ptr<GameObject>>& Mobs, const glm::vec2& Pos, bool& UsedFlag, const glm::vec2& Dir, int combo){
+    Rect HitBox = GetHitBox(Pos, m_Transform.scale, combo);
+    Rect MobRect;
+    for (auto& Obj : Mobs){
+        auto mob = std::dynamic_pointer_cast<Mob>(Obj);
+        if (mob == nullptr) continue;
+
+        MobRect = Rect::CreateRect(mob->m_WorldPos, mob->top + mob->bottom, mob->left +mob->right);
+        if (HitBox.Intersects(MobRect)){
+            mob->Attacked(m_AtkPoint[combo], Dir, 5.f);
+            UsedFlag = true;
+        }
+    }
 }
 
 Rect Bone::GetHitBox(const glm::vec2& Pos, const glm::vec2& Dir, int combo){

@@ -5,5 +5,6 @@
 #include "Item/Weapon/TwinDaggers.hpp"
 #include "Item/Weapon/Bone.hpp"
 #include "Item/Weapon/WoodenShield.hpp"
+#include "Item/Weapon/Bow.hpp"
 
 #endif

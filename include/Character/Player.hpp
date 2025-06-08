@@ -3,7 +3,7 @@
 
 #include "Character/Character.hpp"
 #include "Item/PickUp.hpp"
-#include "Item/Weapon/WeaponUtil/Weapon.hpp"
+#include "Item/Weapon/Abstract/Weapon.hpp"
 #include "Item/Weapon//WeaponTypes.hpp"
 #include "MyUtil/Timer.hpp"
 #include "MyUtil/AtkManager.hpp"
@@ -102,7 +102,6 @@ private:
         ChangeDrawable(AccessKey(), PD, c_state::atk);
     }
     
-    
     //a special function for test, development function, to Log player current position
     void TestP();
     
@@ -115,6 +114,11 @@ private:
      * Block event for shield
      */
     void Block();
+
+    /**
+     * Shoot for all RangedWeapon
+     */
+    void Shoot();
 
     void InterAct();
     

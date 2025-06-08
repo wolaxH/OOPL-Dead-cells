@@ -42,7 +42,7 @@ public:
         }
     }
 
-    std::vector<std::shared_ptr<Util::GameObject>>& GetObjs() noexcept{return m_Children;}
+    std::vector<std::shared_ptr<Util::GameObject>>& GetObjs() noexcept {return m_Children;}
 
 private:
     std::vector<std::shared_ptr<MapObj>>& m_MapObjs;
