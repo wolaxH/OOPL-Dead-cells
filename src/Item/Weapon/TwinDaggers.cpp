@@ -35,10 +35,10 @@ TwinDaggers::TwinDaggers() : Weapon(RESOURCE_DIR"/Item/TwinDaggers/Icon.png", "t
     for (int i = 4; i < 11; i++){m_AtkableFrames[2].push_back(i);}
 }
 
-void TwinDaggers::Use(std::vector<std::shared_ptr<GameObject>>& Mobs, const glm::vec2& Pos, bool& UsedFlag, const glm::vec2& Dir, int combo){
+void TwinDaggers::Use(std::vector<std::shared_ptr<GameObject>>& Objs, const glm::vec2& Pos, bool& UsedFlag, const glm::vec2& Dir, int combo){
     Rect HitBox = GetHitBox(Pos, m_Transform.scale, combo);
     Rect MobRect;
-    for (auto& Obj : Mobs){
+    for (auto& Obj : Objs){
         auto mob = std::dynamic_pointer_cast<Mob>(Obj);
         if (mob == nullptr) continue;
 

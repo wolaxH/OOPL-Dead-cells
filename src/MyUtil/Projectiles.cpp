@@ -4,7 +4,7 @@
 
 #include "Character/Mob.hpp"
 
-Projectile::Projectile(glm::vec2 Pos, glm::vec2 dir, float velocity, 
+Projectile::Projectile(const glm::vec2& Pos, const glm::vec2& dir, float velocity, 
     int damage, Faction faction, GameWorldContext& world, 
     float lifeTime, std::string path) :
     m_LifeTime(lifeTime), m_Dir(dir.x > 0 ? 1 : -1), m_Velocity(velocity), 

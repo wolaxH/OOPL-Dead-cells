@@ -14,7 +14,7 @@ public:
         Enemy
     };
 
-    Projectile(glm::vec2 Pos, glm::vec2 dir, float velocity, 
+    Projectile(const glm::vec2& Pos, const glm::vec2& dir, float velocity, 
         int damage, Faction faction, GameWorldContext& world, 
         float lifeTime = 50.0f, std::string path = "");
     ~Projectile() = default;

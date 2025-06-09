@@ -40,10 +40,10 @@ Bone::Bone() : Weapon(RESOURCE_DIR"/Item/Bone/icon.png", "a Bone"){
 }
 
 
-void Bone::Use(std::vector<std::shared_ptr<GameObject>>& Mobs, const glm::vec2& Pos, bool& UsedFlag, const glm::vec2& Dir, int combo){
+void Bone::Use(std::vector<std::shared_ptr<GameObject>>& Objs, const glm::vec2& Pos, bool& UsedFlag, const glm::vec2& Dir, int combo){
     Rect HitBox = GetHitBox(Pos, m_Transform.scale, combo);
     Rect MobRect;
-    for (auto& Obj : Mobs){
+    for (auto& Obj : Objs){
         auto mob = std::dynamic_pointer_cast<Mob>(Obj);
         if (mob == nullptr) continue;
 
