@@ -45,6 +45,7 @@ void App::InGameInit() {
     auto B = std::make_shared<Bone>();
     auto TD = std::make_shared<TwinDaggers>();
     auto WS = std::make_shared<WoodenShield>();
+    auto bow  = std::make_shared<Bow>(m_World);
 
     auto t = RW->ToDrops();
     m_World.WorldDrops->AddObj(t);
@@ -59,6 +60,10 @@ void App::InGameInit() {
 
     t = WS->ToDrops();
     t->m_WorldPos.x -= 200;
+    m_World.WorldDrops->AddObj(t);
+
+    t = bow->ToDrops();
+    t->m_WorldPos.x += 200;
     m_World.WorldDrops->AddObj(t);
     //Item test end
 

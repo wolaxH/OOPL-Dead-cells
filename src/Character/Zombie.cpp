@@ -15,6 +15,14 @@ Zombie::Zombie(std::vector<std::string>& path, int Hp, std::shared_ptr<Player> p
         bottom = 52 * m_Transform.scale.y;
         left = 13 * m_Transform.scale.x;
         right = 13 * m_Transform.scale.x;
+        m_HpUI = std::make_shared<EnemyHP>(Hp, Hp, m_WorldPos);
+        
+        AddChild(m_HpUI);
+        m_World.AddObj(m_HpUI);
+}
+
+Zombie::~Zombie(){
+    m_World.RemoveObj(m_HpUI);
 }
 
 void Zombie::Attack(float dt){  //player
@@ -158,4 +166,5 @@ void Zombie::Update(float dt){
 
     m_WorldPos.x += VelocityX * dt;
     m_WorldPos.y += VelocityY * dt;
+    m_HpUI->Update(m_Hp);
 }

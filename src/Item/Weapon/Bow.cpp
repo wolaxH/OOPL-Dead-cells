@@ -16,7 +16,7 @@ Bow::Bow(GameWorldContext& ctx) :
         }
         paths.push_back(RESOURCE_DIR"/Item/Shoot/Behavior/Shooting_0.png");
         paths.push_back(RESOURCE_DIR"/Item/Shoot/Behavior/Shooting_1.png");
-        m_Player_Drawables[0] = std::make_shared<Util::Animation>(paths, true, 30, false, 0);
+        m_Player_Drawables[0] = std::make_shared<Util::Animation>(paths, true, 15, false, 0);
 
         m_AtkPoint[0] = 20;
         m_AtkTimes[0] = 1;
@@ -28,7 +28,7 @@ void Bow::Use(std::vector<std::shared_ptr<GameObject>>& Objs, const glm::vec2& P
 }
 
 void Bow::Shoot(const glm::vec2& Dir, const glm::vec2& Pos){
-    glm::vec2 bulletPos = Pos + glm::vec2(0, 50);
+    glm::vec2 bulletPos = Pos + glm::vec2(0, 60);
 
     auto projectile = std::make_shared<Projectile>(bulletPos, Dir, 20.0f, m_AtkPoint[0], 
         Projectile::Faction::Player, m_World, 3.0f, RESOURCE_DIR"/Item/Shoot/arrow.png");
