@@ -80,6 +80,7 @@ protected:
     int m_Hp;
     bool InGround;
     GameWorldContext& m_World;   //reference of World resource
+    bool m_IgnoreOSP = false;
 
 private:
     std::unordered_map<c_state, std::shared_ptr<Core::Drawable>> D_Manager;  //Drawable Manager

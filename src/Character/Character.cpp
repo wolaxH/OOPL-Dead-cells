@@ -109,8 +109,9 @@ void Character::FixPos(float dt){
 
     //One-sided platform 處理
     for (auto& OSP : m_World.OneSidedPlatforms){
-        if (m_WorldPos.y + bottom < OSP->m_WorldPos.y) continue;
+        if (m_WorldPos.y + top < OSP->m_WorldPos.y) continue;
         if (!IsNearBy(OSP, 640.0f)) continue;
+        if (m_IgnoreOSP) return;
 
         //next frame Pos
         m_WorldPos.y += VelocityY * dt;

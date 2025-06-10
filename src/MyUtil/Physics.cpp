@@ -1,26 +1,58 @@
 #include "MyUtil/Physics.hpp"
+#include "MyUtil/Collision.hpp"
 
 bool Physics::IsOnGround(const MapObj* Obj, 
         const std::vector<std::shared_ptr<SolidObj>>& solids, 
         const std::vector<std::shared_ptr<OneSidedPlatform>>& platforms) {
-        glm::vec2 other_Pos;
-        float x, y;
+        // glm::vec2 other_Pos;
+        // float x, y;
 
-        std::vector<std::shared_ptr<SolidObj>> temp(solids);
-        temp.insert(temp.end(), platforms.begin(), platforms.end());
+        // std::vector<std::shared_ptr<SolidObj>> temp(solids);
+        // temp.insert(temp.end(), platforms.begin(), platforms.end());
 
-        for (const auto& Solid : temp) {
-            other_Pos = Solid->m_WorldPos;
+        // for (const auto& Solid : temp) {
+        //     other_Pos = Solid->m_WorldPos;
 
-            x = !(Obj->m_WorldPos.x < other_Pos.x - Solid->left - 1 ||
-                    Obj->m_WorldPos.x > other_Pos.x + Solid->right + 1);
-            y = (Obj->m_WorldPos.y + Obj->top > other_Pos.y + Solid->top) &&
-                (Obj->m_WorldPos.y - Obj->bottom < other_Pos.y + Solid->top + 2);
-            if (x && y) return true;
+        //     x = !(Obj->m_WorldPos.x < other_Pos.x - Solid->left - 1 ||
+        //             Obj->m_WorldPos.x > other_Pos.x + Solid->right + 1);
+        //     y = (Obj->m_WorldPos.y + Obj->top > other_Pos.y + Solid->top) &&
+        //         (Obj->m_WorldPos.y - Obj->bottom < other_Pos.y + Solid->top + 2);
+        //     if (x && y) return true;
+        // }
+
+        // return false;
+    Collision::AABB aabb = Collision::GetAABB(Obj);
+
+    // 檢查 SolidObj
+    for (const auto& Solid : solids) {
+        Collision::AABB solidAABB = Collision::GetAABB(Solid.get());
+
+        // 稍微放寬 y 軸底部接觸範圍 (+1 容錯)
+        bool overlapX = aabb.right > solidAABB.left && aabb.left < solidAABB.right;
+        bool onTop = std::abs(aabb.bottom - solidAABB.top) <= 1.5f;
+
+        if (overlapX && onTop) {
+            return true;
         }
+    }
 
-        return false;
+    // 檢查 OneSidedPlatform
+    for (const auto& OSP : platforms) {
+        Collision::AABB ospAABB = Collision::GetAABB(OSP.get());
+
+        // 角色底部要接觸平台頂部，並且角色要在平台上方落下來
+        bool overlapX = aabb.right > ospAABB.left && aabb.left < ospAABB.right;
+        bool onTop = std::abs(aabb.bottom - ospAABB.top) <= 1.5f;
+        bool isAbove = aabb.bottom >= ospAABB.top;
+
+        if (overlapX && onTop && isAbove) {
+            return true;
+        }
+    }
+
+    return false;
 }
+
 
 void Physics::ApplyGravity(float& velocityY, bool onGround, float gravity, float maxFallSpeed) {
     if (!onGround) {

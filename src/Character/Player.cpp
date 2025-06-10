@@ -264,7 +264,7 @@ bool Player::IsUnderOSP(){
         OSP_scale = abs(OSP->GetScaledSize());
 
         x = !((Pos.x < OSP->m_WorldPos.x - OSP->left - 1) || (Pos.x > OSP->m_WorldPos.x + OSP->right + 1));
-        y = (Pos.y - bottom < OSP->m_WorldPos.y - OSP->bottom) && (Pos.y + top > OSP->m_WorldPos.y - 10.0f);
+        y = (Pos.y - bottom < OSP->m_WorldPos.y - OSP->top) && (Pos.y + top > OSP->m_WorldPos.y - 10.0f);
 
         if (x && y) return true;
     }
@@ -287,9 +287,10 @@ void Player::Move(float dt){
     if ((IS_DOWN_PRESSED()) && (GetState() == c_state::crouch)) {
         Physics::SlowDown(VelocityX, Friction);
         if ((IS_UP_DOWN()) && IsOnOSP()){
-            m_WorldPos.y -= 10;
+            m_WorldPos.y -= 15;
             VelocityY = -5.f;
             fall();
+            m_IgnoreOSP = true;
         }
         return;
     }
@@ -484,6 +485,7 @@ void Player::ClinbOSP(){
     if (GetState() == c_state::clinbOSP && !IsUnderOSP()){
         VelocityY = 0;
         SetState(c_state::idle);
+        m_IgnoreOSP = false;
     }
 
     float P_Head = m_WorldPos.y + top;
@@ -492,8 +494,8 @@ void Player::ClinbOSP(){
     bool IsHeadOver, IsbottomUnder, IsXInRange;
 
     for (auto& OSP : m_World.OneSidedPlatforms){
-        IsHeadOver = P_Head > OSP->m_WorldPos.y - OSP->bottom - 10.0f;
-        IsbottomUnder = P_Bottom < OSP->m_WorldPos.y-3;
+        IsHeadOver = P_Head > OSP->m_WorldPos.y - OSP->bottom;
+        IsbottomUnder = P_Bottom < OSP->m_WorldPos.y;
         IsXInRange = !((m_WorldPos.x < OSP->m_WorldPos.x - OSP->left - 1) || (m_WorldPos.x > OSP->m_WorldPos.x + OSP->right + 1));
         if (IsbottomUnder &&  IsHeadOver && IsXInRange){
                 //rendering, c_state
@@ -502,6 +504,7 @@ void Player::ClinbOSP(){
 
                 //Move logic                
                 VelocityY = 7.5f;
+                m_IgnoreOSP = true;
                 return;
             }
     }
@@ -553,6 +556,7 @@ void Player::roll(){
 void Player::Update(float dt){
     InGround = Physics::IsOnGround(this, m_World.SolidObjs, m_World.OneSidedPlatforms);
     Physics::ApplyGravity(VelocityY, InGround, Gravity, MaxFallSpeed);
+    if (InGround) m_IgnoreOSP = false;
     Move(dt);
 
     if (IS_ROLL_DOWN() || GetState() == c_state::roll){
