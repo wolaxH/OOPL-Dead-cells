@@ -29,7 +29,7 @@ bool Physics::IsOnGround(const MapObj* Obj,
 
         // 稍微放寬 y 軸底部接觸範圍 (+1 容錯)
         bool overlapX = aabb.right > solidAABB.left && aabb.left < solidAABB.right;
-        bool onTop = std::abs(aabb.bottom - solidAABB.top) <= 1.5f;
+        bool onTop = std::abs(aabb.bottom - solidAABB.top) <= 3.5f;
 
         if (overlapX && onTop) {
             return true;
@@ -42,10 +42,10 @@ bool Physics::IsOnGround(const MapObj* Obj,
 
         // 角色底部要接觸平台頂部，並且角色要在平台上方落下來
         bool overlapX = aabb.right > ospAABB.left && aabb.left < ospAABB.right;
-        bool onTop = std::abs(aabb.bottom - ospAABB.top) <= 1.5f;
-        bool isAbove = aabb.bottom >= ospAABB.top;
+        bool onTop = std::abs(aabb.bottom - ospAABB.top) <= 3.5f;
+        // bool isAbove = aabb.bottom >= ospAABB.top;
 
-        if (overlapX && onTop && isAbove) {
+        if (overlapX && onTop) {
             return true;
         }
     }

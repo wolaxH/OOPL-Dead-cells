@@ -246,7 +246,7 @@ bool Player::IsOnOSP(){
         OSP_scale = abs(OSP->GetScaledSize());
 
         x = !((Pos.x < OSP_Pos.x - OSP_scale.x/2 - 1) || (Pos.x > OSP_Pos.x + OSP_scale.x/2 + 1));
-        y = (Pos.y > OSP_Pos.y - OSP_scale.y/2) && (Pos.y < OSP_Pos.y + OSP_scale.y/2 + 2);
+        y = (Pos.y > OSP_Pos.y - OSP_scale.y/2) && (Pos.y < OSP_Pos.y + OSP_scale.y/2 + 3.5);
         if (x && y) return true;
     }
     return false;
@@ -269,6 +269,17 @@ bool Player::IsUnderOSP(){
         if (x && y) return true;
     }
     return false;
+}
+
+bool Player::IsLeaveOSP(){
+    Collision::AABB aabb = Collision::GetAABB(this);
+    Collision::AABB OSP_aabb;
+
+    for (const auto& OSP : m_World.OneSidedPlatforms){
+        OSP_aabb = Collision::GetAABB(OSP.get());
+        if (Collision::IsIntersectAABB(aabb, OSP_aabb)) return false;
+    }
+    return true;
 }
 
 /*-----------------------------------move-----------------------------------*/
@@ -386,7 +397,7 @@ void Player::Move(float dt){
 
 void Player::Jump(){
     if (InGround) jumpStep = 0;   
-    // if (jumpStep == 2) return;
+    if (jumpStep == 2) return;
     
     jumpStep++;
     if (GetState() != c_state::jump){
@@ -556,7 +567,7 @@ void Player::roll(){
 void Player::Update(float dt){
     InGround = Physics::IsOnGround(this, m_World.SolidObjs, m_World.OneSidedPlatforms);
     Physics::ApplyGravity(VelocityY, InGround, Gravity, MaxFallSpeed);
-    if (InGround) m_IgnoreOSP = false;
+    if (InGround || IsLeaveOSP()) m_IgnoreOSP = false;
     Move(dt);
 
     if (IS_ROLL_DOWN() || GetState() == c_state::roll){

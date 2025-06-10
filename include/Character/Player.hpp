@@ -97,6 +97,8 @@ private:
      * return true if player under any OSP, and the padding of OSP is 5px
      */
     bool IsUnderOSP();
+
+    bool IsLeaveOSP();
     
     void RequastToChangeDrawable(std::shared_ptr<Util::Animation> PD){
         ChangeDrawable(AccessKey(), PD, c_state::atk);

@@ -123,7 +123,7 @@ void Character::FixPos(float dt){
         float ospRight = OSP->m_WorldPos.x + OSP->right;
 
         // 只有在角色從上方下落且中心在平台上時才阻擋
-        if (aabb.bottom < OSP_aabb.top &&
+        if (aabb.bottom < OSP_aabb.top - 1 &&
             !(charCenter < ospLeft - 1 || charCenter > ospRight + 1)) {
             m_WorldPos.y -= VelocityY * dt;
             VelocityY = 0;

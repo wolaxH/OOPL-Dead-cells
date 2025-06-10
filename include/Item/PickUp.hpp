@@ -96,7 +96,6 @@ public:
 
     
             if (inXRange && hittingTop && VelocityY < 0) {
-                LOG_DEBUG("point");
                 m_WorldPos.y = solidPos.y + solid->top;
                 VelocityY = 0;
                 return;
