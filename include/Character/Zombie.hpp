@@ -6,7 +6,7 @@
 
 class Zombie : public Mob{
 public:
-    Zombie(std::vector<std::string>& path, int Hp, std::shared_ptr<Player> player, GameWorldContext& World) ;
+    Zombie(std::vector<std::string>& path, int Hp, std::shared_ptr<Player> player, GameWorldContext& World);
     ~Zombie();
 
     void Attacked(int Damage, glm::vec2 Dir, float Velocity = 0.0f) override;

@@ -103,11 +103,6 @@ void Shooter::Move(float dt){
     }
 }
 
-void Shooter::LookAtPlayer(){
-    float absScale = std::abs(m_Transform.scale.x);
-    m_Transform.scale.x = (m_player->m_WorldPos.x < m_WorldPos.x) ? -absScale : absScale;
-}
-
 void Shooter::Update(float dt) {
     // 地面與物理處理
     InGround = Physics::IsOnGround(this, m_World.SolidObjs, m_World.OneSidedPlatforms);

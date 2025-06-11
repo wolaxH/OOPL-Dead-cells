@@ -5,7 +5,6 @@
 #include "Character/Player.hpp"
 #include "MyUtil/Timer.hpp"
 
-
 class Mob : public Character{
 public:
     enum class mob_state{
@@ -26,6 +25,11 @@ protected:
     void PushPlayer();
 
     void Wander(const std::string& path, const size_t frames);
+
+    void LookAtPlayer(){
+        float absScale = std::abs(m_Transform.scale.x);
+        m_Transform.scale.x = (m_player->m_WorldPos.x < m_WorldPos.x) ? -absScale : absScale;
+    }
 protected:
     float m_AtkRange;
     bool m_AtkFlag = false;

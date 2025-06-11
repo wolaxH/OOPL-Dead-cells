@@ -17,8 +17,6 @@ public:
     void FireProjectile();
 
 private:
-    void LookAtPlayer();
-
     void Attack(float dt) override;
 
     void Move(float dt) override;

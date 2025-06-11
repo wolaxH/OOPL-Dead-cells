@@ -39,6 +39,11 @@ public:
     
     c_state GetState(){ return State;}
     
+    /**
+     * Attacked will end by itself
+     * so if current state = atked and there is no special method can interupt it(like roll)
+     * then let It End
+     */
     void virtual Attacked(int Damage, glm::vec2 Dir, float Velocity = 0.0f) = 0;
     
     bool IsAlive() const noexcept{ return m_Hp > 0;}
@@ -58,6 +63,9 @@ protected:
     /*用來修正位置，使其不會穿牆，不修改c_state*/
     void FixPos(float dt);
 
+    /**
+     * Same as Attacked
+     */
     void virtual Attack(float dt) = 0;
 
     //移動

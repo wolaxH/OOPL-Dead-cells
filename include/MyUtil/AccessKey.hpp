@@ -4,6 +4,7 @@
 class AccessKey{
 private:
     friend class Player;
+    friend class Boss;
     AccessKey(){}
 };
 

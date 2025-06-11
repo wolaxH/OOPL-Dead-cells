@@ -91,6 +91,9 @@ void Zombie::Move(float dt){
     if (IsSameLevelNearBy(m_player,m_DetectRange)){  
         //c_state = move
         m_state = mob_state::trace;
+        LookAtPlayer();
+        
+
         if (m_player->m_WorldPos.x > m_WorldPos.x + 10){   
             m_Transform.scale.x = 1.0f;
             //Add state
@@ -128,9 +131,7 @@ void Zombie::Move(float dt){
 void Zombie::Update(float dt){
     InGround = Physics::IsOnGround(this, m_World.SolidObjs, m_World.OneSidedPlatforms);
     Physics::ApplyGravity(VelocityY, InGround, Gravity, MaxFallSpeed);
-    if (InGround){
-        Physics::SlowDown(VelocityX, Friction);
-    }
+    if (InGround) Physics::SlowDown(VelocityX, Friction);
 
     if (!m_AtkCoolDownTimer.IsTimeout()){
         if (GetState() == c_state::atked) Attacked(0, glm::vec2(0, 0), 0.0f);
