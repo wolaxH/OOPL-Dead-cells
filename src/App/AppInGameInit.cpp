@@ -23,22 +23,43 @@ void App::InGameInit() {
     m_World.m_Player = player;
     
 
+    std::vector<glm::vec2> zombie_positions = {
+        {1200, 500}, {1500, 500}, {1800, 520},{4812, 879},{4770, 879},{5481,20},{6600,-1353},{2346,500},{5255,1027},
+        {7778,-2159},{4887,-180},{7511,-2059},{7920,-2059},{8388,-2543}
+
+
+    };
+
     Img.clear();
     for (int i = 0; i < 24; i++){
         Img.push_back(RESOURCE_DIR"/Zombie/idle/idle_" + std::to_string(i) + ".png");
     }
-    std::shared_ptr<Zombie> zombie = std::make_shared<Zombie>(Img, 200, player, m_World);
-    zombie->SetPos({1200, 500});
-    m_World.Mobs->AddObj(zombie);
+
+    for (const auto& pos : zombie_positions) {
+        auto zombie = std::make_shared<Zombie>(Img, 200, player, m_World);
+        zombie->SetPos(pos);
+        m_World.Mobs->AddObj(zombie);
+    }
+
+
+    std::vector<glm::vec2> shooter_positions = {
+        {2000, 600}, {1154, -836}, {2416, 212},{2776, 877},{4812, 879},{9004,-2347},{6258,-2675},
+        {5200,-2344},{5200,-2344},{6697,-2142},{6011,-200},{3154, 492},{5432, 10},{5346,769},{5255,1027},{6181,-1211},
+{6591,-1353}};
 
     Img.clear();
     for (int i = 0; i < 6; i++){
         Img.push_back(RESOURCE_DIR"/shooter/idle/idle_" + std::to_string(i) + ".png");
     }
-    std::shared_ptr<Shooter> shooter = std::make_shared<Shooter>(Img, 200, player, m_World);
-    shooter->SetPos({1200, 500});
-    m_World.Mobs->AddObj(shooter);
-    
+
+    for (const auto& pos : shooter_positions) {
+        auto shooter = std::make_shared<Shooter>(Img, 200, player, m_World);
+        shooter->SetPos(pos);
+        m_World.Mobs->AddObj(shooter);
+    }
+
+
+
 
     //Item test
     auto RW = std::make_shared<RustySword>();
@@ -67,14 +88,14 @@ void App::InGameInit() {
     glm::vec2 temp_pos(1, 1);
     BGs.resize(9);
     BGs[0] = std::make_shared<BG>(RESOURCE_DIR"/bg/bg1.png", temp_pos, glm::vec2{0.8f, 0.8f});
-    BGs[1] = std::make_shared<BG>(RESOURCE_DIR"/bg/bg2.png", glm::vec2{1616.0f, 174.0f}, glm::vec2{0.9f, 0.9f});
+    BGs[8] = std::make_shared<BG>(RESOURCE_DIR"/bg/bg2.png", glm::vec2{1616.0f, 174.0f}, glm::vec2{0.9f, 0.9f});
     BGs[2] = std::make_shared<BG>(RESOURCE_DIR"/bg/bg3.png", glm::vec2{3817.0f, 318.5f}, glm::vec2{1.4f, 1.4f});
     BGs[3] = std::make_shared<BG>(RESOURCE_DIR"/bg/bg5.png", glm::vec2{6309.5f, 316.5f}, glm::vec2{1.2f, 1.2f});
     BGs[4] = std::make_shared<BG>(RESOURCE_DIR"/bg/bg8.png", glm::vec2{6330.5f, -2250.5f}, glm::vec2{1.2f, 1.2f});
     BGs[5] = std::make_shared<BG>(RESOURCE_DIR"/bg/bg7.png", glm::vec2{8605.5f, -970.5f}, glm::vec2{1.2f, 1.2f});
     BGs[6] = std::make_shared<BG>(RESOURCE_DIR"/bg/bg6.png", glm::vec2{6309.5f, -970.0f}, glm::vec2{1.2f, 1.2f});
     BGs[7] = std::make_shared<BG>(RESOURCE_DIR"/bg/bg9.png", glm::vec2{8605.5f, -2250.5f}, glm::vec2{1.2f, 1.2f});
-    BGs[8] = std::make_shared<BG>(RESOURCE_DIR"/bg/bg4.png", glm::vec2{1616.0f, -673.0f}, glm::vec2{0.9f, 0.9f});
+    BGs[1] = std::make_shared<BG>(RESOURCE_DIR"/bg/bg4.png", glm::vec2{1616.0f, -673.0f}, glm::vec2{0.9f, 0.9f});
     for (auto& temp : BGs){
         MapObjs.push_back(temp);
         root.AddChild(temp);

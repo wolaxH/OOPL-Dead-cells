@@ -216,15 +216,14 @@ void Player::PickUp(){
 
 /*-----------------------------------util-----------------------------------*/
 
+
 void Player::TestP(){
     if (Util::Input::IsKeyDown(Util::Keycode::P)){
-        m_Hp -= 5;
-        m_PlayerINFO->SetHp(m_Hp);
-        if (m_PlayerINFO->GetCurrentHp() <= 0){
-            m_PlayerINFO->SetHp(200);
-            m_Hp = 200;
-        }
-        // LOG_DEBUG(m_WorldPos);
+        // m_PlayerINFO->SetHp(m_PlayerINFO->GetCurrentHp() - 5);
+        // if (m_PlayerINFO->GetCurrentHp() <= 0){
+        //     m_PlayerINFO->SetHp(100);
+        // }
+        LOG_DEBUG(m_WorldPos);
     }
 
 }
