@@ -1,12 +1,11 @@
 #include "App.hpp"
 
-#include "json.hpp"
+void App::RetryInit(){
+    player = nullptr;
 
-#include <fstream>
+    m_World.Clear();
 
-void App::InGameInit() {
 
-    Drops::m_World = &m_World;
 
     std::vector<std::string> Img;
     Img.reserve(46);
@@ -48,7 +47,7 @@ void App::InGameInit() {
         //{2000, 600}, {1154, -836}, 
         {2416, 212},{2776, 877},{4812, 879},{9004,-2347},{6258,-2675},
         {5200,-2344},{5200,-2344},{6697,-2142},{6011,-200},{3154, 492},{5432, 10},{5346,769},{5255,1027},{6181,-1211},
-{6591,-1353}};
+        {6591,-1353}};
 
     Img.clear();
     for (int i = 0; i < 6; i++){
@@ -97,29 +96,6 @@ void App::InGameInit() {
     m_World.WorldDrops->AddObj(t);
     //Item test end
 
-
-    //bg
-    glm::vec2 temp_pos(1, 1);
-    BGs.resize(12);
-    BGs[0] = std::make_shared<BG>(RESOURCE_DIR"/bg/bg1.png", temp_pos, glm::vec2{0.8f, 0.8f});
-    BGs[1] = std::make_shared<BG>(RESOURCE_DIR"/bg/bg2.png", glm::vec2{1616.0f, 174.0f}, glm::vec2{0.9f, 0.9f});
-    BGs[2] = std::make_shared<BG>(RESOURCE_DIR"/bg/bg3.png", glm::vec2{3817.0f, 318.5f}, glm::vec2{1.4f, 1.4f});
-    BGs[3] = std::make_shared<BG>(RESOURCE_DIR"/bg/bg5.png", glm::vec2{6309.5f, 316.5f}, glm::vec2{1.2f, 1.2f});
-    BGs[4] = std::make_shared<BG>(RESOURCE_DIR"/bg/bg8.png", glm::vec2{6330.5f, -2250.5f}, glm::vec2{1.2f, 1.2f});
-    BGs[5] = std::make_shared<BG>(RESOURCE_DIR"/bg/bg7.png", glm::vec2{8605.5f, -970.5f}, glm::vec2{1.2f, 1.2f});
-    BGs[6] = std::make_shared<BG>(RESOURCE_DIR"/bg/bg6.png", glm::vec2{6309.5f, -970.0f}, glm::vec2{1.2f, 1.2f});
-    BGs[7] = std::make_shared<BG>(RESOURCE_DIR"/bg/bg9.png", glm::vec2{8605.5f, -2250.5f}, glm::vec2{1.2f, 1.2f});
-    BGs[8] = std::make_shared<BG>(RESOURCE_DIR"/bg/bg4.png", glm::vec2{1616.0f, -673.0f}, glm::vec2{0.9f, 0.9f});
-    BGs[8]->SetZIndex(1.1f);
-    BGs[9] = std::make_shared<BG>(RESOURCE_DIR"/bg/BlackBridge.jpg", glm::vec2(15000, 20), glm::vec2(1.5, 1.5));
-    BGs[10]= std::make_shared<BG>(RESOURCE_DIR"/bg/bridge.png", glm::vec2(16735, 255), glm::vec2(1.3, 1.5));
-    BGs[11]= std::make_shared<BG>(RESOURCE_DIR"/bg/bridge.png", glm::vec2(13810, 255), glm::vec2(-1.3, 1.5));
-
-    for (auto& temp : BGs){
-        MapObjs.push_back(temp);
-        root.AddChild(temp);
-    }
-
     //Portal
     auto portalI = std::make_shared<Portal>(player, glm::vec2(9525, -2693), Portal::Type::entrance);
     auto portalO = std::make_shared<Portal>(player, glm::vec2(14255, 0), Portal::Type::exit, RESOURCE_DIR"/InterAct/Portal_close.png");
@@ -147,34 +123,6 @@ void App::InGameInit() {
         }
     }
 
-
-
-    /**
-     * To create a one sided platform object
-     */
-    InitColliders<OneSidedPlatform>("OSPs.json", m_World.OneSidedPlatforms);
-
-
-    /**
-     * To create a solid object
-     */
-    InitColliders<SolidObj>("SolidObjs.json", m_World.SolidObjs);
-    
-    
-
-    /**
-     * Add all solid objects to the root object for rendering.
-     */
-    temps.clear();
-
-    temps.insert(temps.end(), m_World.OneSidedPlatforms.begin(), m_World.OneSidedPlatforms.end());
-    temps.insert(temps.end(), m_World.SolidObjs.begin(), m_World.SolidObjs.end());
-    root.AddChildren(temps);
-
-
-    root.AddChild(m_World.WorldDrops);
-    root.AddChild(m_World.Mobs);
-    root.AddChild(m_World.Projectiles);
     for (const auto& temp : m_World.WorldDrops->GetObjs()){
         auto drop = std::dynamic_pointer_cast<MapObj>(temp);
         if (drop) MapObjs.push_back(drop);
@@ -185,9 +133,5 @@ void App::InGameInit() {
         if (mob) MapObjs.push_back(mob);
     }
 
-    
-
-    LOG_TRACE("Start");
-    
     m_CurrentState = State::UPDATE;
 }

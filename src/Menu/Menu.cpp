@@ -1,9 +1,17 @@
 #include "Menu/Menu.hpp"
 
-Menu::Menu(const std::vector<std::shared_ptr<Button>>& buttons) : Buttons(buttons) {
-    m_selectlight = std::make_unique<Util::GameObject>(std::make_shared<Util::Image>(RESOURCE_DIR"/menu/selectbar.png"), 2.0f);
-    //m_selectlight->m_Transform.translation = {-426.0f, 0.0f};
-    AddChild(m_selectlight);
+Menu::Menu(const std::vector<std::shared_ptr<Button>>& buttons, const std::shared_ptr<Util::GameObject>& Bg)
+     : Buttons(buttons), m_Bg(Bg){
+        m_selectlight = std::make_unique<Util::GameObject>(std::make_shared<Util::Image>(RESOURCE_DIR"/menu/selectbar.png"), 2.0f);
+        //m_selectlight->m_Transform.translation = {-426.0f, 0.0f};
+        AddChild(m_selectlight);
+        m_Bg = std::make_shared<Util::GameObject>(std::make_shared<Util::Image>(RESOURCE_DIR"/menu/menu_bg.png"), 1.0f);
+        m_Bg->m_Transform.scale = {1/1.5f, 1/1.5f};
+
+        AddChild(m_Bg);
+        for (auto& button : buttons){
+            AddChild(button);
+        }
 }
 
 void Menu::Update(){

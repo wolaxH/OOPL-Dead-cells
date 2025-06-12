@@ -26,7 +26,8 @@ enum class c_state{ //Character state
     roll,
     atked,
     block,
-    heal
+    heal,
+    death
 };
 
 class Character : public MapObj{

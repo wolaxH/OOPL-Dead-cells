@@ -36,6 +36,8 @@ public:
         MENU,
         INIT_UPDATE,
         UPDATE,
+        RETRY_MENU,
+        INIT_RETRY,
         END,
     };
 
@@ -46,6 +48,9 @@ public:
 
     void InGameInit();   //into game
     void InGameUpdate(float dt);
+
+    void RetryMenu();
+    void RetryInit();
 
     void End(); // NOLINT(readability-convert-member-functions-to-static)
 
@@ -81,12 +86,7 @@ private:    //App Objs
     bool WIPFlag = false;
 
 private:    //Menu Objs
-    std::shared_ptr<Util::GameObject> Menu_Bg;
     std::shared_ptr<Menu> StartMenu;
-    std::shared_ptr<Button> PlayButton;
-    std::shared_ptr<Button> OptionButton;
-    std::shared_ptr<Button> ExitButton;
-
 private:    //ingame Objs
     Camera camera;
 
@@ -97,10 +97,8 @@ private:    //ingame Objs
     GameWorldContext m_World = GameWorldContext(MapObjs, camera);
     
     std::vector<std::shared_ptr<BG>> BGs;
-    
-    //for test
-    // std::shared_ptr<Util::GameObject> T_GameObj;
-    // std::shared_ptr<Util::Animation> T_Anim;
+private:
+    std::shared_ptr<Menu> m_RetryMenu;
 };
 
 #endif

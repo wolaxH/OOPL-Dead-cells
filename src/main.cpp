@@ -31,7 +31,8 @@ int main(int, char**) {
             case App::State::UPDATE:
                 app.InGameUpdate(deltaTime);
                 break;
-
+            case App::State::INIT_RETRY:
+                app.RetryInit();
             case App::State::END:
                 app.End();
                 context->SetExit(true);

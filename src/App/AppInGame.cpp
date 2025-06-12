@@ -67,7 +67,15 @@ void App::InGameUpdate(float dt) {
         Util::Input::IfExit()) {
         m_CurrentState = State::END;
     }
-    if (!player->IsAlive()){m_CurrentState = State::END;}
+
+    if (!player->IsAlive()) {
+        if (player->GetState() != c_state::death) {
+            player->Die(); // 初始化死亡動畫
+        }
+        else if (player->m_DeathTimer.IsTimeout()){
+            m_CurrentState = State::END;
+        }
+    }
 }
 
 void App::End() { // NOLINT(this method will mutate members in the future)

@@ -42,6 +42,21 @@ public:
         }
     }
 
+    /**
+     * This method will NOT remove any Obj or ref in Mapobj
+     * only remove all the Children 
+     */
+    void Clear(){
+        for (auto Obj : m_Children){
+            auto temp = std::dynamic_pointer_cast<MapObj>(Obj);
+            if (temp){
+                auto it = std::find(m_MapObjs.begin(), m_MapObjs.end(), temp);
+                if (it != m_MapObjs.end()) m_MapObjs.erase(it);
+            }
+        }
+        m_Children.clear();
+    }
+
     std::vector<std::shared_ptr<Util::GameObject>>& GetObjs() noexcept {return m_Children;}
 
 private:

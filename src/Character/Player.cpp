@@ -140,6 +140,8 @@ void Player::Block(){
 }
 
 void Player::Attacked(int Damage, glm::vec2 Dir, float Velocity){
+    if (GetState() == c_state::death || m_CheatingMode) return;
+    if (m_Hp <= 0) return;
     VelocityX += Dir.x > 0 ? Velocity : -1*Velocity;
     float hurt = 0;
 
@@ -277,12 +279,23 @@ void Player::Drink(){
     }
 }
 
+void Player::Die(){
+    if (m_HasDied) return;
+
+    m_HasDied = true;
+    InitState(c_state::death, {18}, {RESOURCE_DIR"/Beheaded/die/die_"});
+    VelocityX = 0;
+    VelocityY = 0;
+    m_DeathTimer.SetTime(3000, 3000);
+    m_DeathTimer.ResetTime();
+}
+
 /*-----------------------------------util-----------------------------------*/
 
 
 void Player::TestP(){
     if (Util::Input::IsKeyDown(Util::Keycode::P)){
-        LOG_DEBUG(m_WorldPos);
+        m_CheatingMode = m_CheatingMode ? false : true;
     }
 
 }
@@ -623,6 +636,11 @@ void Player::roll(){
 
 /*-----------------------------------update-----------------------------------*/
 void Player::Update(float dt){
+    if (m_HasDied) {
+        return; // 死了不再執行其他動作
+    }
+
+
     InGround = Physics::IsOnGround(this, m_World.SolidObjs, m_World.OneSidedPlatforms);
     // Physics::ApplyGravity(VelocityY, InGround, Gravity, MaxFallSpeed);
     // 落地時重置浮空機會

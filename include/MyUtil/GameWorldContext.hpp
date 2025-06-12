@@ -39,6 +39,13 @@ public:
         m_Camera.TriggerShake(duration, strength);
     }
 
+    void Clear(){
+        InterActAbles.clear();
+        Mobs->Clear();
+        WorldDrops->Clear();
+        Projectiles->Clear();
+    }
+
     std::weak_ptr<Player> m_Player;
     std::vector<std::shared_ptr<SolidObj>> SolidObjs = {};
     std::vector<std::shared_ptr<OneSidedPlatform>> OneSidedPlatforms = {};

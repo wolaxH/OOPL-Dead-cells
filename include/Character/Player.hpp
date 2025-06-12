@@ -39,6 +39,15 @@ public:
     void Attacked(int Damage, glm::vec2 Dir, float Velocity = 0.0f) override;
 
     bool IsAtkedable() const noexcept { return m_Atkedable; }
+
+    void Die();
+
+    std::shared_ptr<Core::Drawable> GetDeadDrawable(){
+        if (IsAlive()) return nullptr;
+        return m_Drawable;
+    }
+
+    Timer m_DeathTimer;
 private:
     
     void PickUp();
@@ -141,5 +150,10 @@ private:
     int jumpStep = 0;   //double jump counter
     Timer timer;   //for count the roll cooling time
     bool m_Atkedable = true;
+
+    bool m_IsDead = false;
+    bool m_HasDied = false;
+
+    bool m_CheatingMode = false;
 };
 #endif

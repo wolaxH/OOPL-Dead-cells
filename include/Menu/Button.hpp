@@ -20,6 +20,7 @@ public:
 private:
     std::string Label;
     std::function<void()> OnClick;
+    std::shared_ptr<Util::GameObject> Menu_Bg;
 };
 
 

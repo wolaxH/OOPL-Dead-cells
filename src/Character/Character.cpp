@@ -38,7 +38,7 @@ void Character::InitState(c_state state, const std::vector<std::size_t>& frames,
     std::vector<c_state> NotLoopingState = {
         c_state::jump, c_state::fall, c_state::atk, c_state::clinb, 
         c_state::roll, c_state::crouch, c_state::atked, c_state::block, 
-        c_state::heal};
+        c_state::heal, c_state::death};
     
     for (std::size_t i = 0; i < frames.size(); i++){
         temp.clear();

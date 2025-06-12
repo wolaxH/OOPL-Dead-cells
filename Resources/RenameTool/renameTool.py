@@ -11,7 +11,7 @@ from natsort import natsorted
 Source_Path = os.getcwd().replace("\\", "/") + "/source"   #The folder path that you will replac
 Target_Path = os.getcwd().replace("\\", "/") + "/target"   #The folder path that you will save
 
-prefix = "atk2_"    #The new name prefix eg: runB_{index}.png
+prefix = "die_"    #The new name prefix eg: runB_{index}.png
 errorItem = []
 temp = input("Please input the prefix or press enter to use source files prefix:")
 if (temp != ""):

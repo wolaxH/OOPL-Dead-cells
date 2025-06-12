@@ -12,9 +12,12 @@
 
 class Menu : public Util::GameObject {
 public:
-    Menu(const std::vector<std::shared_ptr<Button>>& buttons = {});
+    Menu(const std::vector<std::shared_ptr<Button>>& buttons = {}, const std::shared_ptr<Util::GameObject>& Bg = nullptr);
 
-    void AddButton(const std::shared_ptr<Button>& button) {Buttons.push_back(button);}
+    void AddButton(const std::shared_ptr<Button>& button) {
+        Buttons.push_back(button);
+        AddChild(button);
+    }
 
     void Update();
 
@@ -22,6 +25,7 @@ private:
     std::vector<std::shared_ptr<Button>> Buttons;
     int m_CurrentButtonIndex = 0; // Index of the currently selected button
     std::shared_ptr<Util::GameObject> m_selectlight;
+    std::shared_ptr<Util::GameObject> m_Bg;
 };
 
 #endif
