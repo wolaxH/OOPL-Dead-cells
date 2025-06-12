@@ -11,6 +11,16 @@ public:
 
     void Update(int Hp);
 
+    void Pop(){
+        m_HpBar->SetVisible(true);
+        m_HpBg->SetVisible(true);
+    }
+
+    void Hide(){
+        m_HpBar->SetVisible(false);
+        m_HpBg->SetVisible(false);
+    }
+
 private:
     int m_MaxHp;
     int m_Hp;

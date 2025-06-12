@@ -40,6 +40,14 @@ void App::InGameInit() {
     m_World.Mobs->AddObj(shooter);
     
 
+    Img.clear();
+    for (int i = 0; i < 26; i++){
+        Img.push_back(RESOURCE_DIR"/Boss/Idle/idle_" + std::to_string(i) + ".png");
+    }
+    std::shared_ptr<Boss> boss = std::make_shared<Boss>(Img, 1200, player, m_World);
+    boss->m_WorldPos = glm::vec2(16000, 200);
+    m_World.Mobs->AddObj(boss);
+
     //Item test
     auto RW = std::make_shared<RustySword>();
     auto B = std::make_shared<Bone>();
@@ -154,17 +162,17 @@ void App::InGameInit() {
         if (mob) MapObjs.push_back(mob);
     }
 
-    std::vector<std::string> T_path;
-    for (int i = 0; i < 30; i++){
-        T_path.push_back(RESOURCE_DIR"/Boss/attack2/atk2_" + std::to_string(i) + ".png");
-    }
-    for (int i = 0; i < 28; i++){
-        T_path.push_back(RESOURCE_DIR"/Boss/move/move_" + std::to_string(i) + ".png");
-    }
-    T_Anim = std::make_shared<Util::Animation>(T_path, true, 60);
-    T_GameObj = std::make_shared<Util::GameObject>(T_Anim, 100.f);
-    T_GameObj->m_Transform.translation = glm::vec2(2, 2);
-    root.AddChild(T_GameObj);
+    // std::vector<std::string> T_path;
+    // for (int i = 0; i < 30; i++){
+    //     T_path.push_back(RESOURCE_DIR"/Boss/attack2/atk2_" + std::to_string(i) + ".png");
+    // }
+    // for (int i = 0; i < 28; i++){
+    //     T_path.push_back(RESOURCE_DIR"/Boss/move/move_" + std::to_string(i) + ".png");
+    // }
+    // T_Anim = std::make_shared<Util::Animation>(T_path, true, 60);
+    // T_GameObj = std::make_shared<Util::GameObject>(T_Anim, 100.f);
+    // T_GameObj->m_Transform.translation = glm::vec2(2, 2);
+    // root.AddChild(T_GameObj);
 
     LOG_TRACE("Start");
     

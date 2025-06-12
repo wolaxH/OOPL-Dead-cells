@@ -2,10 +2,10 @@
 
 void App::InGameUpdate(float dt) {
     
-    if (T_Anim->GetCurrentFrameIndex() < 30){
-        T_GameObj->m_Transform.translation.x = 50;
-    }
-    else T_GameObj->m_Transform.translation.x = 0;
+    // if (T_Anim->GetCurrentFrameIndex() < 30){
+    //     T_GameObj->m_Transform.translation.x = 50;
+    // }
+    // else T_GameObj->m_Transform.translation.x = 0;
 
 
     player->Update(dt);

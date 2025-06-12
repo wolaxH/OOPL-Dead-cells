@@ -4,7 +4,7 @@
 
 Character::Character(std::vector<std::string>& path, int Hp, GameWorldContext& World) 
     : m_Hp(Hp), m_World(World) {
-    m_Drawable = std::make_shared<Util::Animation>(path, true, 20, true, 0);
+    m_Drawable = std::make_shared<Util::Animation>(path, true, 30, true, 0);
     State = c_state::idle;
     D_Manager[State] = m_Drawable;
     m_ZIndex = 30;
@@ -23,7 +23,7 @@ void Character::SetState(c_state State, std::vector<std::string> path, bool Islo
     } catch (const std::out_of_range &e){
         
         if (!path.empty()){
-            m_Drawable = std::make_shared<Util::Animation>(path, true, 20, Isloop, 0);
+            m_Drawable = std::make_shared<Util::Animation>(path, true, 30, Isloop, 0);
             D_Manager[State] = m_Drawable;
             this->State = State;
         }

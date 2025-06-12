@@ -485,6 +485,7 @@ FodyWeavers.xsd
 /.idea/
 # Custom writen VSCode .gitignore
 .vscode/
+.VSCodeCounter/
 
 # Default build directory for CMake extension
 build/

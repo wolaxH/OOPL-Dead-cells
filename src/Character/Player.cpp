@@ -397,7 +397,7 @@ void Player::Move(float dt){
 
 void Player::Jump(){
     if (InGround) jumpStep = 0;   
-    if (jumpStep == 2) return;
+    // if (jumpStep == 2) return;
     
     jumpStep++;
     if (GetState() != c_state::jump){

@@ -13,6 +13,7 @@
 #include "MyUtil/Projectile.hpp"
 #include "Character/Zombie.hpp"
 #include "Character/Shooter.hpp"
+#include "Character/Boss.hpp"
 #include "Menu/Button.hpp"
 #include "Menu/Menu.hpp"
 #include "BackGround.hpp"
@@ -98,8 +99,8 @@ private:    //ingame Objs
     std::vector<std::shared_ptr<BG>> BGs;
     
     //for test
-    std::shared_ptr<Util::GameObject> T_GameObj;
-    std::shared_ptr<Util::Animation> T_Anim;
+    // std::shared_ptr<Util::GameObject> T_GameObj;
+    // std::shared_ptr<Util::Animation> T_Anim;
 };
 
 #endif

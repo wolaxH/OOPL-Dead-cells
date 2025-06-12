@@ -1,13 +1,5 @@
 #include "Character/Boss.hpp"
 
-/**
- * TODO:
- * *加入attack2(斬擊)
- * *根據大小調整
- * *    攻擊碰撞箱大小
- * *    top, bottom, left, right
- * *    
- */
 
 Boss::Boss(std::vector<std::string>& path, int Hp, std::shared_ptr<Player> player, GameWorldContext& World)
     : Mob(path, Hp, player, World) {
@@ -16,27 +8,28 @@ Boss::Boss(std::vector<std::string>& path, int Hp, std::shared_ptr<Player> playe
      * m_AtkPoint, m_AtkRange should be Correction by the second seg atk
      */
     m_DetectRange = 2500.f;
+    m_AtkRange = 300.f;
     m_Transform.scale = {1.0f, 1.0f};
 
     std::vector<std::string> paths;
     for (int i = 0; i < 22; i++){
         paths.push_back(RESOURCE_DIR"/Boss/attack1/atk1_" + std::to_string(i) + ".png");
     }
-    auto anim = std::make_shared<Util::Animation>(paths, true, 60, false);
-    m_AtkManager[1] = {680.0f, 60, anim};
+    auto anim = std::make_shared<Util::Animation>(paths, true, 50, false);
+    m_AtkManager[1] = {640.0f, 60, anim, 98.f, {11, 12}};
     paths.clear();
     for (int i = 0; i < 30; i++){
         paths.push_back(RESOURCE_DIR"/Boss/attack2/atk2_" + std::to_string(i) + ".png");
     }
-    anim = std::make_shared<Util::Animation>(paths, true, 60, false);
-    m_AtkManager[2] = {1.0f, 70, anim};
+    anim = std::make_shared<Util::Animation>(paths, true, 50, false);
+    m_AtkManager[2] = {900.0f, 70, anim, 70.f, {15, 16, 17}};
 
-    m_AtkCoolDownTimer.SetTime(700, 1200);
+    m_AtkCoolDownTimer.SetTime(300, 1000);
     
-    top = 50 * m_Transform.scale.y;
-    bottom = 50 * m_Transform.scale.y;
-    left =  50 * m_Transform.scale.x;
-    right = 50 * m_Transform.scale.x;
+    top = 150 * m_Transform.scale.y;
+    bottom = 150 * m_Transform.scale.y;
+    left =  90 * m_Transform.scale.x;
+    right = 90 * m_Transform.scale.x;
     
     m_HpUI = std::make_shared<BossHp>(m_Hp);
     AddChild(m_HpUI);
@@ -57,16 +50,22 @@ void Boss::Attack(float dt){
         auto anim = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
         if (anim) anim->Play();
         m_AtkFlag = false;
-        m_WorldPos += m_Transform.scale.x > 0 ? 50 : -50;
+        m_WorldPos.x += m_Transform.scale.x > 0 ? 50 : -50;
         return;
     }
 
     auto anim = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
     if (anim) {
         auto CurrentFrame = anim->GetCurrentFrameIndex();
-        if (CurrentFrame >= 10 && CurrentFrame <= 15 && !m_AtkFlag) {  // 第 10 ~ 15 幀造成傷害
-            
-            Rect HitBox = Rect::CreateRect(m_WorldPos + glm::vec2(100 * m_Transform.scale.x, 0), 200, 100);
+        bool IsAtkable = std::find(
+                        m_AtkManager[m_CurrentAtkID].AtkableFrame.begin(), 
+                        m_AtkManager[m_CurrentAtkID].AtkableFrame.end(), 
+                        CurrentFrame) 
+                    != m_AtkManager[m_CurrentAtkID].AtkableFrame.end();
+
+        if (IsAtkable && !m_AtkFlag){
+            Rect HitBox = Rect::CreateRect(m_WorldPos + glm::vec2(m_AtkManager[m_CurrentAtkID].Offset * m_Transform.scale.x, -100)
+            ,  m_AtkManager[m_CurrentAtkID].AtkRange, 100);
             Rect playerHitBox = Rect::CreateRect(m_player->m_WorldPos, 
                 m_player->left + m_player->right, m_player->top + m_player->bottom);
 
@@ -79,7 +78,7 @@ void Boss::Attack(float dt){
             SetState(c_state::idle);
             m_AtkCoolDownTimer.ResetTime();
             m_AtkFlag = false;
-            m_WorldPos -= m_Transform.scale.x > 0 ? 50 : -50;
+            m_WorldPos.x -= m_Transform.scale.x > 0 ? 50 : -50;
         }
     }
 }
@@ -110,6 +109,9 @@ void Boss::Update(float dt){
     Physics::ApplyGravity(VelocityY, InGround, Gravity, MaxFallSpeed);
     if (InGround) Physics::SlowDown(VelocityX, Friction);
 
+    if (IsNearBy(m_player, m_DetectRange)) m_HpUI->Pop();
+    else m_HpUI->Hide();
+
     if (!m_AtkCoolDownTimer.IsTimeout()){
         if (GetState() == c_state::atked) Attacked(0, glm::vec2(0, 0), 0.0f);
         else SetState(c_state::idle);  // 在 cooldown 時完全 idle
@@ -131,6 +133,7 @@ void Boss::Update(float dt){
     }
     else{
         if (IsNearBy(m_player, m_DetectRange)) {
+            m_Visible = true;
             LookAtPlayer();
             m_state = mob_state::trace;
 
@@ -139,6 +142,7 @@ void Boss::Update(float dt){
                 std::random_device rd;         // 隨機種子
                 std::mt19937 gen(rd());        // 梅森旋轉演算法的亂數產生器
                 std::uniform_int_distribution<> dis(1, 2); // 產生 1 或 2 的均勻分布
+                LOG_DEBUG("Attack");
 
                 m_CurrentAtkID = dis(gen);
                 Attack(dt);  // 初始化攻擊
