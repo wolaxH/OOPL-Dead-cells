@@ -24,22 +24,43 @@ void App::InGameInit() {
     
     
 
+    std::vector<glm::vec2> zombie_positions = {
+        {1200, 500}, {1500, 500}, {1800, 520},{4812, 879},{4770, 879},{5481,20},{6600,-1353},{2346,500},{5255,1027},
+        {7778,-2159},{4887,-180},{7511,-2059},{7920,-2059},{8388,-2543}
+
+
+    };
+
     Img.clear();
     for (int i = 0; i < 24; i++){
         Img.push_back(RESOURCE_DIR"/Zombie/idle/idle_" + std::to_string(i) + ".png");
     }
-    std::shared_ptr<Zombie> zombie = std::make_shared<Zombie>(Img, 200, player, m_World);
-    zombie->SetPos({1200, 500});
-    m_World.Mobs->AddObj(zombie);
+
+    for (const auto& pos : zombie_positions) {
+        auto zombie = std::make_shared<Zombie>(Img, 200, player, m_World);
+        zombie->SetPos(pos);
+        m_World.Mobs->AddObj(zombie);
+    }
+
+
+    std::vector<glm::vec2> shooter_positions = {
+        {2000, 600}, {1154, -836}, {2416, 212},{2776, 877},{4812, 879},{9004,-2347},{6258,-2675},
+        {5200,-2344},{5200,-2344},{6697,-2142},{6011,-200},{3154, 492},{5432, 10},{5346,769},{5255,1027},{6181,-1211},
+{6591,-1353}};
 
     Img.clear();
     for (int i = 0; i < 6; i++){
         Img.push_back(RESOURCE_DIR"/shooter/idle/idle_" + std::to_string(i) + ".png");
     }
-    std::shared_ptr<Shooter> shooter = std::make_shared<Shooter>(Img, 200, player, m_World);
-    shooter->SetPos({1200, 500});
-    m_World.Mobs->AddObj(shooter);
-    
+
+    for (const auto& pos : shooter_positions) {
+        auto shooter = std::make_shared<Shooter>(Img, 200, player, m_World);
+        shooter->SetPos(pos);
+        m_World.Mobs->AddObj(shooter);
+    }
+
+
+
 
     Img.clear();
     for (int i = 0; i < 26; i++){
