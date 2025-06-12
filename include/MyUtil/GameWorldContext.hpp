@@ -6,12 +6,14 @@
 #include "OneSidedPlatform.hpp"
 #include "InterAct/IInterAct.hpp"
 #include "MyUtil/RemovableManager.hpp"
+#include "MyUtil/Camera.hpp"
 
 class Player;
 
 class GameWorldContext{
 public:
-    GameWorldContext(std::vector<std::shared_ptr<MapObj>>& MapObjs) : m_MapObjs(MapObjs){
+    GameWorldContext(std::vector<std::shared_ptr<MapObj>>& MapObjs, Camera& camera)
+     : m_MapObjs(MapObjs), m_Camera(camera){
         Mobs = std::make_shared<RemovableManager>(MapObjs);
         WorldDrops = std::make_shared<RemovableManager>(MapObjs);
         Projectiles = std::make_shared<RemovableManager>(MapObjs);
@@ -33,6 +35,10 @@ public:
         if (it != m_MapObjs.end()) m_MapObjs.erase(it);
     }
 
+    void TriggerShake(float duration, float strength){
+        m_Camera.TriggerShake(duration, strength);
+    }
+
     std::weak_ptr<Player> m_Player;
     std::vector<std::shared_ptr<SolidObj>> SolidObjs = {};
     std::vector<std::shared_ptr<OneSidedPlatform>> OneSidedPlatforms = {};
@@ -41,6 +47,7 @@ public:
     std::shared_ptr<RemovableManager> WorldDrops;
     std::shared_ptr<RemovableManager> Projectiles;
 private:
+    Camera& m_Camera;
     std::vector<std::shared_ptr<MapObj>>& m_MapObjs;
 };
 

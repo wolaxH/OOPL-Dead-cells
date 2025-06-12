@@ -22,6 +22,7 @@ void App::InGameInit() {
     camera.SetPos(player->m_WorldPos);
     m_World.m_Player = player;
     
+    
 
     Img.clear();
     for (int i = 0; i < 24; i++){

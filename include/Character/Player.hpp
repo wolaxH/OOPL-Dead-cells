@@ -132,6 +132,12 @@ private:
     float m_Defense = 0; //防禦力
     std::shared_ptr<Shield> m_CurrentShield = nullptr; //當前使用的shield 如果沒有就nullptr
     
+    bool m_IsAerialLock = false;       // 當前是否正在空中浮空
+    bool m_ComboFloatUsed = false;     // 本次落地前是否已經使用浮空
+    bool m_AerialComboStarted = false; // 是否正在空中攻擊
+
+    bool m_HasDrunkThisHealAnim = false;
+
     int jumpStep = 0;   //double jump counter
     Timer timer;   //for count the roll cooling time
     bool m_Atkedable = true;

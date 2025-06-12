@@ -15,13 +15,13 @@ void Character::SetState(c_state State, std::vector<std::string> path, bool Islo
     try{
         m_Drawable = D_Manager.at(State);   //may throw error
         this->State = State;
-        if (!Isloop) {
-            auto temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
+        auto temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
+        if (temp && !temp->GetLooping()) {
             temp->SetCurrentFrame(0);
             temp->Play();
         }
     } catch (const std::out_of_range &e){
-        
+        LOG_DEBUG("pp");
         if (!path.empty()){
             m_Drawable = std::make_shared<Util::Animation>(path, true, 30, Isloop, 0);
             D_Manager[State] = m_Drawable;
@@ -35,10 +35,12 @@ void Character::InitState(c_state state, const std::vector<std::size_t>& frames,
     std::vector<std::string> Img;
     std::vector<std::string> temp;
     
-    std::vector<c_state> NotLoopingState = {c_state::jump, c_state::fall, c_state::atk, c_state::clinb, c_state::roll, c_state::crouch, c_state::atked};
+    std::vector<c_state> NotLoopingState = {
+        c_state::jump, c_state::fall, c_state::atk, c_state::clinb, 
+        c_state::roll, c_state::crouch, c_state::atked, c_state::block, 
+        c_state::heal};
     
-    
-    for (std::size_t i =0; i < frames.size(); i++){
+    for (std::size_t i = 0; i < frames.size(); i++){
         temp.clear();
         for (std::size_t j = 0; j < frames[i]; j++){temp.push_back(paths[i] + std::to_string(j) + ".png");}
         Img.insert(Img.end(), temp.begin(), temp.end());

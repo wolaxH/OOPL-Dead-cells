@@ -153,7 +153,7 @@ void Zombie::Update(float dt){
         VelocityX = 0;
         
         //set atk state
-        if (IsContainState(c_state::atk)) SetState(c_state::atk, {}, false);
+        if (IsContainState(c_state::atk)) SetState(c_state::atk);
         else InitState(c_state::atk, {28}, {RESOURCE_DIR"/Zombie/atk/atk_"});
         Attack(dt);
     }

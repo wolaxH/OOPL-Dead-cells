@@ -8,7 +8,7 @@
 class HealBottle : public Item{
 public:
     enum class state{
-        full,
+        full = 0,
         half,
         little,
         empty,
@@ -20,15 +20,6 @@ public:
     void Drink(int& Player_Hp);
 
     bool IsNonEmpty(){ return m_state != state::empty;}
-
-    // auto GetcurrentDrawable() const { 
-    //     try{
-    //         return m_Drawables.at(m_state);
-    //     }
-    //     catch(const std::out_of_range &e){
-    //         LOG_ERROR("HealBottle::GetcurrentDrawable() m_Drawables out_of_range");
-    //     }
-    // }
 
     state GetState() const noexcept{ return m_state;}
 

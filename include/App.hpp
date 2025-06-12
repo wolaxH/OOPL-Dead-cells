@@ -94,7 +94,7 @@ private:    //ingame Objs
 
     std::vector<std::shared_ptr<MapObj>> MapObjs;
 
-    GameWorldContext m_World = GameWorldContext(MapObjs);
+    GameWorldContext m_World = GameWorldContext(MapObjs, camera);
     
     std::vector<std::shared_ptr<BG>> BGs;
     

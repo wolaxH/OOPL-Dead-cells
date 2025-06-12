@@ -49,10 +49,20 @@ void Player::Attack(float dt){
     //武器動畫與 c_State 設定
     if (UsedWeapon){
         int slot = UsedWeapon == m_Skill1 ? 0 : 1;
-        if (!m_AttackManager.IsAttacking()) m_AttackManager.StartAttack(slot, UsedWeapon);
-        
-        if (IsContainState(c_state::atk)) SetState(c_state::atk);
-        else InitState(c_state::atk, nullptr);
+
+        if (!m_AttackManager.IsAttacking()) {
+            // 若不是第二次 combo，啟動浮空
+            if (!InGround && !m_ComboFloatUsed){
+                m_IsAerialLock = true;
+                m_AerialComboStarted = true;
+                VelocityY = 0; // 初始化強制浮空
+            }
+
+            m_AttackManager.StartAttack(slot, UsedWeapon);
+
+            if (IsContainState(c_state::atk)) SetState(c_state::atk);
+            else InitState(c_state::atk, nullptr);
+        }
     }
 
     //攻擊操作
@@ -70,6 +80,14 @@ void Player::Attack(float dt){
 
         if (IsWeaponUsed) m_AttackManager.UpdateAtkTimes();
     }
+    if (!m_AttackManager.IsAttacking()){
+        if (m_AerialComboStarted && !m_ComboFloatUsed){
+            m_ComboFloatUsed = true;
+        }
+        m_IsAerialLock = false;
+        m_AerialComboStarted = false;
+    }
+
     m_AttackManager.Update(dt);
 }
 
@@ -132,6 +150,7 @@ void Player::Attacked(int Damage, glm::vec2 Dir, float Velocity){
         switch (m_CurrentShield->GetState()){
         case Shield::State::Block:
             hurt = abs((float)Damage * (1-m_Defense));
+            m_World.TriggerShake(0.15f, 3.0f);
             break;        
         case Shield::State::BlockEnd:
             VelocityX = 0;
@@ -156,8 +175,9 @@ void Player::Attacked(int Damage, glm::vec2 Dir, float Velocity){
         Jump();
         VelocityY = 10.f;
         hurt = Damage;
+        m_World.TriggerShake(0.2f, 5.0f);
     }
-
+    m_IsAerialLock = false;
     m_Hp -= hurt;
 }
 
@@ -231,7 +251,10 @@ void Player::Drink(){
     if (!canDrink) return;
 
     if (GetState() != c_state::heal && m_Hp != 200 && m_HealBottle->IsNonEmpty()){
-        if (IsContainState(c_state::heal)) SetState(c_state::heal);
+        if (IsContainState(c_state::heal)){
+            SetState(c_state::heal);
+            LOG_DEBUG("Point");
+        }
         else InitState(c_state::heal, {34}, {RESOURCE_DIR"/Item/drink/Behavior/Drink_"});
     }
     else if (GetState() == c_state::heal) {
@@ -239,11 +262,14 @@ void Player::Drink(){
         if (anim == nullptr) return;
         size_t currentFrame = anim->GetCurrentFrameIndex();
 
-        if (currentFrame == 20){
+        if (currentFrame == 20 && !m_HasDrunkThisHealAnim){
             m_HealBottle->Drink(m_Hp);
+            m_PlayerINFO->UpdateWaterSlot(m_HealBottle);
+            m_HasDrunkThisHealAnim = true;
         }
         else if (anim->GetCurrentFrameIndex() >= anim->GetFrameCount() - 1){
             SetState(c_state::idle);
+            m_HasDrunkThisHealAnim = false;
         }
     }
     else{
@@ -438,14 +464,14 @@ void Player::Jump(){
     
     jumpStep++;
     if (GetState() != c_state::jump){
-        if (IsContainState(c_state::jump)) SetState(c_state::jump, {}, false);
+        if (IsContainState(c_state::jump)) SetState(c_state::jump);
         else InitState(c_state::jump, {5}, {RESOURCE_DIR"/Beheaded/jump/jumpUp_"});
     }
     VelocityY = 12.5f; 
 }
 
 void Player::fall(){
-    if(IsContainState(c_state::fall)) SetState(c_state::fall, {}, false);
+    if(IsContainState(c_state::fall)) SetState(c_state::fall);
     else{
         std::vector<std::string> Img =  {RESOURCE_DIR"/Beheaded/jump/jumpTrans_",
                                          RESOURCE_DIR"/Beheaded/jump/jumpDown_"};
@@ -506,7 +532,7 @@ void Player::Clinb(){
         if (inYRange && (leftCheck || rightCheck)) {
             // 設定狀態
             if (IsContainState(c_state::clinb)) {
-                SetState(c_state::clinb, {}, false);
+                SetState(c_state::clinb);
             } else {
                 InitState(c_state::clinb, {4}, {RESOURCE_DIR"/Beheaded/jump/jumpThrough_"});
                 auto anim = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
@@ -569,7 +595,7 @@ void Player::roll(){
             else VelocityX = -1*MaxSpeed;
             
             if (InGround) SetState(c_state::idle);
-            else SetState(c_state::fall, {}, false);
+            else SetState(c_state::fall);
             m_Atkedable = true;
         }
         return;
@@ -581,7 +607,7 @@ void Player::roll(){
     if (!timer.IsTimeout()) return;//翻滾冷卻
 
     if (IsContainState(c_state::roll)){
-        SetState(c_state::roll, {}, false);
+        SetState(c_state::roll);
     }
     else{
         std::vector<std::string> paths = {  RESOURCE_DIR"/Beheaded/roll/rollstart_",
@@ -603,7 +629,19 @@ void Player::roll(){
 /*-----------------------------------update-----------------------------------*/
 void Player::Update(float dt){
     InGround = Physics::IsOnGround(this, m_World.SolidObjs, m_World.OneSidedPlatforms);
-    Physics::ApplyGravity(VelocityY, InGround, Gravity, MaxFallSpeed);
+    // Physics::ApplyGravity(VelocityY, InGround, Gravity, MaxFallSpeed);
+    // 落地時重置浮空機會
+    if (InGround){
+        m_ComboFloatUsed = false;
+    }
+
+    // 重力控制：若浮空鎖住則不落下
+    if (m_IsAerialLock && !InGround){
+        VelocityY = 0;
+    } else {
+        Physics::ApplyGravity(VelocityY, InGround, Gravity, MaxFallSpeed);
+    }
+
     if (InGround || IsLeaveOSP()) m_IgnoreOSP = false;
     Move(dt);
 
