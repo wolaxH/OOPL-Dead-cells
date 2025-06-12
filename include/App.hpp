@@ -96,6 +96,10 @@ private:    //ingame Objs
     GameWorldContext m_World = GameWorldContext(MapObjs);
     
     std::vector<std::shared_ptr<BG>> BGs;
+    
+    //for test
+    std::shared_ptr<Util::GameObject> T_GameObj;
+    std::shared_ptr<Util::Animation> T_Anim;
 };
 
 #endif

@@ -9,9 +9,7 @@
 struct AtkInfo{
     float AtkRange;
     int AtkPoint; 
-    size_t FramesCount;
-    //std::shared_ptr<Util::Animation> anim;
-    std::string Path;
+    std::shared_ptr<Util::Animation> anim;
 };
 
 class Boss : public Mob{
@@ -29,9 +27,10 @@ private:
 private:
     // boss Hp GameObject use
     std::shared_ptr<BossHp> m_HpUI;
-    std::vector<AtkInfo> m_AtkInfo;
-    //std::unordered_map<size_t, AtkInfo> m_AtkManager;
+    // std::vector<AtkInfo> m_AtkInfo;
+    std::unordered_map<size_t, AtkInfo> m_AtkManager;
     int m_CurrentAtkID;
+    glm::vec2 m_AtkPosOffset;
 };
 
 #endif

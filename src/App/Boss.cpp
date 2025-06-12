@@ -3,9 +3,9 @@
 /**
  * TODO:
  * *加入attack2(斬擊)
- * *根據大小調整m_Tranform.scale
+ * *根據大小調整
  * *    攻擊碰撞箱大小
- * *    m_AtkInfo, top, bottom, left, right
+ * *    top, bottom, left, right
  * *    
  */
 
@@ -17,8 +17,20 @@ Boss::Boss(std::vector<std::string>& path, int Hp, std::shared_ptr<Player> playe
      */
     m_DetectRange = 2500.f;
     m_Transform.scale = {1.0f, 1.0f};
-    m_AtkInfo.push_back({680.0f, 60, 22, RESOURCE_DIR"/Boss/attack1/atk1_"});
-    m_AtkInfo.push_back({1.0f, 1, 1, RESOURCE_DIR"/Boss/attack2/atk2_"});
+
+    std::vector<std::string> paths;
+    for (int i = 0; i < 22; i++){
+        paths.push_back(RESOURCE_DIR"/Boss/attack1/atk1_" + std::to_string(i) + ".png");
+    }
+    auto anim = std::make_shared<Util::Animation>(paths, true, 60, false);
+    m_AtkManager[1] = {680.0f, 60, anim};
+    paths.clear();
+    for (int i = 0; i < 30; i++){
+        paths.push_back(RESOURCE_DIR"/Boss/attack2/atk2_" + std::to_string(i) + ".png");
+    }
+    anim = std::make_shared<Util::Animation>(paths, true, 60, false);
+    m_AtkManager[2] = {1.0f, 70, anim};
+
     m_AtkCoolDownTimer.SetTime(700, 1200);
     
     top = 50 * m_Transform.scale.y;
@@ -38,18 +50,14 @@ void Boss::Attack(float dt){
     if (GetState() != c_state::atk) {
         if (IsContainState(c_state::atk)){
             SetState(c_state::atk);
-            std::vector<std::string> paths;
-            for (size_t i = 0 ; i < m_AtkInfo[m_CurrentAtkID].FramesCount; i++){
-                paths.push_back(m_AtkInfo[m_CurrentAtkID].Path + std::to_string(i) + ".png");
-            }
-            auto drawable = std::make_shared<Util::Animation>(paths, true, 20, false, 0);
-            ChangeDrawable(AccessKey(), drawable, c_state::atk);
+            ChangeDrawable(AccessKey(), m_AtkManager[m_CurrentAtkID].anim, c_state::atk);
         }
-        else InitState(c_state::atk, {m_AtkInfo[m_CurrentAtkID].FramesCount}, {m_AtkInfo[m_CurrentAtkID].Path});
+        else InitState(c_state::atk, m_AtkManager[m_CurrentAtkID].anim);
         
         auto anim = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
         if (anim) anim->Play();
         m_AtkFlag = false;
+        m_WorldPos += m_Transform.scale.x > 0 ? 50 : -50;
         return;
     }
 
@@ -63,7 +71,7 @@ void Boss::Attack(float dt){
                 m_player->left + m_player->right, m_player->top + m_player->bottom);
 
             if (HitBox.Intersects(playerHitBox)) {
-                m_player->Attacked(m_AtkInfo[m_CurrentAtkID].AtkPoint, m_Transform.scale, 15.0f);
+                m_player->Attacked(m_AtkManager[m_CurrentAtkID].AtkPoint, m_Transform.scale, 15.0f);
                 m_AtkFlag = true;
             }
         }
@@ -71,6 +79,7 @@ void Boss::Attack(float dt){
             SetState(c_state::idle);
             m_AtkCoolDownTimer.ResetTime();
             m_AtkFlag = false;
+            m_WorldPos -= m_Transform.scale.x > 0 ? 50 : -50;
         }
     }
 }
@@ -114,6 +123,8 @@ void Boss::Update(float dt){
     // atk behavior
     if (GetState() == c_state::atk){
         Attack(dt);
+        VelocityX = 0;
+        VelocityY = 0;
     }
     else if (GetState() == c_state::atked){
         Attacked(0, glm::vec2(0, 0), 0.0f);
@@ -127,10 +138,11 @@ void Boss::Update(float dt){
                 VelocityX = 0;
                 std::random_device rd;         // 隨機種子
                 std::mt19937 gen(rd());        // 梅森旋轉演算法的亂數產生器
-                std::uniform_int_distribution<> dis(0, 1); // 產生 0 或 1 的均勻分布
+                std::uniform_int_distribution<> dis(1, 2); // 產生 1 或 2 的均勻分布
 
                 m_CurrentAtkID = dis(gen);
                 Attack(dt);  // 初始化攻擊
+                VelocityY = 0;
             }
             else Move(dt);  // 追蹤玩家
         }
