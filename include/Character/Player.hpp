@@ -5,6 +5,7 @@
 #include "Item/PickUp.hpp"
 #include "Item/Weapon/Abstract/Weapon.hpp"
 #include "Item/Weapon//WeaponTypes.hpp"
+#include "Item/HealBottle.hpp"
 #include "MyUtil/Timer.hpp"
 #include "MyUtil/AtkManager.hpp"
 #include "MyUtil/GameWorldContext.hpp"
@@ -118,10 +119,13 @@ private:
     void Block();
 
     void InterAct();
+
+    void Drink();
     
 private:
     friend class AttackManager;
     
+    std::shared_ptr<HealBottle> m_HealBottle;
     std::shared_ptr<Item> m_Skill1 = nullptr, m_skill2 = nullptr; //武器槽
     std::shared_ptr<PlayerUI> m_PlayerINFO; //玩家UI
     AttackManager m_AttackManager; //攻擊管理器

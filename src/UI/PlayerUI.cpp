@@ -1,11 +1,14 @@
 #include "UI/PlayerUI.hpp"
 
-PlayerUI::PlayerUI(){
+#include "Item/HealBottle.hpp"
+PlayerUI::PlayerUI(const std::shared_ptr<HealBottle>& healBottle){
     m_Hp = std::make_shared<Hp>();
+
 
     m_WaterSlot = std::make_shared<SkillSlot>();
     m_WaterSlot->SetPos(glm::vec2(-575, -260));
-
+    auto Icon = std::dynamic_pointer_cast<Util::Image>(healBottle->GetIcon());
+    m_WaterSlot->SetSkillIcon(Icon);
 
     m_SkillSlot.reserve(2);
     for (size_t i = 0; i < m_SkillSlot.capacity(); i++){
@@ -20,6 +23,10 @@ PlayerUI::PlayerUI(){
     AddChild(m_SkillSlot[1]);
 }
 
+void PlayerUI::UpdateWaterSlot(const std::shared_ptr<HealBottle>& healBottle){
+    auto Icon = std::dynamic_pointer_cast<Util::Image>(healBottle->GetIcon());
+    m_WaterSlot->SetSkillIcon(Icon);
+}
 
 void PlayerUI::SetSkill(std::shared_ptr<Item> item, int index){
     auto Icon = std::dynamic_pointer_cast<Util::Image>(item->GetIcon());

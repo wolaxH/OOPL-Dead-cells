@@ -11,6 +11,7 @@
 #define IS_DOWN_PRESSED()   Util::Input::IsKeyPressed(Util::Keycode::DOWN)  || Util::Input::IsKeyPressed(Util::Keycode::S)
 #define IS_UP_DOWN()        Util::Input::IsKeyDown(Util::Keycode::UP)       || Util::Input::IsKeyDown(Util::Keycode::W) || Util::Input::IsKeyDown(Util::Keycode::SPACE)
 #define IS_ROLL_DOWN()      Util::Input::IsKeyDown(Util::Keycode::LSHIFT)   || Util::Input::IsKeyDown(Util::Keycode::LCTRL)
+#define IS_HEAL_DOWN()      Util::Input::IsKeyDown(Util::Keycode::F)
 
 Player::Player(std::vector<std::string>& path, int Hp, GameWorldContext& World): 
     Character(path, Hp, World){
@@ -19,9 +20,10 @@ Player::Player(std::vector<std::string>& path, int Hp, GameWorldContext& World):
         top = 50 * m_Transform.scale.y;
         bottom = 0 * m_Transform.scale.y;
         left = 10 * m_Transform.scale.x;
-        right = 10 * m_Transform.scale.x;
+        right = 10 * m_Transform.scale.x;        
+        m_HealBottle = std::make_shared<HealBottle>();
         
-        m_PlayerINFO = std::make_shared<PlayerUI>();
+        m_PlayerINFO = std::make_shared<PlayerUI>(m_HealBottle);
 
         AddChild(m_PlayerINFO);
 }
@@ -30,7 +32,9 @@ Player::Player(std::vector<std::string>& path, int Hp, GameWorldContext& World):
 void Player::Attack(float dt){
     if (GetState() == c_state::roll     || //翻滾狀態不能攻擊
         GetState() == c_state::clinb    || //攀爬狀態不能攻擊
-        GetState() == c_state::block    ) return; 
+        GetState() == c_state::block    ||
+        GetState() == c_state::heal     ||
+        GetState() == c_state::clinbOSP) return; 
     
 
     std::shared_ptr<Weapon> UsedWeapon = nullptr;
@@ -70,9 +74,11 @@ void Player::Attack(float dt){
 }
 
 void Player::Block(){
-    if (GetState() == c_state::roll) return; //翻滾狀態不能擋格
-    if (GetState() == c_state::clinb) return; //攀爬狀態不能擋格
-    if (GetState() == c_state::atk) return; //攻擊狀態不能擋格
+    if (GetState() == c_state::roll     || //翻滾狀態不能擋格
+        GetState() == c_state::clinb    || //攀爬狀態不能擋格
+        GetState() == c_state::atk      || //攻擊狀態不能擋格
+        GetState() == c_state::heal     || //治療狀態不能擋格
+        GetState() == c_state::clinbOSP) return; 
 
     std::shared_ptr<Shield> UsedShield = nullptr;
     bool JPressed =  Util::Input::IsKeyPressed(Util::Keycode::J);
@@ -153,7 +159,6 @@ void Player::Attacked(int Damage, glm::vec2 Dir, float Velocity){
     }
 
     m_Hp -= hurt;
-    m_PlayerINFO->SetHp(m_Hp);
 }
 
 void Player::PickUpDrops(std::shared_ptr<Drops> drops){
@@ -214,6 +219,35 @@ void Player::InterAct(){
         if (Obj && IsNearBy(Obj, 100.0)){
             InterActAble->InterAct();
         }
+    }
+}
+
+void Player::Drink(){
+    bool canDrink = (GetState() == c_state::L_move || 
+                     GetState() == c_state::R_move || 
+                     GetState() == c_state::idle   || 
+                     GetState() == c_state::heal);
+
+    if (!canDrink) return;
+
+    if (GetState() != c_state::heal && m_Hp != 200 && m_HealBottle->IsNonEmpty()){
+        if (IsContainState(c_state::heal)) SetState(c_state::heal);
+        else InitState(c_state::heal, {34}, {RESOURCE_DIR"/Item/drink/Behavior/Drink_"});
+    }
+    else if (GetState() == c_state::heal) {
+        auto anim = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
+        if (anim == nullptr) return;
+        size_t currentFrame = anim->GetCurrentFrameIndex();
+
+        if (currentFrame == 20){
+            m_HealBottle->Drink(m_Hp);
+        }
+        else if (anim->GetCurrentFrameIndex() >= anim->GetFrameCount() - 1){
+            SetState(c_state::idle);
+        }
+    }
+    else{
+        //WIP
     }
 }
 
@@ -289,7 +323,10 @@ void Player::Move(float dt){
      * 特定狀態不能移動
      */
     if (GetState() == c_state::clinb) return; //攀爬時不能移動
-    if (GetState() == c_state::atk || GetState() == c_state::block){
+    if (GetState() == c_state::atk      || 
+        GetState() == c_state::block    ||
+        GetState() == c_state::heal)
+    {
         Physics::SlowDown(VelocityX, Friction);
         return;
     }
@@ -578,6 +615,10 @@ void Player::Update(float dt){
     if (Util::Input::IsKeyDown(Util::Keycode::R)){
         InterAct();
     }
+
+    if (IS_HEAL_DOWN() || GetState() == c_state::heal){
+        Drink();
+    }
     
     Clinb();
     ClinbOSP();
@@ -591,4 +632,5 @@ void Player::Update(float dt){
 
     m_WorldPos.x += VelocityX * dt;
     m_WorldPos.y += VelocityY * dt;
+    m_PlayerINFO->SetHp(m_Hp);
 }
