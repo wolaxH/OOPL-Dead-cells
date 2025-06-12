@@ -97,8 +97,8 @@
     },
     {
         "_comment" : "2號房間下方的牆(左邊1)",
-        "pos" : {"x" : 2024, "y" : -131},
-        "scale" : {"x" :0.08 , "y" : 0.318}
+        "pos" : {"x" : 2024, "y" : -124},
+        "scale" : {"x" :0.08 , "y" : 0.26}
     },
     {
         "_comment" : "2號房間下方的牆(右邊3)",
@@ -535,6 +535,21 @@
         "_comment" : "",
         "pos" : {"x" : 7255, "y" : -1887},
         "scale" : {"x" :0.1 , "y" :0.5 }
+    },
+    {
+        "_comment" : "Boss room floor",
+        "pos" : {"x" : 15000, "y" : -170},
+        "scale" : {"x" :10 , "y" :0.5 }
+    },
+    {
+        "_comment" : "Boss room right wall",
+        "pos" : {"x" : 16545, "y" : 160},
+        "scale" : {"x" :0.5 , "y" :3 }
+    },
+    {
+        "_comment" : "Boss room left wall",
+        "pos" : {"x" : 14000, "y" : 160},
+        "scale" : {"x" :0.5 , "y" :3 }
     }
 
 ]

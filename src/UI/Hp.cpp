@@ -26,7 +26,7 @@ void Hp::SetHp(int hp){
     else CurrentHp = hp;
 
     HpBar->m_Transform.scale.x = hp/200.0f;
-    HpBar->m_Transform.translation.x = -380.0f - (1 - hp/200.0f) * 464.6f * 0.5f ;
+    HpBar->m_Transform.translation.x = -380.0f - (1 - hp/200.0f) * 464.6f * 0.5f;
     
     text->SetText(std::to_string(CurrentHp) + "/" + std::to_string(MaxHp));
 }

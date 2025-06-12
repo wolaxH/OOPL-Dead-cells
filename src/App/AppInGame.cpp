@@ -1,7 +1,7 @@
 #include "App.hpp"
 
 void App::InGameUpdate(float dt) {
-    
+
     player->Update(dt);
 
     //projectiles
@@ -14,7 +14,11 @@ void App::InGameUpdate(float dt) {
         auto projectile = std::dynamic_pointer_cast<Projectile>(temp);
         return projectile && projectile->IsDestroyed();
     });
-    
+
+    //InterActs
+    for (auto& temp : m_World.InterActAbles){
+        if (temp) temp->Update();
+    }
         
     //mobs
     for (auto& temp : m_World.Mobs->GetObjs()){

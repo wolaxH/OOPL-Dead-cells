@@ -1,7 +1,7 @@
 #ifndef ATKMANAGER_HPP
 #define ATKMANAGER_HPP
 
-#include "Item/Weapon/WeaponUtil/Weapon.hpp"
+#include "Item/Weapon/Abstract/Weapon.hpp"
 
 #include "Util/Animation.hpp"
 
@@ -44,7 +44,7 @@ public:
     AttackManager(std::weak_ptr<Player> player);
     ~AttackManager() = default;
 
-    bool IsAttacking() const {return m_IsAttacking;}
+    bool IsAttacking() const noexcept {return m_IsAttacking;}
 
     void Update(float dt);
 
@@ -52,11 +52,11 @@ public:
 
     void Interrupt();
 
-    int GetComboIndex() noexcept { return m_ComboIndex;}
+    int GetComboIndex() const noexcept { return m_ComboIndex;}
 
     bool GetHitable() const noexcept { return m_CurrentAtkData.HitableFlag;}
 
-    std::shared_ptr<Weapon> GetCurrentWeapon() const {return m_Weapon;}
+    std::shared_ptr<Weapon> GetCurrentWeapon() const noexcept {return m_Weapon;}
 
     bool IsAtkAble() { return m_CurrentAtkData.AtkTimes > m_CurrentAtkData.HasAtkTimes && m_CurrentAtkData.HitableFlag;}
 

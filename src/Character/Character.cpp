@@ -4,7 +4,7 @@
 
 Character::Character(std::vector<std::string>& path, int Hp, GameWorldContext& World) 
     : m_Hp(Hp), m_World(World) {
-    m_Drawable = std::make_shared<Util::Animation>(path, true, 20, true, 0);
+    m_Drawable = std::make_shared<Util::Animation>(path, true, 30, true, 0);
     State = c_state::idle;
     D_Manager[State] = m_Drawable;
     m_ZIndex = 30;
@@ -15,15 +15,15 @@ void Character::SetState(c_state State, std::vector<std::string> path, bool Islo
     try{
         m_Drawable = D_Manager.at(State);   //may throw error
         this->State = State;
-        if (!Isloop) {
-            auto temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
+        auto temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
+        if (temp && !temp->GetLooping()) {
             temp->SetCurrentFrame(0);
             temp->Play();
         }
     } catch (const std::out_of_range &e){
-        
+        LOG_DEBUG("pp");
         if (!path.empty()){
-            m_Drawable = std::make_shared<Util::Animation>(path, true, 20, Isloop, 0);
+            m_Drawable = std::make_shared<Util::Animation>(path, true, 30, Isloop, 0);
             D_Manager[State] = m_Drawable;
             this->State = State;
         }
@@ -35,10 +35,12 @@ void Character::InitState(c_state state, const std::vector<std::size_t>& frames,
     std::vector<std::string> Img;
     std::vector<std::string> temp;
     
-    std::vector<c_state> NotLoopingState = {c_state::jump, c_state::fall, c_state::atk, c_state::clinb, c_state::roll, c_state::crouch, c_state::atked};
+    std::vector<c_state> NotLoopingState = {
+        c_state::jump, c_state::fall, c_state::atk, c_state::clinb, 
+        c_state::roll, c_state::crouch, c_state::atked, c_state::block, 
+        c_state::heal};
     
-    
-    for (std::size_t i =0; i < frames.size(); i++){
+    for (std::size_t i = 0; i < frames.size(); i++){
         temp.clear();
         for (std::size_t j = 0; j < frames[i]; j++){temp.push_back(paths[i] + std::to_string(j) + ".png");}
         Img.insert(Img.end(), temp.begin(), temp.end());
@@ -109,8 +111,9 @@ void Character::FixPos(float dt){
 
     //One-sided platform 處理
     for (auto& OSP : m_World.OneSidedPlatforms){
-        if (m_WorldPos.y + bottom < OSP->m_WorldPos.y) continue;
+        if (m_WorldPos.y + top < OSP->m_WorldPos.y) continue;
         if (!IsNearBy(OSP, 640.0f)) continue;
+        if (m_IgnoreOSP) return;
 
         //next frame Pos
         m_WorldPos.y += VelocityY * dt;
@@ -122,7 +125,7 @@ void Character::FixPos(float dt){
         float ospRight = OSP->m_WorldPos.x + OSP->right;
 
         // 只有在角色從上方下落且中心在平台上時才阻擋
-        if (aabb.bottom < OSP_aabb.top &&
+        if (aabb.bottom < OSP_aabb.top - 1 &&
             !(charCenter < ospLeft - 1 || charCenter > ospRight + 1)) {
             m_WorldPos.y -= VelocityY * dt;
             VelocityY = 0;

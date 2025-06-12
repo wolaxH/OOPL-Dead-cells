@@ -2,7 +2,9 @@
 
 #include "Character/Player.hpp"
 
-Projectile::Projectile(glm::vec2 Pos, glm::vec2 dir, float velocity, 
+#include "Character/Mob.hpp"
+
+Projectile::Projectile(const glm::vec2& Pos, const glm::vec2& dir, float velocity, 
     int damage, Faction faction, GameWorldContext& world, 
     float lifeTime, std::string path) :
     m_LifeTime(lifeTime), m_Dir(dir.x > 0 ? 1 : -1), m_Velocity(velocity), 
@@ -12,7 +14,7 @@ Projectile::Projectile(glm::vec2 Pos, glm::vec2 dir, float velocity,
     m_ZIndex = 30.0f;
     m_Visible = true;
     m_WorldPos = Pos;
-    m_Transform.scale = {1.0f * dir.x, 1.0f};
+    m_Transform.scale = {1.0f * m_Dir, 1.0f};
     left = m_Dir > 0 ? 0 : 10;
     right = m_Dir < 0 ? 0 : 10;
     top = bottom = 5;
@@ -35,6 +37,16 @@ void Projectile::Update(float dt){
         if (Collision::IsIntersectAABB(this, player.get()) && player->IsAtkedable()){
             player->Attacked(m_Damage, glm::vec2(m_Dir, 0.f), 5.0f);
             m_IsDestroyed = true;
+        }
+    }
+    else if (m_Faction == Faction::Player){
+        for (auto& obj : m_World.Mobs->GetObjs()){
+            auto mob = std::dynamic_pointer_cast<Mob>(obj);
+            if (mob && Collision::IsIntersectAABB(this, mob.get())){
+                mob->Attacked(m_Damage, glm::vec2(m_Dir), 5.0f);
+                m_IsDestroyed = true;
+                break;
+            }
         }
     }
 

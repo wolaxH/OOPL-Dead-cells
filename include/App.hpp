@@ -13,13 +13,15 @@
 #include "MyUtil/Projectile.hpp"
 #include "Character/Zombie.hpp"
 #include "Character/Shooter.hpp"
+#include "Character/Boss.hpp"
 #include "Menu/Button.hpp"
 #include "Menu/Menu.hpp"
 #include "BackGround.hpp"
 #include "OneSidedPlatform.hpp"
 #include "UI/PlayerUI.hpp"
 #include "Item/Weapon/WeaponTypes.hpp"
-
+#include "InterAct/Portal.hpp"
+#include "InterAct/TreasureChest.hpp"
 
 #include "json.hpp"
 
@@ -92,9 +94,13 @@ private:    //ingame Objs
 
     std::vector<std::shared_ptr<MapObj>> MapObjs;
 
-    GameWorldContext m_World = GameWorldContext(MapObjs);
+    GameWorldContext m_World = GameWorldContext(MapObjs, camera);
     
     std::vector<std::shared_ptr<BG>> BGs;
+    
+    //for test
+    // std::shared_ptr<Util::GameObject> T_GameObj;
+    // std::shared_ptr<Util::Animation> T_Anim;
 };
 
 #endif

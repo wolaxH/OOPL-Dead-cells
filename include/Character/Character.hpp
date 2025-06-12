@@ -25,7 +25,8 @@ enum class c_state{ //Character state
     crouch,
     roll,
     atked,
-    block
+    block,
+    heal
 };
 
 class Character : public MapObj{
@@ -39,6 +40,11 @@ public:
     
     c_state GetState(){ return State;}
     
+    /**
+     * Attacked will end by itself
+     * so if current state = atked and there is no special method can interupt it(like roll)
+     * then let It End
+     */
     void virtual Attacked(int Damage, glm::vec2 Dir, float Velocity = 0.0f) = 0;
     
     bool IsAlive() const noexcept{ return m_Hp > 0;}
@@ -58,6 +64,9 @@ protected:
     /*用來修正位置，使其不會穿牆，不修改c_state*/
     void FixPos(float dt);
 
+    /**
+     * Same as Attacked
+     */
     void virtual Attack(float dt) = 0;
 
     //移動
@@ -80,6 +89,7 @@ protected:
     int m_Hp;
     bool InGround;
     GameWorldContext& m_World;   //reference of World resource
+    bool m_IgnoreOSP = false;
 
 private:
     std::unordered_map<c_state, std::shared_ptr<Core::Drawable>> D_Manager;  //Drawable Manager

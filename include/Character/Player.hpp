@@ -3,8 +3,9 @@
 
 #include "Character/Character.hpp"
 #include "Item/PickUp.hpp"
-#include "Item/Weapon/WeaponUtil/Weapon.hpp"
+#include "Item/Weapon/Abstract/Weapon.hpp"
 #include "Item/Weapon//WeaponTypes.hpp"
+#include "Item/HealBottle.hpp"
 #include "MyUtil/Timer.hpp"
 #include "MyUtil/AtkManager.hpp"
 #include "MyUtil/GameWorldContext.hpp"
@@ -97,11 +98,12 @@ private:
      * return true if player under any OSP, and the padding of OSP is 5px
      */
     bool IsUnderOSP();
+
+    bool IsLeaveOSP();
     
     void RequastToChangeDrawable(std::shared_ptr<Util::Animation> PD){
         ChangeDrawable(AccessKey(), PD, c_state::atk);
     }
-    
     
     //a special function for test, development function, to Log player current position
     void TestP();
@@ -115,19 +117,29 @@ private:
      * Block event for shield
      */
     void Block();
+
+    void InterAct();
+
+    void Drink();
     
 private:
     friend class AttackManager;
     
+    std::shared_ptr<HealBottle> m_HealBottle;
     std::shared_ptr<Item> m_Skill1 = nullptr, m_skill2 = nullptr; //武器槽
     std::shared_ptr<PlayerUI> m_PlayerINFO; //玩家UI
     AttackManager m_AttackManager; //攻擊管理器
     float m_Defense = 0; //防禦力
     std::shared_ptr<Shield> m_CurrentShield = nullptr; //當前使用的shield 如果沒有就nullptr
     
+    bool m_IsAerialLock = false;       // 當前是否正在空中浮空
+    bool m_ComboFloatUsed = false;     // 本次落地前是否已經使用浮空
+    bool m_AerialComboStarted = false; // 是否正在空中攻擊
+
+    bool m_HasDrunkThisHealAnim = false;
+
     int jumpStep = 0;   //double jump counter
     Timer timer;   //for count the roll cooling time
     bool m_Atkedable = true;
-    
 };
 #endif

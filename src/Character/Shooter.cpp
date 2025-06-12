@@ -9,6 +9,14 @@ Shooter::Shooter(std::vector<std::string>& path, int Hp, std::shared_ptr<Player>
     m_AtkRange = 400.0f;
     m_AtkCoolDownTimer.SetTime(1000, 1000);
     m_AtkPoint = 20;
+
+    m_HpUI = std::make_shared<EnemyHP>(Hp, Hp, m_WorldPos);
+    AddChild(m_HpUI);
+    m_World.AddObj(m_HpUI);
+}
+
+Shooter::~Shooter(){
+    m_World.RemoveObj(m_HpUI);
 }
 
 void Shooter::Attacked(int Damage, glm::vec2 Dir, float Velocity){
@@ -95,14 +103,9 @@ void Shooter::Move(float dt){
     }
 }
 
-void Shooter::LookAtPlayer(){
-    float absScale = std::abs(m_Transform.scale.x);
-    m_Transform.scale.x = (m_player->m_WorldPos.x < m_WorldPos.x) ? -absScale : absScale;
-}
-
 void Shooter::Update(float dt) {
     // 地面與物理處理
-    InGround = Physics::IsOnGround(m_WorldPos, m_World.SolidObjs, m_World.OneSidedPlatforms);
+    InGround = Physics::IsOnGround(this, m_World.SolidObjs, m_World.OneSidedPlatforms);
     Physics::ApplyGravity(VelocityY, InGround, Gravity, MaxFallSpeed);
     if (InGround) Physics::SlowDown(VelocityX, Friction);
 
@@ -138,4 +141,5 @@ void Shooter::Update(float dt) {
     PushPlayer();
     FixPos(dt);
     m_WorldPos += glm::vec2(VelocityX, VelocityY) * dt;
+    m_HpUI->Update(m_Hp);
 }

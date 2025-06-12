@@ -15,6 +15,14 @@ Zombie::Zombie(std::vector<std::string>& path, int Hp, std::shared_ptr<Player> p
         bottom = 52 * m_Transform.scale.y;
         left = 13 * m_Transform.scale.x;
         right = 13 * m_Transform.scale.x;
+        m_HpUI = std::make_shared<EnemyHP>(Hp, Hp, m_WorldPos);
+        
+        AddChild(m_HpUI);
+        m_World.AddObj(m_HpUI);
+}
+
+Zombie::~Zombie(){
+    m_World.RemoveObj(m_HpUI);
 }
 
 void Zombie::Attack(float dt){  //player
@@ -83,6 +91,9 @@ void Zombie::Move(float dt){
     if (IsSameLevelNearBy(m_player,m_DetectRange)){  
         //c_state = move
         m_state = mob_state::trace;
+        LookAtPlayer();
+        
+
         if (m_player->m_WorldPos.x > m_WorldPos.x + 10){   
             m_Transform.scale.x = 1.0f;
             //Add state
@@ -118,7 +129,7 @@ void Zombie::Move(float dt){
 }
 
 void Zombie::Update(float dt){
-    InGround = Physics::IsOnGround(m_WorldPos, m_World.SolidObjs, m_World.OneSidedPlatforms);
+    InGround = Physics::IsOnGround(this, m_World.SolidObjs, m_World.OneSidedPlatforms);
     Physics::ApplyGravity(VelocityY, InGround, Gravity, MaxFallSpeed);
     if (InGround) Physics::SlowDown(VelocityX, Friction);
 
@@ -142,7 +153,7 @@ void Zombie::Update(float dt){
         VelocityX = 0;
         
         //set atk state
-        if (IsContainState(c_state::atk)) SetState(c_state::atk, {}, false);
+        if (IsContainState(c_state::atk)) SetState(c_state::atk);
         else InitState(c_state::atk, {28}, {RESOURCE_DIR"/Zombie/atk/atk_"});
         Attack(dt);
     }
@@ -156,4 +167,5 @@ void Zombie::Update(float dt){
 
     m_WorldPos.x += VelocityX * dt;
     m_WorldPos.y += VelocityY * dt;
+    m_HpUI->Update(m_Hp);
 }

@@ -33,8 +33,19 @@ RustySword::RustySword() : Weapon(RESOURCE_DIR"/Item/RustySword/Icon.png", "this
     for (int i = 6; i < 14; i++){m_AtkableFrames[2].push_back(i);}
 }
 
-void RustySword::Use(std::shared_ptr<Mob>& mob, const glm::vec2& Dir, int combo){
-    mob->Attacked(m_AtkPoint[combo], Dir, 5.f);
+void RustySword::Use(std::vector<std::shared_ptr<GameObject>>& Objs, const glm::vec2& Pos, bool& UsedFlag, const glm::vec2& Dir, int combo){
+    Rect HitBox = GetHitBox(Pos, m_Transform.scale, combo);
+    Rect MobRect;
+    for (auto& Obj : Objs){
+        auto mob = std::dynamic_pointer_cast<Mob>(Obj);
+        if (mob == nullptr) continue;
+
+        MobRect = Rect::CreateRect(mob->m_WorldPos, mob->top + mob->bottom, mob->left +mob->right);
+        if (HitBox.Intersects(MobRect)){
+            mob->Attacked(m_AtkPoint[combo], Dir, 5.f);
+            UsedFlag = true;
+        }
+    }
 }
 
 Rect RustySword::GetHitBox(const glm::vec2& Pos, const glm::vec2& Dir, int combo){

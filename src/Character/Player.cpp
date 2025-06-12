@@ -11,6 +11,7 @@
 #define IS_DOWN_PRESSED()   Util::Input::IsKeyPressed(Util::Keycode::DOWN)  || Util::Input::IsKeyPressed(Util::Keycode::S)
 #define IS_UP_DOWN()        Util::Input::IsKeyDown(Util::Keycode::UP)       || Util::Input::IsKeyDown(Util::Keycode::W) || Util::Input::IsKeyDown(Util::Keycode::SPACE)
 #define IS_ROLL_DOWN()      Util::Input::IsKeyDown(Util::Keycode::LSHIFT)   || Util::Input::IsKeyDown(Util::Keycode::LCTRL)
+#define IS_HEAL_DOWN()      Util::Input::IsKeyDown(Util::Keycode::F)
 
 Player::Player(std::vector<std::string>& path, int Hp, GameWorldContext& World): 
     Character(path, Hp, World){
@@ -19,18 +20,22 @@ Player::Player(std::vector<std::string>& path, int Hp, GameWorldContext& World):
         top = 50 * m_Transform.scale.y;
         bottom = 0 * m_Transform.scale.y;
         left = 10 * m_Transform.scale.x;
-        right = 10 * m_Transform.scale.x;
+        right = 10 * m_Transform.scale.x;        
+        m_HealBottle = std::make_shared<HealBottle>();
         
-        m_PlayerINFO = std::make_shared<PlayerUI>();
+        m_PlayerINFO = std::make_shared<PlayerUI>(m_HealBottle);
 
         AddChild(m_PlayerINFO);
 }
 
-//WIP
-void Player::Attack(float dt){
-    if (GetState() == c_state::roll) return; //翻滾狀態不能攻擊
-    if (GetState() == c_state::clinb) return; //攀爬狀態不能攻擊
 
+void Player::Attack(float dt){
+    if (GetState() == c_state::roll     || //翻滾狀態不能攻擊
+        GetState() == c_state::clinb    || //攀爬狀態不能攻擊
+        GetState() == c_state::block    ||
+        GetState() == c_state::heal     ||
+        GetState() == c_state::clinbOSP) return; 
+    
 
     std::shared_ptr<Weapon> UsedWeapon = nullptr;
     //使用武器1 
@@ -44,10 +49,20 @@ void Player::Attack(float dt){
     //武器動畫與 c_State 設定
     if (UsedWeapon){
         int slot = UsedWeapon == m_Skill1 ? 0 : 1;
-        if (!m_AttackManager.IsAttacking()) m_AttackManager.StartAttack(slot, UsedWeapon);
-        
-        if (IsContainState(c_state::atk)) SetState(c_state::atk);
-        else InitState(c_state::atk, nullptr);
+
+        if (!m_AttackManager.IsAttacking()) {
+            // 若不是第二次 combo，啟動浮空
+            if (!InGround && !m_ComboFloatUsed){
+                m_IsAerialLock = true;
+                m_AerialComboStarted = true;
+                VelocityY = 0; // 初始化強制浮空
+            }
+
+            m_AttackManager.StartAttack(slot, UsedWeapon);
+
+            if (IsContainState(c_state::atk)) SetState(c_state::atk);
+            else InitState(c_state::atk, nullptr);
+        }
     }
 
     //攻擊操作
@@ -59,28 +74,29 @@ void Player::Attack(float dt){
         }
         //player 攻擊產生的碰撞箱
         
-        Rect HitBox = currentWeapon->GetHitBox(m_WorldPos, m_Transform.scale, m_AttackManager.GetComboIndex());
-        Rect MobRect;
         bool IsWeaponUsed = false;
-        for (auto& mob : m_World.Mobs->GetObjs()){
-            auto MobObj = std::dynamic_pointer_cast<Mob>(mob);
-            if (MobObj == nullptr) continue;
+        currentWeapon->Use( m_World.Mobs->GetObjs(), m_WorldPos, IsWeaponUsed, 
+                            m_Transform.scale, m_AttackManager.GetComboIndex());
 
-            MobRect = Rect::CreateRect(MobObj->m_WorldPos, MobObj->top + MobObj->bottom, MobObj->left + MobObj->right);
-            if (HitBox.Intersects(MobRect)){
-                currentWeapon->Use(MobObj, m_Transform.scale, m_AttackManager.GetComboIndex());
-                IsWeaponUsed = true;
-            }
-        }
         if (IsWeaponUsed) m_AttackManager.UpdateAtkTimes();
     }
+    if (!m_AttackManager.IsAttacking()){
+        if (m_AerialComboStarted && !m_ComboFloatUsed){
+            m_ComboFloatUsed = true;
+        }
+        m_IsAerialLock = false;
+        m_AerialComboStarted = false;
+    }
+
     m_AttackManager.Update(dt);
 }
 
 void Player::Block(){
-    if (GetState() == c_state::roll) return; //翻滾狀態不能擋格
-    if (GetState() == c_state::clinb) return; //攀爬狀態不能擋格
-    if (GetState() == c_state::atk) return; //攻擊狀態不能擋格
+    if (GetState() == c_state::roll     || //翻滾狀態不能擋格
+        GetState() == c_state::clinb    || //攀爬狀態不能擋格
+        GetState() == c_state::atk      || //攻擊狀態不能擋格
+        GetState() == c_state::heal     || //治療狀態不能擋格
+        GetState() == c_state::clinbOSP) return; 
 
     std::shared_ptr<Shield> UsedShield = nullptr;
     bool JPressed =  Util::Input::IsKeyPressed(Util::Keycode::J);
@@ -134,6 +150,7 @@ void Player::Attacked(int Damage, glm::vec2 Dir, float Velocity){
         switch (m_CurrentShield->GetState()){
         case Shield::State::Block:
             hurt = abs((float)Damage * (1-m_Defense));
+            m_World.TriggerShake(0.15f, 3.0f);
             break;        
         case Shield::State::BlockEnd:
             VelocityX = 0;
@@ -158,10 +175,10 @@ void Player::Attacked(int Damage, glm::vec2 Dir, float Velocity){
         Jump();
         VelocityY = 10.f;
         hurt = Damage;
+        m_World.TriggerShake(0.2f, 5.0f);
     }
-
+    m_IsAerialLock = false;
     m_Hp -= hurt;
-    m_PlayerINFO->SetHp(m_Hp);
 }
 
 void Player::PickUpDrops(std::shared_ptr<Drops> drops){
@@ -179,16 +196,18 @@ void Player::PickUpDrops(std::shared_ptr<Drops> drops){
         }
         else{ //WIP
             //彈出更換武器視窗
-            int select = 0;
+            static int select = 0;
+            select = 1 - select;
 
             //將被替換的武器變成掉落物
-            auto temp = m_Skill1->ToDrops();
+            std::shared_ptr<Item>& selectSkill = select == 0 ? m_Skill1 : m_skill2;
+            auto temp = selectSkill->ToDrops();
             temp->m_WorldPos = m_WorldPos + glm::vec2(10, 40);
             m_World.WorldDrops->AddObj(temp);
-            m_Skill1 = NewItem;
+            selectSkill = NewItem;
             
             //更換slot圖案
-            m_PlayerINFO->SetSkill(m_Skill1, select);
+            m_PlayerINFO->SetSkill(selectSkill, select);
         }
         m_World.WorldDrops->RemoveObj(drops);
     } //如果是卷軸
@@ -214,15 +233,55 @@ void Player::PickUp(){
     }
 }
 
+void Player::InterAct(){
+    for (auto& InterActAble : m_World.InterActAbles){
+        auto Obj = std::dynamic_pointer_cast<MapObj>(InterActAble);
+        if (Obj && IsNearBy(Obj, 100.0)){
+            InterActAble->InterAct();
+        }
+    }
+}
+
+void Player::Drink(){
+    bool canDrink = (GetState() == c_state::L_move || 
+                     GetState() == c_state::R_move || 
+                     GetState() == c_state::idle   || 
+                     GetState() == c_state::heal);
+
+    if (!canDrink) return;
+
+    if (GetState() != c_state::heal && m_Hp != 200 && m_HealBottle->IsNonEmpty()){
+        if (IsContainState(c_state::heal)){
+            SetState(c_state::heal);
+            LOG_DEBUG("Point");
+        }
+        else InitState(c_state::heal, {34}, {RESOURCE_DIR"/Item/drink/Behavior/Drink_"});
+    }
+    else if (GetState() == c_state::heal) {
+        auto anim = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
+        if (anim == nullptr) return;
+        size_t currentFrame = anim->GetCurrentFrameIndex();
+
+        if (currentFrame == 20 && !m_HasDrunkThisHealAnim){
+            m_HealBottle->Drink(m_Hp);
+            m_PlayerINFO->UpdateWaterSlot(m_HealBottle);
+            m_HasDrunkThisHealAnim = true;
+        }
+        else if (anim->GetCurrentFrameIndex() >= anim->GetFrameCount() - 1){
+            SetState(c_state::idle);
+            m_HasDrunkThisHealAnim = false;
+        }
+    }
+    else{
+        //WIP
+    }
+}
+
 /*-----------------------------------util-----------------------------------*/
 
 
 void Player::TestP(){
     if (Util::Input::IsKeyDown(Util::Keycode::P)){
-        // m_PlayerINFO->SetHp(m_PlayerINFO->GetCurrentHp() - 5);
-        // if (m_PlayerINFO->GetCurrentHp() <= 0){
-        //     m_PlayerINFO->SetHp(100);
-        // }
         LOG_DEBUG(m_WorldPos);
     }
 
@@ -242,7 +301,7 @@ bool Player::IsOnOSP(){
         OSP_scale = abs(OSP->GetScaledSize());
 
         x = !((Pos.x < OSP_Pos.x - OSP_scale.x/2 - 1) || (Pos.x > OSP_Pos.x + OSP_scale.x/2 + 1));
-        y = (Pos.y > OSP_Pos.y - OSP_scale.y/2) && (Pos.y < OSP_Pos.y + OSP_scale.y/2 + 2);
+        y = (Pos.y > OSP_Pos.y - OSP_scale.y/2) && (Pos.y < OSP_Pos.y + OSP_scale.y/2 + 3.5);
         if (x && y) return true;
     }
     return false;
@@ -260,11 +319,22 @@ bool Player::IsUnderOSP(){
         OSP_scale = abs(OSP->GetScaledSize());
 
         x = !((Pos.x < OSP->m_WorldPos.x - OSP->left - 1) || (Pos.x > OSP->m_WorldPos.x + OSP->right + 1));
-        y = (Pos.y - bottom < OSP->m_WorldPos.y - OSP->bottom) && (Pos.y + top > OSP->m_WorldPos.y - 10.0f);
+        y = (Pos.y - bottom < OSP->m_WorldPos.y - OSP->top) && (Pos.y + top > OSP->m_WorldPos.y - 10.0f);
 
         if (x && y) return true;
     }
     return false;
+}
+
+bool Player::IsLeaveOSP(){
+    Collision::AABB aabb = Collision::GetAABB(this);
+    Collision::AABB OSP_aabb;
+
+    for (const auto& OSP : m_World.OneSidedPlatforms){
+        OSP_aabb = Collision::GetAABB(OSP.get());
+        if (Collision::IsIntersectAABB(aabb, OSP_aabb)) return false;
+    }
+    return true;
 }
 
 /*-----------------------------------move-----------------------------------*/
@@ -274,7 +344,10 @@ void Player::Move(float dt){
      * 特定狀態不能移動
      */
     if (GetState() == c_state::clinb) return; //攀爬時不能移動
-    if (GetState() == c_state::atk || GetState() == c_state::block){
+    if (GetState() == c_state::atk      || 
+        GetState() == c_state::block    ||
+        GetState() == c_state::heal)
+    {
         Physics::SlowDown(VelocityX, Friction);
         return;
     }
@@ -283,9 +356,10 @@ void Player::Move(float dt){
     if ((IS_DOWN_PRESSED()) && (GetState() == c_state::crouch)) {
         Physics::SlowDown(VelocityX, Friction);
         if ((IS_UP_DOWN()) && IsOnOSP()){
-            m_WorldPos.y -= 10;
+            m_WorldPos.y -= 15;
             VelocityY = -5.f;
             fall();
+            m_IgnoreOSP = true;
         }
         return;
     }
@@ -385,14 +459,14 @@ void Player::Jump(){
     
     jumpStep++;
     if (GetState() != c_state::jump){
-        if (IsContainState(c_state::jump)) SetState(c_state::jump, {}, false);
+        if (IsContainState(c_state::jump)) SetState(c_state::jump);
         else InitState(c_state::jump, {5}, {RESOURCE_DIR"/Beheaded/jump/jumpUp_"});
     }
     VelocityY = 12.5f; 
 }
 
 void Player::fall(){
-    if(IsContainState(c_state::fall)) SetState(c_state::fall, {}, false);
+    if(IsContainState(c_state::fall)) SetState(c_state::fall);
     else{
         std::vector<std::string> Img =  {RESOURCE_DIR"/Beheaded/jump/jumpTrans_",
                                          RESOURCE_DIR"/Beheaded/jump/jumpDown_"};
@@ -453,7 +527,7 @@ void Player::Clinb(){
         if (inYRange && (leftCheck || rightCheck)) {
             // 設定狀態
             if (IsContainState(c_state::clinb)) {
-                SetState(c_state::clinb, {}, false);
+                SetState(c_state::clinb);
             } else {
                 InitState(c_state::clinb, {4}, {RESOURCE_DIR"/Beheaded/jump/jumpThrough_"});
                 auto anim = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
@@ -480,6 +554,7 @@ void Player::ClinbOSP(){
     if (GetState() == c_state::clinbOSP && !IsUnderOSP()){
         VelocityY = 0;
         SetState(c_state::idle);
+        m_IgnoreOSP = false;
     }
 
     float P_Head = m_WorldPos.y + top;
@@ -488,8 +563,8 @@ void Player::ClinbOSP(){
     bool IsHeadOver, IsbottomUnder, IsXInRange;
 
     for (auto& OSP : m_World.OneSidedPlatforms){
-        IsHeadOver = P_Head > OSP->m_WorldPos.y - OSP->bottom - 10.0f;
-        IsbottomUnder = P_Bottom < OSP->m_WorldPos.y-3;
+        IsHeadOver = P_Head > OSP->m_WorldPos.y - OSP->bottom;
+        IsbottomUnder = P_Bottom < OSP->m_WorldPos.y;
         IsXInRange = !((m_WorldPos.x < OSP->m_WorldPos.x - OSP->left - 1) || (m_WorldPos.x > OSP->m_WorldPos.x + OSP->right + 1));
         if (IsbottomUnder &&  IsHeadOver && IsXInRange){
                 //rendering, c_state
@@ -498,6 +573,7 @@ void Player::ClinbOSP(){
 
                 //Move logic                
                 VelocityY = 7.5f;
+                m_IgnoreOSP = true;
                 return;
             }
     }
@@ -514,7 +590,7 @@ void Player::roll(){
             else VelocityX = -1*MaxSpeed;
             
             if (InGround) SetState(c_state::idle);
-            else SetState(c_state::fall, {}, false);
+            else SetState(c_state::fall);
             m_Atkedable = true;
         }
         return;
@@ -526,7 +602,7 @@ void Player::roll(){
     if (!timer.IsTimeout()) return;//翻滾冷卻
 
     if (IsContainState(c_state::roll)){
-        SetState(c_state::roll, {}, false);
+        SetState(c_state::roll);
     }
     else{
         std::vector<std::string> paths = {  RESOURCE_DIR"/Beheaded/roll/rollstart_",
@@ -547,14 +623,35 @@ void Player::roll(){
 
 /*-----------------------------------update-----------------------------------*/
 void Player::Update(float dt){
-    InGround = Physics::IsOnGround(m_WorldPos, m_World.SolidObjs, m_World.OneSidedPlatforms);
-    Physics::ApplyGravity(VelocityY, InGround, Gravity, MaxFallSpeed);
+    InGround = Physics::IsOnGround(this, m_World.SolidObjs, m_World.OneSidedPlatforms);
+    // Physics::ApplyGravity(VelocityY, InGround, Gravity, MaxFallSpeed);
+    // 落地時重置浮空機會
+    if (InGround){
+        m_ComboFloatUsed = false;
+    }
+
+    // 重力控制：若浮空鎖住則不落下
+    if (m_IsAerialLock && !InGround){
+        VelocityY = 0;
+    } else {
+        Physics::ApplyGravity(VelocityY, InGround, Gravity, MaxFallSpeed);
+    }
+
+    if (InGround || IsLeaveOSP()) m_IgnoreOSP = false;
     Move(dt);
 
     if (IS_ROLL_DOWN() || GetState() == c_state::roll){
         roll();
     }
     if (GetState() != c_state::roll) m_Atkedable = true;
+
+    if (Util::Input::IsKeyDown(Util::Keycode::R)){
+        InterAct();
+    }
+
+    if (IS_HEAL_DOWN() || GetState() == c_state::heal){
+        Drink();
+    }
     
     Clinb();
     ClinbOSP();
@@ -568,4 +665,5 @@ void Player::Update(float dt){
 
     m_WorldPos.x += VelocityX * dt;
     m_WorldPos.y += VelocityY * dt;
+    m_PlayerINFO->SetHp(m_Hp);
 }
