@@ -40,8 +40,9 @@ void App::MainPageInit(){
     auto Bg = std::make_shared<Util::GameObject>(std::make_shared<Util::Image>(RESOURCE_DIR"/menu/menu_bg.png"), 2.f);
     Bg->m_Transform.scale = glm::vec2(1/1.5f, 1/1.5f);
 
-    auto SelectBar = std::make_shared<Util::GameObject>(std::make_shared<Util::Image>(RESOURCE_DIR"/menu/selectbar.png"), 2.0);
-    StartMenu = std::make_shared<Menu>(SelectBar, Bg, std::vector<std::shared_ptr<Button>>{PlayButton, OptionButton, ExitButton}, glm::vec2(125, 21));
+    auto offset = glm::vec2(125, 21);
+    auto SelectBar = std::make_shared<Util::GameObject>(std::make_shared<Util::Image>(RESOURCE_DIR"/menu/selectbar.png"), 2.1f);
+    StartMenu = std::make_shared<Menu>(SelectBar, Bg, std::vector<std::shared_ptr<Button>>{PlayButton, OptionButton, ExitButton}, offset);
 
     root.AddChild(StartMenu);
     m_CurrentState = State::MENU;

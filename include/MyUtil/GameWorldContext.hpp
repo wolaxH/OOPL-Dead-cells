@@ -8,12 +8,14 @@
 #include "MyUtil/RemovableManager.hpp"
 #include "MyUtil/Camera.hpp"
 
+#include "Util/Logger.hpp"
+
 class Player;
 
 class GameWorldContext{
 public:
     GameWorldContext(std::vector<std::shared_ptr<MapObj>>& MapObjs, Camera& camera)
-     : m_MapObjs(MapObjs), m_Camera(camera){
+     : m_Camera(camera), m_MapObjs(MapObjs){
         Mobs = std::make_shared<RemovableManager>(MapObjs);
         WorldDrops = std::make_shared<RemovableManager>(MapObjs);
         Projectiles = std::make_shared<RemovableManager>(MapObjs);
@@ -44,6 +46,7 @@ public:
         Mobs->Clear();
         WorldDrops->Clear();
         Projectiles->Clear();
+        m_Player.reset();
     }
 
     std::weak_ptr<Player> m_Player;

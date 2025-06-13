@@ -19,9 +19,11 @@ Zombie::Zombie(std::vector<std::string>& path, int Hp, std::shared_ptr<Player> p
         
         AddChild(m_HpUI);
         m_World.AddObj(m_HpUI);
+        LOG_DEBUG("Zombie init");
 }
 
 Zombie::~Zombie(){
+    LOG_DEBUG("Deleted Zombie");
     m_World.RemoveObj(m_HpUI);
 }
 

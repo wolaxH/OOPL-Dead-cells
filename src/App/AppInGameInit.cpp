@@ -37,8 +37,9 @@ void App::InGameInit() {
         Img.push_back(RESOURCE_DIR"/Zombie/idle/idle_" + std::to_string(i) + ".png");
     }
 
+    std::shared_ptr<Zombie> zombie;
     for (const auto& pos : zombie_positions) {
-        auto zombie = std::make_shared<Zombie>(Img, 200, player, m_World);
+        zombie = std::make_shared<Zombie>(Img, 200, player, m_World);
         zombie->SetPos(pos);
         m_World.Mobs->AddObj(zombie);
     }
@@ -62,6 +63,7 @@ void App::InGameInit() {
     }
 
 
+
     Img.clear();
     for (int i = 0; i < 26; i++){
         Img.push_back(RESOURCE_DIR"/Boss/Idle/idle_" + std::to_string(i) + ".png");
@@ -69,6 +71,7 @@ void App::InGameInit() {
     std::shared_ptr<Boss> boss = std::make_shared<Boss>(Img, 2000, player, m_World);
     boss->m_WorldPos = glm::vec2(16000, 200);
     m_World.Mobs->AddObj(boss);
+
 
     //Item test
     auto RW = std::make_shared<RustySword>();
@@ -148,7 +151,6 @@ void App::InGameInit() {
     }
 
 
-
     /**
      * To create a one sided platform object
      */
@@ -175,17 +177,7 @@ void App::InGameInit() {
     root.AddChild(m_World.WorldDrops);
     root.AddChild(m_World.Mobs);
     root.AddChild(m_World.Projectiles);
-    for (const auto& temp : m_World.WorldDrops->GetObjs()){
-        auto drop = std::dynamic_pointer_cast<MapObj>(temp);
-        if (drop) MapObjs.push_back(drop);
-    }
 
-    for (const auto& temp : m_World.Mobs->GetObjs()){
-        auto mob = std::dynamic_pointer_cast<MapObj>(temp);
-        if (mob) MapObjs.push_back(mob);
-    }
-
-    
 
     LOG_TRACE("Start");
     

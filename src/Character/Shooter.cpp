@@ -13,9 +13,12 @@ Shooter::Shooter(std::vector<std::string>& path, int Hp, std::shared_ptr<Player>
     m_HpUI = std::make_shared<EnemyHP>(Hp, Hp, m_WorldPos);
     AddChild(m_HpUI);
     m_World.AddObj(m_HpUI);
+
+    LOG_DEBUG("Shooter init");
 }
 
 Shooter::~Shooter(){
+    LOG_DEBUG("Deleted Shooter");
     m_World.RemoveObj(m_HpUI);
 }
 

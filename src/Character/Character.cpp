@@ -21,7 +21,7 @@ void Character::SetState(c_state State, std::vector<std::string> path, bool Islo
             temp->Play();
         }
     } catch (const std::out_of_range &e){
-        LOG_DEBUG("pp");
+
         if (!path.empty()){
             m_Drawable = std::make_shared<Util::Animation>(path, true, 30, Isloop, 0);
             D_Manager[State] = m_Drawable;

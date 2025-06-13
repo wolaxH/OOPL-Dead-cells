@@ -17,7 +17,7 @@ struct AtkInfo{
 class Boss : public Mob{
 public:
     Boss(std::vector<std::string>& path, int Hp, std::shared_ptr<Player> player, GameWorldContext& World);
-    ~Boss() = default;
+    ~Boss(){LOG_DEBUG("Deleted Boss");};
 
     void Attacked(int Damage, glm::vec2 Dir, float Velocity = 0.0f) override;
     

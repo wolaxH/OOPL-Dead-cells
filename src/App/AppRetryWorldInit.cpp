@@ -1,8 +1,8 @@
 #include "App.hpp"
 
 void App::RetryWorldInit(){
+    root.RemoveChild(player);
     player = nullptr;
-
     m_World.Clear();
 
 

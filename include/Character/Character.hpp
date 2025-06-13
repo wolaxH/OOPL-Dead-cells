@@ -2,6 +2,7 @@
 #define CHARACTER_HPP
 
 #include "Util/Animation.hpp"
+#include "Util/Logger.hpp"
 
 #include "Abstract/MapObj.hpp"
 #include "MyUtil/GameWorldContext.hpp"

@@ -2,8 +2,10 @@
 #define REMOVABLEMANAGER_HPP
 
 #include "Util/GameObject.hpp"
+#include "Util/Logger.hpp"
 #include "Abstract/MapObj.hpp"
 #include <functional>
+
 
 class RemovableManager : public Util::GameObject{
 public:
@@ -38,14 +40,14 @@ public:
             }
         }
         for (auto& obj : toRemove) {
+            int a = obj.use_count();
             RemoveObj(obj);
+            LOG_DEBUG("Remove {} ref", a - obj.use_count());
+            LOG_DEBUG("Current ref by {}", obj.use_count() - 1);
         }
     }
 
-    /**
-     * This method will NOT remove any Obj or ref in Mapobj
-     * only remove all the Children 
-     */
+
     void Clear(){
         for (auto Obj : m_Children){
             auto temp = std::dynamic_pointer_cast<MapObj>(Obj);
