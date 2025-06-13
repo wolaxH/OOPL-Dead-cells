@@ -28,7 +28,8 @@ enum class c_state{ //Character state
     atked,
     block,
     heal,
-    death
+    death,
+    rebirth
 };
 
 class Character : public MapObj{

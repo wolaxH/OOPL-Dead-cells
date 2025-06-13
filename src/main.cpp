@@ -40,6 +40,12 @@ int main(int, char**) {
             case App::State::INIT_RETRY:
                 app.RetryWorldInit();
                 break;
+            case App::State::SUMMARY_INIT:
+                app.SummaryInit();
+                break;
+            case App::State::SUMMARY:
+                app.Summary();
+                break;
             case App::State::END:
                 app.End();
                 context->SetExit(true);

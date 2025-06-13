@@ -14,7 +14,7 @@ void App::RetryWorldInit(){
     }
     player = std::make_shared<Player>(Img, 200, m_World);
     player->Init();
-    player->SetPos({0, 0});
+    player->SetPos({0, -225});
     player->SetZIndex(30.1);
 
     root.AddChild(player);
@@ -65,34 +65,30 @@ void App::RetryWorldInit(){
     for (int i = 0; i < 26; i++){
         Img.push_back(RESOURCE_DIR"/Boss/Idle/idle_" + std::to_string(i) + ".png");
     }
-    std::shared_ptr<Boss> boss = std::make_shared<Boss>(Img, 2000, player, m_World);
-    boss->m_WorldPos = glm::vec2(16000, 200);
-    m_World.Mobs->AddObj(boss);
+    m_Boss = std::make_shared<Boss>(Img, 2000, player, m_World);
+    m_Boss->m_WorldPos = glm::vec2(16000, 200);
+    m_World.Mobs->AddObj(m_Boss);
 
-    //Item test
+   //Item test
     auto RW = std::make_shared<RustySword>();
-    auto B = std::make_shared<Bone>();
     auto TD = std::make_shared<TwinDaggers>();
     auto WS = std::make_shared<WoodenShield>();
     auto bow  = std::make_shared<Bow>(m_World);
 
     auto t = RW->ToDrops();
     m_World.WorldDrops->AddObj(t);
-
-    t = B->ToDrops();
-    t->m_WorldPos.x += 100;
-    m_World.WorldDrops->AddObj(t);
+    t->m_WorldPos = glm::vec2(1023, -887);
 
     t = TD->ToDrops();
-    t->m_WorldPos.x -= 400;
+    t->m_WorldPos = glm::vec2(2605, 899);
     m_World.WorldDrops->AddObj(t);
 
     t = WS->ToDrops();
-    t->m_WorldPos.x -= 200;
+    t->m_WorldPos = glm::vec2(8499.888672, -2539.343994);
     m_World.WorldDrops->AddObj(t);
 
     t = bow->ToDrops();
-    t->m_WorldPos.x += 200;
+    t->m_WorldPos = glm::vec2(7625.755859, -1105.678589);
     m_World.WorldDrops->AddObj(t);
     //Item test end
 
@@ -106,7 +102,7 @@ void App::RetryWorldInit(){
     
     
     //TreasureChest
-    auto treasure = std::make_shared<RustySword>();
+    auto treasure = std::make_shared<Bone>();
     auto Tchest = std::make_shared<TreasureChest>(treasure, m_World);
     Tchest->m_WorldPos = glm::vec2(6369, 620);
     m_World.InterActAbles.push_back(Tchest);
@@ -121,16 +117,6 @@ void App::RetryWorldInit(){
             auto child = std::dynamic_pointer_cast<MapObj>(child_temp);
             MapObjs.push_back(child);
         }
-    }
-
-    for (const auto& temp : m_World.WorldDrops->GetObjs()){
-        auto drop = std::dynamic_pointer_cast<MapObj>(temp);
-        if (drop) MapObjs.push_back(drop);
-    }
-
-    for (const auto& temp : m_World.Mobs->GetObjs()){
-        auto mob = std::dynamic_pointer_cast<MapObj>(temp);
-        if (mob) MapObjs.push_back(mob);
     }
 
     m_CurrentState = State::UPDATE;

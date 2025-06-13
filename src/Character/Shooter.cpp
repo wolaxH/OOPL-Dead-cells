@@ -13,6 +13,7 @@ Shooter::Shooter(std::vector<std::string>& path, int Hp, std::shared_ptr<Player>
     m_HpUI = std::make_shared<EnemyHP>(Hp, Hp, m_WorldPos);
     AddChild(m_HpUI);
     m_World.AddObj(m_HpUI);
+    m_score = 25;
 
     LOG_DEBUG("Shooter init");
 }

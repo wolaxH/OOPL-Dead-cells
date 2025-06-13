@@ -26,6 +26,8 @@ private:
     void Attack(float dt) override;
 
     void Move(float dt) override;
+
+    int GetScore() {return m_score;}
 private:
     // boss Hp GameObject use
     std::shared_ptr<BossHp> m_HpUI;

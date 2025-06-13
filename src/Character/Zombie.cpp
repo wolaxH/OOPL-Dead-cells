@@ -19,6 +19,7 @@ Zombie::Zombie(std::vector<std::string>& path, int Hp, std::shared_ptr<Player> p
         
         AddChild(m_HpUI);
         m_World.AddObj(m_HpUI);
+        m_score = 15;
         LOG_DEBUG("Zombie init");
 }
 

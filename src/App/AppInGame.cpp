@@ -2,6 +2,17 @@
 
 void App::InGameUpdate(float dt) {
 
+    if (!player->GetHasRebirth() || player->GetState() == c_state::rebirth){
+        player->Rebrith();
+        //camera    
+        camera.Update(player);
+        for (auto& temp : MapObjs){
+            temp->m_Transform.translation = temp->m_WorldPos - camera.GetPos();
+        }
+        root.Update();
+        return;
+    }
+
     player->Update(dt);
 
     //projectiles
@@ -24,6 +35,7 @@ void App::InGameUpdate(float dt) {
     for (auto& temp : m_World.Mobs->GetObjs()){
         auto mob = std::dynamic_pointer_cast<Mob>(temp);
         mob->Update(dt);
+        if (!mob->IsAlive()) player->AddScore(mob->GetScore());
     }
     m_World.Mobs->RemoveObjs([](const std::shared_ptr<Util::GameObject>& temp){
         auto mob = std::dynamic_pointer_cast<Mob>(temp);
@@ -76,8 +88,8 @@ void App::InGameUpdate(float dt) {
             m_CurrentState = State::INIT_RETRY_MENU;
         }
     }
+    else if (!m_Boss->IsAlive()){
+        m_CurrentState = State::SUMMARY_INIT;
+    }
 }
 
-void App::End() { // NOLINT(this method will mutate members in the future)
-    LOG_TRACE("End");
-}

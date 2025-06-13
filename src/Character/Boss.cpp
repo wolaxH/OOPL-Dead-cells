@@ -31,6 +31,7 @@ Boss::Boss(std::vector<std::string>& path, int Hp, std::shared_ptr<Player> playe
     left =  90 * m_Transform.scale.x;
     right = 90 * m_Transform.scale.x;
     
+    m_score = 100;
     m_HpUI = std::make_shared<BossHp>(m_Hp);
     AddChild(m_HpUI);
 }

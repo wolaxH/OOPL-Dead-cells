@@ -12,6 +12,8 @@ public:
     void Attacked(int Damage, glm::vec2 Dir, float Velocity = 0.0f) override;
     
     void Update(float dt) override;
+
+    int GetScore() {return m_score;}
 private:
     void Attack(float dt) override;
 

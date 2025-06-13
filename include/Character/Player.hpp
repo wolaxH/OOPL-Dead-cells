@@ -48,6 +48,16 @@ public:
     }
 
     Timer m_DeathTimer;
+
+    void AddScore(int score){
+        m_score = score;
+    }
+
+    int GetScore(){return m_score;}
+
+    void Rebrith();
+
+    bool GetHasRebirth() {return m_Hasrebirth;}
 private:
     
     void PickUp();
@@ -154,6 +164,9 @@ private:
     bool m_IsDead = false;
     bool m_HasDied = false;
 
+    bool m_Hasrebirth = false; 
+
     bool m_CheatingMode = false;
+    int m_score;
 };
 #endif

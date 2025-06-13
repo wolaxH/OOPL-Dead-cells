@@ -78,7 +78,10 @@ void Player::Attack(float dt){
         currentWeapon->Use( m_World.Mobs->GetObjs(), m_WorldPos, IsWeaponUsed, 
                             m_Transform.scale, m_AttackManager.GetComboIndex());
 
-        if (IsWeaponUsed) m_AttackManager.UpdateAtkTimes();
+        if (IsWeaponUsed){
+            m_World.TriggerShake(0.15f, 0.8f);
+            m_AttackManager.UpdateAtkTimes();
+        }
     }
     if (!m_AttackManager.IsAttacking()){
         if (m_AerialComboStarted && !m_ComboFloatUsed){
@@ -291,12 +294,32 @@ void Player::Die(){
     m_DeathTimer.ResetTime();
 }
 
+
+void Player::Rebrith(){
+    if (m_Hasrebirth){
+        if (GetState() == c_state::rebirth){
+            auto anim = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
+            if (anim && anim->GetCurrentFrameIndex() >= anim->GetFrameCount() - 1){
+                SetState(c_state::idle);
+            }
+        }
+        return;
+    }
+
+    m_Hasrebirth = true;
+    InitState(c_state::rebirth, {46}, {RESOURCE_DIR"/Beheaded/rebirth/rebirth_"});
+    auto anim = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
+    anim->SetInterval(60);
+
+}
 /*-----------------------------------util-----------------------------------*/
 
 
 void Player::TestP(){
     if (Util::Input::IsKeyDown(Util::Keycode::P)){
-        m_CheatingMode = m_CheatingMode ? false : true;
+        m_CheatingMode = !m_CheatingMode;
+        LOG_DEBUG("Cheating Mode On");
+        // LOG_DEBUG(m_WorldPos);   
     }
 
 }

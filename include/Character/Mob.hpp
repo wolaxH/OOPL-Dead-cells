@@ -16,6 +16,8 @@ public:
     : Character(path, Hp, World), m_player(player){MaxSpeed = 5.0f, AccelerationX = 2.0f;}
     virtual ~Mob() = default;
 
+    int GetScore() {return m_score;}
+
 protected:
     bool IsSameLevelNearBy(std::shared_ptr<MapObj> other, float distance = 1000.0f){
         glm::vec2 D = m_WorldPos - other->m_WorldPos;
@@ -40,7 +42,9 @@ protected:
 
     mob_state m_state = mob_state::wander;
     std::shared_ptr<Player> m_player;
+    int m_score;
 private:
     Timer m_WanderTimer;
+
 };
 #endif

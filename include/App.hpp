@@ -39,6 +39,8 @@ public:
         INIT_RETRY_MENU,
         RETRY_MENU,
         INIT_RETRY,
+        SUMMARY_INIT,
+        SUMMARY,
         END,
     };
 
@@ -53,6 +55,9 @@ public:
     void RetryMenuInit();
     void RetryMenu();
     void RetryWorldInit();
+
+    void Summary();
+    void SummaryInit();
 
     void End(); // NOLINT(readability-convert-member-functions-to-static)
 
@@ -86,6 +91,7 @@ private:    //App Objs
     Util::Renderer root;
     std::shared_ptr<Util::GameObject> WIP;
     bool WIPFlag = false;
+    std::shared_ptr<Util::GameObject> m_noob;
 
 private:    //Menu Objs
     std::shared_ptr<Menu> StartMenu;
@@ -93,14 +99,22 @@ private:    //ingame Objs
     Camera camera;
 
     std::shared_ptr<Player> player;
+    
+    std::shared_ptr<Boss> m_Boss;
 
     std::vector<std::shared_ptr<MapObj>> MapObjs;
 
     GameWorldContext m_World = GameWorldContext(MapObjs, camera);
     
     std::vector<std::shared_ptr<BG>> BGs;
+
+    bool IsEnd;
 private:
     std::shared_ptr<Menu> m_RetryMenu;
+private:    //for summary
+    std::shared_ptr<Util::GameObject> m_SummaryBg;
+    std::shared_ptr<Util::GameObject> m_SummaryScore;
+    Timer m_SummaryTimer;
 };
 
 #endif
