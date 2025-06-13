@@ -37,8 +37,11 @@ void App::MainPageInit(){
     });
     ExitButton->m_Transform.translation = {-550.0f, -200.0f};
     
-    auto Bg = std::make_shared<Util::GameObject>(std::make_shared<Util::Image>(RESOURCE_DIR"/menu/menu_bg.png"), 100);
-    StartMenu = std::make_shared<Menu>(std::vector<std::shared_ptr<Button>>{PlayButton, OptionButton, ExitButton}, Bg);
+    auto Bg = std::make_shared<Util::GameObject>(std::make_shared<Util::Image>(RESOURCE_DIR"/menu/menu_bg.png"), 2.f);
+    Bg->m_Transform.scale = glm::vec2(1/1.5f, 1/1.5f);
+
+    auto SelectBar = std::make_shared<Util::GameObject>(std::make_shared<Util::Image>(RESOURCE_DIR"/menu/selectbar.png"), 2.0);
+    StartMenu = std::make_shared<Menu>(SelectBar, Bg, std::vector<std::shared_ptr<Button>>{PlayButton, OptionButton, ExitButton}, glm::vec2(125, 21));
 
     root.AddChild(StartMenu);
     m_CurrentState = State::MENU;

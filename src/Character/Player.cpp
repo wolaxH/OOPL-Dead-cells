@@ -282,6 +282,7 @@ void Player::Drink(){
 void Player::Die(){
     if (m_HasDied) return;
 
+    m_PlayerINFO->SetHp(0);
     m_HasDied = true;
     InitState(c_state::death, {18}, {RESOURCE_DIR"/Beheaded/die/die_"});
     VelocityX = 0;
@@ -638,6 +639,8 @@ void Player::roll(){
 void Player::Update(float dt){
     if (m_HasDied) {
         return; // 死了不再執行其他動作
+        m_Hp = 0;
+        m_PlayerINFO->SetHp(m_Hp);
     }
 
 

@@ -73,7 +73,7 @@ void App::InGameUpdate(float dt) {
             player->Die(); // 初始化死亡動畫
         }
         else if (player->m_DeathTimer.IsTimeout()){
-            m_CurrentState = State::END;
+            m_CurrentState = State::INIT_RETRY_MENU;
         }
     }
 }

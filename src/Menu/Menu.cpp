@@ -1,16 +1,20 @@
 #include "Menu/Menu.hpp"
 
-Menu::Menu(const std::vector<std::shared_ptr<Button>>& buttons, const std::shared_ptr<Util::GameObject>& Bg)
-     : Buttons(buttons), m_Bg(Bg){
-        m_selectlight = std::make_unique<Util::GameObject>(std::make_shared<Util::Image>(RESOURCE_DIR"/menu/selectbar.png"), 2.0f);
+#include "Util/Logger.hpp"
+
+Menu::Menu( const std::shared_ptr<Util::GameObject>& SelectBar, 
+            const std::shared_ptr<Util::GameObject>& Bg, 
+            const std::vector<std::shared_ptr<Button>>& buttons,
+            const glm::vec2& Offset)
+        : Buttons(buttons), m_selectlight(SelectBar), m_Bg(Bg), m_Offset(Offset){
+        // m_selectlight = std::make_unique<Util::GameObject>(std::make_shared<Util::Image>(RESOURCE_DIR"/menu/selectbar.png"), 2.0f);
         //m_selectlight->m_Transform.translation = {-426.0f, 0.0f};
         AddChild(m_selectlight);
-        m_Bg = std::make_shared<Util::GameObject>(std::make_shared<Util::Image>(RESOURCE_DIR"/menu/menu_bg.png"), 1.0f);
-        m_Bg->m_Transform.scale = {1/1.5f, 1/1.5f};
 
         AddChild(m_Bg);
-        for (auto& button : buttons){
-            AddChild(button);
+        for (auto bt : buttons){
+            LOG_DEBUG("Bt Init");
+            AddChild(bt);
         }
 }
 
@@ -28,5 +32,5 @@ void Menu::Update(){
     else if (Util::Input::IsKeyDown(Util::Keycode::RETURN)){
         Buttons[m_CurrentButtonIndex]->Click();
     }
-    m_selectlight->m_Transform.translation = Buttons[m_CurrentButtonIndex]->m_Transform.translation + glm::vec2(125, 21);
+    m_selectlight->m_Transform.translation = Buttons[m_CurrentButtonIndex]->m_Transform.translation + m_Offset;
 }

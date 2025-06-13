@@ -31,8 +31,15 @@ int main(int, char**) {
             case App::State::UPDATE:
                 app.InGameUpdate(deltaTime);
                 break;
+            case App::State::INIT_RETRY_MENU:
+                app.RetryMenuInit();
+                break;
+            case App::State::RETRY_MENU:
+                app.RetryMenu();
+                break;
             case App::State::INIT_RETRY:
-                app.RetryInit();
+                app.RetryWorldInit();
+                break;
             case App::State::END:
                 app.End();
                 context->SetExit(true);

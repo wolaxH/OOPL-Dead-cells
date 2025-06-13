@@ -36,6 +36,7 @@ public:
         MENU,
         INIT_UPDATE,
         UPDATE,
+        INIT_RETRY_MENU,
         RETRY_MENU,
         INIT_RETRY,
         END,
@@ -49,8 +50,9 @@ public:
     void InGameInit();   //into game
     void InGameUpdate(float dt);
 
+    void RetryMenuInit();
     void RetryMenu();
-    void RetryInit();
+    void RetryWorldInit();
 
     void End(); // NOLINT(readability-convert-member-functions-to-static)
 
