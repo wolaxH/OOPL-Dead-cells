@@ -78,10 +78,10 @@ Player就是繼承Character，複寫 Update() 等 method，根據條件觸發 ev
 Mob class 是所有敵人的共同父類，提供工具與共同行為。
 ![alt text](report_data/Character_struct.png)  
 玩家狀態圖變更
-![alt text](report_data/Player_State.png)  
+![alt text](report_data/Player_state.png)  
 
 資源管理系統
-![alt text](report_data/Resource_Manager.png)
+![alt text](report_data/Resource_manager.png)
 RemoveManager細部內容，用來移除遊戲邏輯上的物件與Render的引用
 ![alt text](report_data/RemoveManager.png)
 
