@@ -95,6 +95,11 @@ protected:
     bool m_IgnoreOSP = false;
 
 private:
+    /**
+     * 如果你來看這個是因為我在Character的子類直接呼叫m_Drawable在static_pointer_cast中
+     * 我只能說，我知道，應該要設成private，但是等我發現時已經太晚了
+     * 重構尚未成功 同志仍需努力
+     */
     std::unordered_map<c_state, std::shared_ptr<Core::Drawable>> D_Manager;  //Drawable Manager
     c_state State;      //current state
 };
