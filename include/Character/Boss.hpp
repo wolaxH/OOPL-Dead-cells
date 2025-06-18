@@ -29,7 +29,6 @@ private:
 
     int GetScore() {return m_score;}
 private:
-    // boss Hp GameObject use
     std::shared_ptr<BossHp> m_HpUI;
     std::unordered_map<size_t, AtkInfo> m_AtkManager;
     int m_CurrentAtkID;

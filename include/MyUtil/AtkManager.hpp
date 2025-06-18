@@ -7,15 +7,6 @@
 
 class Player;
 
-enum class AttackPhase {
-    None,
-    A,
-    B,
-    C,
-    D,
-    E,
-    F
-};
 
 struct AttackData {
     std::vector<size_t> AttackableFrams;

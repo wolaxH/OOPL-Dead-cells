@@ -86,7 +86,6 @@ public:
         temp.insert(temp.end(), m_World->OneSidedPlatforms.begin(), m_World->OneSidedPlatforms.end());
         for (const auto& solid : temp) {
             glm::vec2 solidPos = solid->m_WorldPos;
-            // glm::vec2 solidSize = abs(solid->GetScaledSize());
     
             bool inXRange = m_WorldPos.x >= solidPos.x - solid->left &&
                             m_WorldPos.x <= solidPos.x + solid->right;

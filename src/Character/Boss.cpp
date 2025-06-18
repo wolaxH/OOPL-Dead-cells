@@ -4,9 +4,7 @@
 Boss::Boss(std::vector<std::string>& path, int Hp, std::shared_ptr<Player> player, GameWorldContext& World)
     : Mob(path, Hp, player, World) {
 
-    /**
-     * m_AtkPoint, m_AtkRange should be Correction by the second seg atk
-     */
+
     m_DetectRange = 2500.f;
     m_AtkRange = 300.f;
     m_Transform.scale = {1.0f, 1.0f};

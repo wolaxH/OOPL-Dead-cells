@@ -58,7 +58,7 @@ protected:
     bool IsContainState(c_state State){return (D_Manager.find(State) != D_Manager.end()) ? true : false;}
     
     /**
-     * @param path eg:RESOURCE_DIR"Zombie/move/move_"
+     * @param path eg:{RESOURCE_DIR"Zombie/move/move_"}
      */
     void InitState(c_state state, const std::vector<std::size_t>& frames = {}, const std::vector<std::string>& paths = {});
     
@@ -97,7 +97,6 @@ protected:
 private:
     std::unordered_map<c_state, std::shared_ptr<Core::Drawable>> D_Manager;  //Drawable Manager
     c_state State;      //current state
-
 };
 
 #endif

@@ -9,7 +9,6 @@ void App::RetryMenuInit(){
     auto Img = std::make_shared<Util::Image>(RESOURCE_DIR"/menu/retryBg.png");
     auto Bg = std::make_shared<Util::GameObject>(Img, 99);
     Bg->m_Transform.scale = glm::vec2(6, 6);
-    // Bg->m_Transform.translation = glm::vec2(0, 300);
 
     auto SelectBar = std::make_shared<Util::GameObject>(std::make_shared<Util::Image>(RESOURCE_DIR"/menu/selectMid.png"), 2.0f);
     SelectBar->m_Transform.scale *= 3.5;

@@ -81,9 +81,6 @@ private:
      */
     void Clinb();
     
-    /**
-     * 
-     */
     void ClinbOSP();
     
     /**
@@ -124,7 +121,7 @@ private:
         ChangeDrawable(AccessKey(), PD, c_state::atk);
     }
     
-    //a special function for test, development function, to Log player current position
+    //a special function for test, development function, to Log player current position or  cheating mode
     void TestP();
     
     /**

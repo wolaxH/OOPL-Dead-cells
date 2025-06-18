@@ -28,7 +28,6 @@ private:
 private:
     state m_state = state::full;
     std::unordered_map<state, std::shared_ptr<Util::Image>> m_Drawables;
-    // std::vector<std::shared_ptr<Util::Image>> m_drawables;
     int m_heal;
 };
 

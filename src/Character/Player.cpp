@@ -319,7 +319,6 @@ void Player::TestP(){
     if (Util::Input::IsKeyDown(Util::Keycode::P)){
         m_CheatingMode = !m_CheatingMode;
         LOG_DEBUG("Cheating Mode On");
-        // LOG_DEBUG(m_WorldPos);   
     }
 
 }
@@ -511,6 +510,9 @@ void Player::fall(){
     }
 }
 
+/**
+ * 屎山代碼
+ */
 void Player::Clinb(){
     if (GetState() == c_state::roll) return; //翻滾時不能攀爬
     if (GetState() == c_state::clinbOSP) return;
@@ -585,6 +587,9 @@ void Player::Clinb(){
     }
 }
 
+/**
+ * 第二坨
+ */
 void Player::ClinbOSP(){
     if (VelocityY < 0) return;
 
@@ -619,7 +624,6 @@ void Player::ClinbOSP(){
 void Player::roll(){
 
     //roll end detect
-    // if (!InGround && GetState() != c_state::roll) return;
     if (GetState() == c_state::roll){
         auto temp = std::dynamic_pointer_cast<Util::Animation>(m_Drawable);
         if (temp->GetCurrentFrameIndex() == temp->GetFrameCount() - 1){ //結束動畫
@@ -668,7 +672,6 @@ void Player::Update(float dt){
 
 
     InGround = Physics::IsOnGround(this, m_World.SolidObjs, m_World.OneSidedPlatforms);
-    // Physics::ApplyGravity(VelocityY, InGround, Gravity, MaxFallSpeed);
     // 落地時重置浮空機會
     if (InGround){
         m_ComboFloatUsed = false;

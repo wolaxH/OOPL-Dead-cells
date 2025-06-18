@@ -1,10 +1,6 @@
 #include "Item/HealBottle.hpp"
 
-/**
- * m_drawable(std::vector) to 
- * m_Drawable(std::unorder_map)
- * apply Drink to UI
- */
+
 HealBottle::HealBottle(){
 
     for (int i = 0; i < static_cast<int>(state::count); ++i) {

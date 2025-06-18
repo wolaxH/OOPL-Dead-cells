@@ -4,23 +4,7 @@
 bool Physics::IsOnGround(const MapObj* Obj, 
         const std::vector<std::shared_ptr<SolidObj>>& solids, 
         const std::vector<std::shared_ptr<OneSidedPlatform>>& platforms) {
-        // glm::vec2 other_Pos;
-        // float x, y;
 
-        // std::vector<std::shared_ptr<SolidObj>> temp(solids);
-        // temp.insert(temp.end(), platforms.begin(), platforms.end());
-
-        // for (const auto& Solid : temp) {
-        //     other_Pos = Solid->m_WorldPos;
-
-        //     x = !(Obj->m_WorldPos.x < other_Pos.x - Solid->left - 1 ||
-        //             Obj->m_WorldPos.x > other_Pos.x + Solid->right + 1);
-        //     y = (Obj->m_WorldPos.y + Obj->top > other_Pos.y + Solid->top) &&
-        //         (Obj->m_WorldPos.y - Obj->bottom < other_Pos.y + Solid->top + 2);
-        //     if (x && y) return true;
-        // }
-
-        // return false;
     Collision::AABB aabb = Collision::GetAABB(Obj);
 
     // 檢查 SolidObj

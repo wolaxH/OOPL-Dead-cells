@@ -7,7 +7,7 @@
 /*
  * MapObj class
  * This class is used to represent objects in the game world that have a World position and can be Collsion.
- * It is used to replace normal GameObject.
+ * It is used to replace original GameObject.
 */
 class MapObj : public Util::GameObject{
 public:
